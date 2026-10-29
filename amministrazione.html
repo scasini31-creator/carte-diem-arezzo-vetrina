@@ -57,4 +57,5 @@ async function checkLogin(){if(passwordRecoveryActive)return;const {data:{user},
 el('loginForm').onsubmit=async e=>{e.preventDefault();const {error}=await sb.auth.signInWithPassword({email:el('loginEmail').value,password:el('loginPassword').value});if(error){alert('Accesso non riuscito: '+error.message);return}el('loginPassword').value='';await checkLogin()};
 el('logout').onclick=async()=>{await sb.auth.signOut();await checkLogin()};checkLogin();
 </script><script src="featured-admin.js"></script>
+<script src="mancolista-admin.js" defer></script>
 </body></html>

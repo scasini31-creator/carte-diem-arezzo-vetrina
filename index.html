@@ -243,7 +243,40 @@ header{padding:6px 15px!important;min-height:62px!important}header .brand{font-s
 <link rel="apple-touch-icon" href="icona-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 
+
+<style>
+#cd-install-btn{
+  display:none;
+  margin:8px auto;
+  padding:10px 18px;
+  border:1px solid #d4af65;
+  border-radius:8px;
+  background:#171717;
+  color:#f4d58a;
+  font-weight:700;
+  cursor:pointer;
+}
+#cd-install-help{
+  display:none;
+  padding:12px 18px;
+  margin:8px 16px;
+  border:1px solid #d4af65;
+  border-radius:8px;
+  background:#171717;
+  color:#fff;
+  text-align:center;
+}
+</style>
 </head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="#chi-siamo">Chi siamo</a><a href="#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header>
+<button id="cd-install-btn" type="button">
+  ⬇ Installa CARTE DIEM
+</button>
+<div id="cd-install-help" role="status">
+  Per aggiungere CARTE DIEM alla schermata Home,
+  apri il menu ⋮ di Chrome e seleziona
+  "Installa e crea scorciatoia".
+</div>
+
 <section class="hero" id="home"><div aria-hidden="true" class="cd-scene"></div><div class="cd-hero-content"><p class="cd-kicker">IL MONDO DEL COLLEZIONISMO</p><h1 class="cd-title">CARTE <em>DIEM</em><small>AREZZO</small></h1><p class="cd-action">VENDO · COMPRO · SCAMBIO</p><p class="cd-intro">Carte da collezione, prodotti sigillati e pezzi speciali. Scopri il nostro catalogo e contattaci per informazioni e disponibilità.</p><div class="cd-hero-buttons"><a class="cd-primary" href="catalogo.html">▣   ESPLORA IL CATALOGO <span>›</span></a><a class="cd-outline" href="#contatti">✉   CONTATTACI <span>›</span></a></div></div></section>
 <main><section class="container" id="categorie"><h2 class="section-title">LE NOSTRE CATEGORIE</h2><p class="sub">Seleziona una categoria per esplorare il catalogo dedicato.</p><div class="grid"><a class="category" href="catalogo.html?catalogo=pokemon"><div aria-hidden="true" class="cd-category-visual visual-1"><div class="cd-mini-card mini-1"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">✦</span><strong>TCG Pokémon</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=tcg"><div aria-hidden="true" class="cd-category-visual visual-2"><div class="cd-mini-card mini-2"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">◇</span><strong>Altri TCG</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=videogiochi"><div aria-hidden="true" class="cd-category-visual visual-3"><div class="cd-mini-card mini-3"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">▣</span><strong>Console e Videogiochi</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=accessori"><div aria-hidden="true" class="cd-category-visual visual-4"><div class="cd-mini-card mini-4"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">✧</span><strong>Accessori</strong><span class="cd-arrow">›</span></div></a></div></section>
 <section aria-label="I nostri servizi" class="cd-services"><div><span class="cd-service-icon">▣</span><p><b>VENDITA</b><small>Carte e prodotti da collezione</small></p></div><div><span class="cd-service-icon">♧</span><p><b>ACQUISTO</b><small>Portaci le tue carte per una valutazione</small></p></div><div><span class="cd-service-icon">⇄</span><p><b>SCAMBIO</b><small>Scambia e completa la tua collezione</small></p></div></section><section class="notice" id="chi-siamo"><strong>La passione per il collezionismo, ogni giorno.</strong>CARTE DIEM AREZZO · Vendita, acquisto e scambio di articoli da collezione.</section><section class="container" id="contatti" style="text-align:center"><div class="eyebrow">Hai trovato qualcosa che ti interessa?</div><a class="cd-whatsapp-link" href="https://wa.me/393517171630" target="_blank" rel="noopener noreferrer" aria-label="Apri una conversazione WhatsApp con CARTE DIEM AREZZO"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16 .5A15.4 15.4 0 0 0 2.7 23.7L.5 31.5l8-2.1A15.5 15.5 0 1 0 16 .5Zm0 28.1c-2.5 0-4.9-.7-7-2l-.5-.3-4.7 1.2 1.3-4.6-.3-.5A12.6 12.6 0 1 1 16 28.6Zm6.9-9.4c-.4-.2-2.2-1.1-2.6-1.2-.3-.1-.6-.2-.8.2-.2.4-1 1.2-1.2 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3.1-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8l.6-.7.4-.6c.1-.2.1-.5 0-.7l-1.2-2.8c-.3-.7-.6-.6-.8-.6h-.7c-.3 0-.7.1-1 .5-.3.4-1.3 1.3-1.3 3.1s1.4 3.6 1.6 3.9c.2.2 2.8 4.3 6.8 6 .9.4 1.6.6 2.1.8.9.3 1.7.3 2.3.2.7-.1 2.2-.9 2.5-1.8.3-.9.3-1.7.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg><span>Contattaci!</span></a><p class="sub cd-vetrina-note">Il sito è una vetrina: gli acquisti non avvengono online.</p></section></main><footer>© 2026 CARTE DIEM AREZZO</footer><script>
@@ -293,6 +326,41 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
   }catch(e){console.warn('V18: impossibile leggere le impostazioni pubblicate:',e.message)}
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+<script>
+(function(){
+  let installPrompt = null;
+  const btn = document.getElementById('cd-install-btn');
+  const help = document.getElementById('cd-install-help');
+  const installed = () =>
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  if (!installed()) btn.style.display = 'block';
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    installPrompt = e;
+    if (!installed()) btn.style.display = 'block';
+  });
+
+  btn.addEventListener('click', async () => {
+    if (installPrompt) {
+      const prompt = installPrompt;
+      installPrompt = null;
+      await prompt.prompt();
+    } else {
+      help.style.display =
+        help.style.display === 'block' ? 'none' : 'block';
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    btn.style.display = 'none';
+    help.style.display = 'none';
+  });
 })();
 </script>
 </body></html>

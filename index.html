@@ -267,10 +267,39 @@ header{padding:6px 15px!important;min-height:62px!important}header .brand{font-s
   text-align:center;
 }
 </style>
-</head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="#chi-siamo">Chi siamo</a><a href="#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header>
-<button id="cd-install-btn" type="button">
-  ⬇ Installa CARTE DIEM
-</button>
+
+<style>
+header{
+  position:relative;
+  padding-right:65px!important;
+}
+#cd-install-btn{
+  position:absolute!important;
+  top:50%!important;
+  right:12px!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+  padding:0!important;
+  width:42px!important;
+  height:42px!important;
+  border:1px solid #d4af65!important;
+  border-radius:10px!important;
+  background:#171717!important;
+  color:#f4d58a!important;
+  font-size:25px!important;
+  line-height:1!important;
+  align-items:center!important;
+  justify-content:center!important;
+  z-index:100!important;
+}
+#cd-install-btn[style*="display: block"]{
+  display:flex!important;
+}
+</style>
+</head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="#chi-siamo">Chi siamo</a><a href="#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav><button id="cd-install-btn" type="button"
+aria-label="Installa CARTE DIEM"
+title="Installa CARTE DIEM">⬇</button></header>
+
 <div id="cd-install-help" role="status">
   Per aggiungere CARTE DIEM alla schermata Home,
   apri il menu ⋮ di Chrome e seleziona

@@ -361,7 +361,7 @@ document.getElementById('cloudLoad').after(document.getElementById('ueResetPage'
 const editorMenu=document.createElement('details');editorMenu.id='editorMenu';
 const menuSummary=document.createElement('summary');menuSummary.textContent='Menu editor · Strumenti e gestione';editorMenu.appendChild(menuSummary);
 const menuDescription=document.querySelector('header p');
-if(menuDescription){menuDescription.classList.add('menu-description');editorMenu.appendChild(menuDescription);}
+if(menuDescription){menuDescription.remove();}
 
 const makeSubmenu=(title)=>{
  const section=document.createElement('details');

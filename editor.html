@@ -364,6 +364,11 @@ const menuDescription=document.querySelector('header p');
 if(menuDescription){menuDescription.classList.add('menu-description');editorMenu.appendChild(menuDescription);}
 editorMenu.appendChild(document.querySelector('.header-actions'));
 editorMenu.appendChild(document.querySelector('.controls'));
+// Pubblicazione in una riga separata e sempre riconoscibile.
+const publishRow=document.createElement('div');publishRow.id='publishToolbar';publishRow.style.cssText='display:flex;align-items:center;gap:9px;overflow-x:auto;white-space:nowrap;padding:10px 14px;background:#172234;border-top:1px solid #ad8948;border-bottom:1px solid #ad8948';
+const publishLabel=document.createElement('strong');publishLabel.textContent='Pubblicazione';publishLabel.style.cssText='color:#f3ca67;flex-shrink:0;margin-right:6px';publishRow.appendChild(publishLabel);
+['publishPreview','publishExport'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(b);}});
+editorMenu.appendChild(publishRow);
 editorMenu.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
 

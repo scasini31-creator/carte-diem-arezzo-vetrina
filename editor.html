@@ -124,36 +124,7 @@ el('loginForm').onsubmit=async e=>{e.preventDefault();const {error}=await sb.aut
 el('logout').onclick=async()=>{await sb.auth.signOut();await checkLogin()};checkLogin();
 </script><script src="featured-admin.js"></script>
 <script src="mancolista-admin.js" defer></script>
-<script>
-/* Preflight non distruttivo: nessun token GitHub nel browser, nessuna scrittura pubblica. */
-(function(){
-const status=document.getElementById('cloudStatus');
-const getDraft=()=>({texts:typeof textDraft==='object'?textDraft:{},images:typeof imageDraft==='object'?imageDraft:{},elements:typeof ueData==='object'?ueData:{}});
-const count=o=>Object.keys(o||{}).length;
-async function preflight(){
- try{
-  await cloudContext();
-  const d=getDraft();const total=count(d.texts)+count(d.images)+count(d.elements);
-  if(!total){status.textContent='Non ci sono modifiche grafiche da pubblicare.';return null;}
-  const page=preview.contentDocument;
-  if(!page?.body)throw Error('Anteprima non disponibile');
-  const missing=Object.keys(d.texts).filter(k=>!page.querySelector(k));
-  if(missing.length)status.textContent='Attenzione: '+missing.length+' selettori di testo non presenti nella pagina corrente.';
-  else status.textContent='Controllo completato: '+total+' modifiche in bozza. Il sito pubblico è invariato.';
-  return d;
- }catch(e){status.textContent='Verifica non riuscita: '+e.message;return null;}
-}
-document.getElementById('publishPreview').onclick=preflight;
-document.getElementById('publishExport').onclick=async()=>{
- const d=await preflight();if(!d)return;
- if(!confirm('Preparare il file con le modifiche grafiche? Questo NON pubblica automaticamente sul sito.'))return;
- const payload={format:'carte-diem-visual-publication-v1',created_at:new Date().toISOString(),pages:{[preview.getAttribute('src')||'index.html']:d}};
- const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carte-diem-pubblicazione.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),30000);
- status.textContent='File di pubblicazione preparato. Nessuna modifica applicata al sito pubblico.';
-};
-})();
-</script>
+
 </body></html></template>
 <script>
 /* Modulo amministrativo incorporato: non richiede più pagine legacy separate. */
@@ -369,6 +340,7 @@ const publishRow=document.createElement('div');publishRow.id='publishToolbar';pu
 const publishLabel=document.createElement('strong');publishLabel.textContent='Pubblicazione';publishLabel.style.cssText='color:#f3ca67;flex-shrink:0;margin-right:6px';publishRow.appendChild(publishLabel);
 ['publishPreview','publishExport'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(b);}});
 editorMenu.appendChild(publishRow);
+const publishStatus=document.createElement('div');publishStatus.id='publishStatus';publishStatus.textContent='Nessuna verifica eseguita.';publishStatus.style.cssText='padding:9px 15px 12px;color:#ffe2a4;font-size:13px;background:#111a29;border-bottom:1px solid #ad8948;white-space:normal';publishStatus.setAttribute('role','status');publishStatus.setAttribute('aria-live','polite');editorMenu.appendChild(publishStatus);
 editorMenu.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
 
@@ -510,6 +482,38 @@ document.getElementById('adminFrame').addEventListener('load',verify);
 document.getElementById('editorAuthFrame').addEventListener('load',verify);
 window.addEventListener('focus',verify);
 setTimeout(verify,800);
+})();
+</script>
+<script>
+/* Preflight non distruttivo: nessun token GitHub nel browser, nessuna scrittura pubblica. */
+(function(){
+const status=document.getElementById('publishStatus');
+function announce(message,type='info'){status.textContent=message;status.style.color=type==='error'?'#ffb3a8':type==='ok'?'#baf3c5':'#ffe2a4';status.setAttribute('role','status');status.setAttribute('aria-live','polite');}
+const getDraft=()=>({texts:typeof textDraft==='object'?textDraft:{},images:typeof imageDraft==='object'?imageDraft:{},elements:typeof ueData==='object'?ueData:{}});
+const count=o=>Object.keys(o||{}).length;
+async function preflight(){
+ announce('Verifica in corso…');
+ try{
+  await cloudContext();
+  const d=getDraft();const total=count(d.texts)+count(d.images)+count(d.elements);
+  if(!total){announce('Non ci sono modifiche grafiche da pubblicare.');return null;}
+  const page=preview.contentDocument;
+  if(!page?.body)throw Error('Anteprima non disponibile');
+  const missing=Object.keys(d.texts).filter(k=>!page.querySelector(k));
+  if(missing.length)announce('Attenzione: '+missing.length+' selettori di testo non presenti nella pagina corrente.','error');
+  else announce('Controllo completato: '+total+' modifiche in bozza. Il sito pubblico è invariato.','ok');
+  return d;
+ }catch(e){announce('Verifica non riuscita: '+e.message,'error');return null;}
+}
+document.getElementById('publishPreview').onclick=preflight;
+document.getElementById('publishExport').onclick=async()=>{
+ const d=await preflight();if(!d)return;
+ if(!confirm('Preparare il file con le modifiche grafiche? Questo NON pubblica automaticamente sul sito.'))return;
+ const payload={format:'carte-diem-visual-publication-v1',created_at:new Date().toISOString(),pages:{[preview.getAttribute('src')||'index.html']:d}};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carte-diem-pubblicazione.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),30000);
+ announce('File di pubblicazione preparato. Nessuna modifica applicata al sito pubblico.','ok');
+};
 })();
 </script>
 </body></html>

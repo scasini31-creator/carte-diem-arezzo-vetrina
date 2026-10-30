@@ -629,4 +629,13 @@ aria-labelledby="cd-mancolista-title">
 <script src="featured-home.js"></script>
 <script src="mancolista-home.js"></script>
 <script src="visual-published.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(error => {
+      console.warn('Cache PWA non disponibile:', error);
+    });
+  });
+}
+</script>
 </body></html>

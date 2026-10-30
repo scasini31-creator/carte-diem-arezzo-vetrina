@@ -34,4 +34,13 @@ document.getElementById('sendWhatsApp').onclick=()=>{if(!selectedProducts().leng
 document.getElementById('copyRequest').onclick=async()=>{if(!selectedProducts().length)return;const msg=requestMessage();try{await navigator.clipboard.writeText(msg);document.getElementById('copyFeedback').textContent='Messaggio copiato.'}catch(e){window.prompt('Copia il messaggio:',msg)}};
 loadProducts().then(data=>{products=data;renderRequests()}).catch(e=>{document.getElementById('requestEmpty').textContent='Errore caricamento prodotti: '+e.message});
 </script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a href="catalogo.html"><span>▦</span>Catalogo</a><a class="active" href="richieste.html"><span>♡</span>Lista</a></nav><script src="visual-published.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(error => {
+      console.warn('Cache PWA non disponibile:', error);
+    });
+  });
+}
+</script>
 </body></html>

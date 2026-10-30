@@ -585,7 +585,11 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
   const installed = () =>
     ['standalone','fullscreen','minimal-ui'].some(mode => window.matchMedia('(display-mode: '+mode+')').matches) ||
     window.navigator.standalone === true ||
-    document.referrer.startsWith('android-app://');
+    document.referrer.startsWith('android-app://') ||
+    // Android fullscreen PWA fallback when display-mode is not reported correctly.
+    (window.innerHeight >= window.screen.height * 0.94 &&
+     window.innerWidth >= window.screen.width * 0.94 &&
+     !window.navigator.userAgent.includes('wv'));
 
   const syncInstallButton = () => {
     btn.style.setProperty('display', installed() ? 'none' : 'block', 'important');
@@ -628,6 +632,8 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
     window.matchMedia('(display-mode: '+mode+')').addEventListener?.('change', syncInstallButton);
   });
   window.addEventListener('pageshow', syncInstallButton);
+  window.addEventListener('resize', syncInstallButton);
+  window.addEventListener('orientationchange', syncInstallButton);
   window.addEventListener('appinstalled', () => {
     btn.style.setProperty('display','none','important');
     help.style.display = 'none';

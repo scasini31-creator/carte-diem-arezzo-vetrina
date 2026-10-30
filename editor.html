@@ -87,6 +87,22 @@ main>.site>iframe{display:block;flex:1 1 auto;height:100%!important;min-height:0
  #editorMenu #publishToolbar>button,
  #editorMenu #ueToolbarCarousel .ue-actions-row button{font-size:inherit!important}
 }
+/* Altezza uniforme per tutti i pulsanti del menu, riferimento Gestione catalogo. */
+#editorMenu>.header-actions>a,
+#editorMenu>.header-actions button,
+#editorMenu #editingControls .editing-row>button,
+#editorMenu #publishToolbar>button,
+#editorMenu #ueToolbarCarousel .ue-actions-row button{
+ height:36px!important;
+ min-height:36px!important;
+ max-height:36px!important;
+ padding-top:3px!important;
+ padding-bottom:3px!important;
+ box-sizing:border-box!important;
+ align-self:stretch!important;
+ line-height:1.2!important;
+}
+#editorMenu #editingControls #refresh{padding-top:3px!important;padding-bottom:3px!important}
 </style></head><body><div id="editorAuthGate"><strong>Accesso riservato all’amministratore</strong><p id="editorAuthStatus">Verifica della sessione in corso…</p><div id="editorAuthLogin" style="display:none;width:min(600px,100%)"><p>Accedi al tuo account amministratore qui sotto.</p><iframe id="editorAuthFrame" title="Accesso amministratore"></iframe></div><button type="button" id="editorAuthRetry">Verifica accesso</button></div>
 <header><div></div><div class="header-actions"><a href="https://scasini31-creator.github.io/carte-diem-arezzo-vetrina/" target="_blank" rel="noopener">Sito pubblico ↗</a><div id="ueHeaderControls"></div></div></header>
 <div class="controls" role="group" aria-label="Pagina da visualizzare">

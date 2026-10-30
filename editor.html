@@ -362,7 +362,7 @@ const editorMenu=document.createElement('details');editorMenu.id='editorMenu';
 const menuSummary=document.createElement('summary');menuSummary.textContent='Menu editor · Strumenti e gestione';editorMenu.appendChild(menuSummary);
 const menuDescription=document.querySelector('header p');
 if(menuDescription){menuDescription.classList.add('menu-description');editorMenu.appendChild(menuDescription);}
-editorMenu.appendChild(document.querySelector('.header-actions'));
+
 const makeSubmenu=(title)=>{
  const section=document.createElement('details');
  section.className='editor-submenu';
@@ -375,6 +375,7 @@ const makeSubmenu=(title)=>{
  return section;
 };
 const graphicSection=makeSubmenu('Editor grafico');
+graphicSection.appendChild(document.querySelector('.header-actions'));
 graphicSection.appendChild(document.querySelector('.controls'));
 // Pubblicazione in una riga separata e sempre riconoscibile.
 const publishRow=document.createElement('div');publishRow.id='publishToolbar';publishRow.style.cssText='display:flex;align-items:center;gap:9px;overflow-x:auto;white-space:nowrap;padding:10px 14px;background:#172234;border-top:1px solid #ad8948;border-bottom:1px solid #ad8948';

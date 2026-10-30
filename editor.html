@@ -496,7 +496,7 @@ ueGet('Apply').onclick=()=>{
  persistDraft();uePanel.style.display='none';
 };
 ueGet('Restore').onclick=()=>{if(!ueSelected)return;delete ueData[ueSelected.page+'|'+ueSelected.selector];persistDraft();uePanel.style.display='none';preview.contentWindow.location.reload();};
-document.getElementById('ueResetPage').onclick=()=>{if(!confirm('Ripristinare tutte le modifiche in bozza per questa pagina?'))return;for(const k of Object.keys(ueData))if(k.startsWith(uePage()+'|'))delete ueData[k];persistDraft();preview.contentWindow.location.reload();};
+document.getElementById('ueResetPage').onclick=()=>{if(!confirm('ATTENZIONE: ripristinando le bozze della pagina perderai tutte le modifiche in bozza agli elementi di questa pagina. L’operazione non può essere annullata.\n\nVuoi continuare?'))return;for(const k of Object.keys(ueData))if(k.startsWith(uePage()+'|'))delete ueData[k];persistDraft();preview.contentWindow.location.reload();};
 function universalDecorate(){
  let d;try{d=preview.contentDocument;}catch(e){ueStatus.textContent='Anteprima non accessibile: '+e.message;return;}
  if(!d||!d.body){ueStatus.textContent='';return;}

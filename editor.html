@@ -403,6 +403,15 @@ contentSection.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
 editorMenu.style.position='relative';
 editorMenu.style.zIndex='50';
+// Sposta i pulsanti esistenti soltanto dopo aver collegato il menu al documento.
+for(const id of ['publishPreview','publishExport']){
+ const button=document.getElementById(id);
+ if(button){
+  button.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';
+  publishRow.insertBefore(button,livePublish);
+ }
+}
+
 
 let ueEnabled=true,ueSelected=null,ueOutline=null;
 ueNav.onclick=()=>{ueEnabled=false;ueNav.textContent='Navigazione: ATTIVA';document.getElementById('ueToggle').textContent='✎ Selezione elementi: DISATTIVA';document.getElementById('ueToggle').setAttribute('aria-pressed','false');};

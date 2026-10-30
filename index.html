@@ -655,8 +655,17 @@ if ('serviceWorker' in navigator) {
  exit.addEventListener('click',function(){
   if(!window.confirm("Vuoi uscire da Vetrina Carte Diem?"))return;
   window.close();
-  // Android e i browser possono impedire la chiusura programmata delle PWA.
-
+  // Se il contesto PWA rimane visibile, mostra un'indicazione non invasiva.
+  window.setTimeout(function(){
+   if(document.visibilityState!=='visible')return;
+   if(document.getElementById('cd-exit-fallback'))return;
+   const screen=document.createElement('div');
+   screen.id='cd-exit-fallback';
+   screen.setAttribute('role','status');
+   screen.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#080d17;color:#f4d58a;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;font:600 18px/1.5 Arial,Helvetica,sans-serif';
+   screen.textContent='Chiusura automatica non supportata. Esci tornando alla Home del tuo dispositivo';
+   document.body.appendChild(screen);
+  },800);
  });
 })();
 </script>

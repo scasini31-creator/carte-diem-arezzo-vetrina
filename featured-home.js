@@ -11,13 +11,15 @@
   }
 
   try {
-    const [prodotti, evidenza] = await Promise.all([
-      loadProducts(),
-      loadFeaturedProducts()
-    ]);
+    // Evita di scaricare l'intero catalogo quando non ci sono articoli in evidenza.
+    const evidenza = await loadFeaturedProducts();
+    if (!evidenza.length) {
+      mostraMessaggio('Presto troverai qui i nostri articoli in evidenza.');
+      return;
+    }
 
+    const prodotti = await loadProducts();
     const mappa = new Map(prodotti.map(p => [String(p.id), p]));
-
     const selezionati = evidenza
       .map(r => mappa.get(String(r.product_id)))
       .filter(Boolean);
@@ -32,14 +34,6 @@
     for (const p of selezionati) {
       const link = document.createElement('a');
       link.className = 'cd-featured-card';
-
-      const gruppi = {
-        singole: 'pokemon',
-        singole_pokemon: 'pokemon',
-        gradate: 'pokemon',
-        sealed: 'pokemon',
-        accessori: 'accessori'
-      };
 
       const gruppo = p.catalog_group || 'pokemon';
       link.href = 'catalogo.html?catalogo=' +

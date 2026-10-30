@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Editor visuale · Carte Diem Arezzo</title>
+<style>
+:root{color-scheme:dark;--gold:#ffd05e;--bg:#080d17;--panel:#101723;--line:#5b4c36}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f7f8fc;font:14px Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 22px;background:#080d17;border-bottom:1px solid var(--line)}
+h1{font-size:19px;margin:0;letter-spacing:.5px}h1 span{color:var(--gold)}p{color:#aab4c8;line-height:1.5;margin:5px 0 0}
+a,button{border:1px solid #aa8743;border-radius:9px;padding:11px 14px;background:#151b29;color:var(--gold);text-decoration:none;cursor:pointer;font:inherit}
+button[aria-pressed="true"]{background:var(--gold);color:#111;font-weight:700}
+.controls{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line);background:#101723}
+main{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,35%);height:calc(100dvh - 139px);min-height:450px}
+section{min-width:0;display:flex;flex-direction:column}section+section{border-left:1px solid var(--line)}
+.section-heading{padding:10px 14px;background:#141c2b;color:var(--gold);font-weight:700;border-bottom:1px solid var(--line)}
+iframe{width:100%;height:100%;border:0;background:white}
+.notice{font-size:12px;color:#c2c8d5;padding:9px 15px;background:#0c1220}
+@media(max-width:760px){header{padding:12px}main{height:auto;display:flex;flex-direction:column}.site{height:65dvh;min-height:380px}.admin{height:70dvh;min-height:460px}section+section{border-left:0;border-top:1px solid var(--line)}.controls{padding:10px}}
+</style></head><body>
+<header><div><h1>CARTE DIEM <span>AREZZO</span> · Editor visuale</h1><p>Ambiente di sviluppo separato · il sito pubblico non viene modificato</p></div><a href="amministrazione.html" target="_blank" rel="noopener">Apri amministrazione ↗</a></header>
+<div class="controls" role="group" aria-label="Pagina da visualizzare">
+<button data-page="index.html" aria-pressed="true">Homepage</button>
+<button data-page="catalogo.html" aria-pressed="false">Catalogo</button>
+<button data-page="mancolista.html" aria-pressed="false">Mancolista</button>
+<button id="refresh" type="button">Aggiorna anteprima ↻</button>
+</div>
+<main><section class="site"><div class="section-heading">Anteprima del sito</div><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
+<section class="admin"><div class="section-heading">Strumenti amministrativi esistenti</div><div class="notice">Accedi nel riquadro sottostante con il tuo account amministratore. Le modifiche salvate qui sono reali: aggiorna l'anteprima per vederle.</div><iframe title="Pannello amministratore" src="amministrazione.html"></iframe></section></main>
+<script>
+const preview=document.getElementById('preview');
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{preview.src=b.dataset.page;document.querySelectorAll('[data-page]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
+document.getElementById('refresh').addEventListener('click',()=>{try{preview.contentWindow.location.reload()}catch(e){preview.src=preview.getAttribute('src')}});
+</script></body></html>

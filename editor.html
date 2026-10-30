@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Editor visuale · Carte Diem Arezzo</title>
+<style>
+:root{color-scheme:dark;--gold:#ffd05e;--bg:#080d17;--panel:#101723;--line:#5b4c36}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f7f8fc;font:14px Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 22px;background:#080d17;border-bottom:1px solid var(--line)}
+h1{font-size:19px;margin:0;letter-spacing:.5px}h1 span{color:var(--gold)}p{color:#aab4c8;line-height:1.5;margin:5px 0 0}
+a,button{border:1px solid #aa8743;border-radius:9px;padding:11px 14px;background:#151b29;color:var(--gold);text-decoration:none;cursor:pointer;font:inherit}
+button[aria-pressed="true"]{background:var(--gold);color:#111;font-weight:700}
+.controls{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line);background:#101723}
+main{height:calc(100dvh - 139px);min-height:450px}
+section{min-width:0;display:flex;flex-direction:column}section+section{border-left:0}
+.section-heading{padding:10px 14px;background:#141c2b;color:var(--gold);font-weight:700;border-bottom:1px solid var(--line)}
+iframe{width:100%;height:100%;border:0;background:white}
+.notice{font-size:12px;color:#c2c8d5;padding:9px 15px;background:#0c1220}
+@media(max-width:760px){header{padding:12px}main{height:auto;display:flex;flex-direction:column}.site{height:75dvh;min-height:380px}section+section{border-left:0;border-top:1px solid var(--line)}.controls{padding:10px}}
+.edit-tag{position:absolute;right:12px;top:12px;z-index:20;background:#ffd05e!important;color:#111!important;border:2px solid #18120a!important;border-radius:9px!important;padding:9px 12px!important;font:700 13px Arial,sans-serif!important;box-shadow:0 3px 16px #0009!important;cursor:pointer!important}.edit-outline{outline:2px dashed #ffd05e!important;outline-offset:-3px!important}.admin-hint{padding:8px 14px;background:#332714;color:#ffe5aa;font-size:12px}.site{height:100%}.admin{position:fixed;inset:0;z-index:100;background:#050810e8;padding:3vh max(10px,calc((100vw - 900px)/2));display:none;align-items:stretch;justify-content:center}.admin.open{display:flex}.admin-shell{background:#101723;border:1px solid #8c723e;border-radius:14px;box-shadow:0 20px 70px #000c;display:flex;flex-direction:column;width:100%;min-height:0;overflow:hidden}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;background:#141c2b}.modal-head button{padding:7px 12px}.admin iframe{flex:1;min-height:0}.admin-hint{min-height:30px}@media(max-width:760px){.admin{padding:8px}.admin-shell{height:100%}.site{height:75dvh}} .text-editor{position:fixed;inset:0;z-index:120;background:#000c;display:none;align-items:center;justify-content:center;padding:16px}.text-editor.open{display:flex}.text-editor-panel{background:#131b2b;border:1px solid #aa8743;border-radius:14px;padding:22px;width:min(580px,100%);box-shadow:0 12px 60px #000a}.text-editor-panel label{display:block;color:#f6d795;margin:14px 0 8px}.text-editor-panel textarea{display:block;width:100%;min-height:115px;background:#080d17;color:white;border:1px solid #877249;border-radius:8px;padding:12px;font:inherit;resize:vertical}.text-editor-panel .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.text-editor-panel p{margin:10px 0;color:#c6cede}.image-editor{position:fixed;inset:0;z-index:125;background:#000c;display:none;align-items:center;justify-content:center;padding:16px}.image-editor.open{display:flex}.image-editor-panel{width:min(520px,100%);background:#131b2b;border:1px solid #aa8743;border-radius:14px;padding:20px}.image-editor-panel input{width:100%;margin:14px 0}.image-editor-panel p{margin:10px 0}.image-editor-panel .actions{display:flex;gap:8px;flex-wrap:wrap}.image-edit-btn{position:absolute;bottom:8px;right:8px;z-index:25;background:#ffd05e!important;color:#111!important;font-weight:700!important;padding:8px!important;border-radius:8px!important}.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.header-actions #ueHeaderControls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.header-actions button{padding:11px 12px}.controls #ueResetPage{margin:0}#uePanelStatus{display:none}@media(max-width:760px){.header-actions{width:100%}}
+
+/* Tre caroselli orizzontali indipendenti per i comandi */
+.header-actions,.controls,#ueToolbarCarousel{display:flex;flex-wrap:nowrap!important;align-items:center;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%;min-width:0}
+.header-actions>a,.header-actions button,.controls>button,#ueToolbarCarousel button{flex:0 0 auto;white-space:nowrap;scroll-snap-align:start}
+.header-actions #ueHeaderControls{display:contents!important}
+header{align-items:flex-start}header>.header-actions{flex:1 1 100%;width:100%;padding:3px 0 8px}
+.controls{padding-bottom:14px!important}
+#ueToolbarCarousel{padding:12px 18px!important}
+#ueToolbarCarousel .ue-actions-row{display:contents!important}
+#ueToolbarCarousel .ue-actions-row button{margin:0!important}
+@media(min-width:1000px){header>.header-actions{flex:0 1 auto;width:auto}header{align-items:center}}
+
+/* Menu a scomparsa per descrizione e tre caroselli */
+#editorMenu{background:#0d1420;border-bottom:1px solid var(--line);width:100%;min-width:0}
+#editorMenu>summary{list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;padding:13px 20px;color:var(--gold);font-weight:700;font-size:15px;user-select:none}
+#editorMenu>summary::-webkit-details-marker{display:none}
+#editorMenu>summary::before{content:'☰';font-size:20px}
+#editorMenu>summary::after{content:'▾';margin-left:auto;transition:transform .2s}
+#editorMenu[open]>summary::after{transform:rotate(180deg)}
+#editorMenu .menu-description{padding:4px 20px 8px;color:#aab4c8;font-size:13px}
+#editorMenu .header-actions{width:100%;max-width:100%;padding:9px 18px 12px;box-sizing:border-box}
+#editorMenu .controls,#editorMenu #ueToolbarCarousel{width:100%;max-width:100%;box-sizing:border-box}
+#editorMenu .controls{margin:0}
+
+/* Anteprima a tutta altezza: niente header vuoto o fascia inferiore */
+html,body{width:100%;height:100%;min-height:0;margin:0;overflow:hidden}
+body{height:100dvh;display:flex;flex-direction:column}
+body>header{display:none!important}
+#editorMenu{flex:0 0 auto}
+main,main.site{display:flex!important;flex:1 1 auto!important;height:auto!important;min-height:0!important;overflow:hidden}
+main>.site{display:flex!important;flex-direction:column;flex:1 1 auto!important;height:auto!important;min-height:0!important;overflow:hidden}
+main>.site>iframe{display:block;flex:1 1 auto;height:100%!important;min-height:0!important;width:100%;border:0}
+@media(max-width:760px){main{height:auto!important;min-height:0!important;display:flex!important;flex-direction:column!important}main>.site{height:auto!important;min-height:0!important;flex:1 1 auto!important}}
+
+/* Accesso editor: schermata bloccata finché l'account non risulta amministratore */
+#editorAuthGate{position:fixed;inset:0;z-index:999;background:#080d17;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px;color:#f8e2a3;text-align:center}
+#editorAuthGate iframe{width:min(600px,100%);height:min(65dvh,650px);min-height:330px;flex:0 1 auto;border:1px solid #a88a4a;border-radius:12px;background:#0d0d0f}
+#editorAuthGate[hidden]{display:none!important}
+</style></head><body><div id="editorAuthGate"><strong>Accesso riservato all’amministratore</strong><p id="editorAuthStatus">Verifica della sessione in corso…</p><div id="editorAuthLogin" style="display:none;width:min(600px,100%)"><p>Accedi al tuo account amministratore qui sotto.</p><iframe id="editorAuthFrame" title="Accesso amministratore" src="amministrazione.html"></iframe></div><button type="button" id="editorAuthRetry">Verifica accesso</button></div>
+<header><div><p>Ambiente di sviluppo separato · il sito pubblico non viene modificato</p></div><div class="header-actions"><a href="https://scasini31-creator.github.io/carte-diem-arezzo-vetrina/" target="_blank" rel="noopener">Sito pubblico ↗</a><div id="ueHeaderControls"></div></div></header>
+<div class="controls" role="group" aria-label="Pagina da visualizzare">
+<button data-page="index.html" aria-pressed="true">Homepage</button>
+<button data-page="catalogo.html" aria-pressed="false">Catalogo</button>
+<button data-page="richieste.html" aria-pressed="false">Mancolista</button>
+<button id="refresh" type="button">Aggiorna anteprima ↻</button><button id="cloudSave" type="button">Salva bozza online</button><button id="cloudLoad" type="button">Carica bozza online</button><span id="cloudStatus" role="status" style="align-self:center;color:#ffe2a4"></span>
+</div>
+<div id="textEditor" class="text-editor" role="dialog" aria-modal="true" aria-label="Modifica testo"><div class="text-editor-panel"><h2 id="textEditorTitle">Modifica testo</h2><label for="textEditorInput">Testo</label><textarea id="textEditorInput"></textarea><p>Le modifiche ai testi sono una bozza visibile nell'anteprima: non vengono ancora pubblicate sul sito.</p><div class="actions"><button type="button" id="applyText">Applica all'anteprima</button><button type="button" id="cancelText">Annulla</button><button type="button" id="exportTexts">Esporta bozza JSON</button></div></div></div><div id="imageEditor" class="image-editor" role="dialog" aria-modal="true" aria-label="Modifica immagine"><div class="image-editor-panel"><h2 id="imageEditorTitle">Modifica immagine</h2><p>Seleziona un'immagine per la bozza locale. Non viene caricata su Supabase né pubblicata.</p><input id="imageEditorFile" type="file" accept="image/png,image/jpeg,image/webp"><div class="actions"><button id="applyImage" type="button">Applica all'anteprima</button><button id="cancelImage" type="button">Annulla</button><button id="removeImage" type="button">Ripristina originale</button></div></div></div><main><section class="site"><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
+<section class="admin" id="editorModal" role="dialog" aria-modal="true" aria-label="Modifica contenuti"><div class="admin-shell"><div class="modal-head"><strong>✎ Modifica contenuti</strong><button type="button" id="closeEditor" aria-label="Chiudi editor">Chiudi ✕</button></div><div class="admin-hint" id="editorHint" role="status">Tocca “Modifica” su una sezione dell’anteprima per aprire il relativo strumento.</div><div class="notice">Accedi con il tuo account amministratore per gestire le bozze. ATTENZIONE: le operazioni di salvataggio effettuate nel pannello amministrativo aggiornano il database REALE. Le modifiche grafiche dell’editor rimangono invece bozze.</div><iframe id="adminFrame" title="Pannello amministratore" src="amministrazione.html"></iframe></div></section></main>
+<script>
+const preview=document.getElementById('preview');
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{preview.src=b.dataset.page;document.querySelectorAll('[data-page]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
+document.getElementById('refresh').addEventListener('click',()=>{try{preview.contentWindow.location.reload()}catch(e){preview.src=preview.getAttribute('src')}});
+
+const adminFrame=document.getElementById('adminFrame'),hint=document.getElementById('editorHint');
+// Ambiente di test: nessuna modifica ai dati pubblicati tramite il pannello esistente.
+// Il pannello amministrativo e' accessibile solo con autenticazione Supabase.
+const modal=document.getElementById('editorModal');
+function showEditor(){modal.classList.add('open');document.body.style.overflow='hidden';document.getElementById('closeEditor').focus();}
+function closeEditor(){modal.classList.remove('open');document.body.style.overflow='';try{preview.contentWindow.location.reload()}catch(e){} }
+document.getElementById('closeEditor').addEventListener('click',closeEditor);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeEditor();});
+const textTargets=[
+ {selector:'.cd-intro',label:'Introduzione homepage'},
+ {selector:'.cd-kicker',label:'Sottotitolo homepage'},
+ {selector:'.cd-action',label:'Slogan homepage'},
+ {selector:'#chi-siamo strong',label:'Titolo Chi siamo'},
+ {selector:'#categorie .sub',label:'Descrizione categorie'},
+ {selector:'#contatti .eyebrow',label:'Titolo contatti'}
+];
+const DRAFT_KEY='cd-visual-editor-draft-v1';
+let savedDraft={};try{savedDraft=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}')||{}}catch(e){}
+const textDraft=savedDraft.texts||{},imageDraft=savedDraft.images||{};let currentText=null;
+function persistDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify({texts:textDraft,images:imageDraft,elements:ueData}));return true}catch(e){alert('Spazio locale insufficiente: esporta la bozza e usa immagini più leggere.');return false}}
+const textModal=document.getElementById('textEditor'),textInput=document.getElementById('textEditorInput');
+function editText(item){
+ const d=preview.contentDocument,el=d.querySelector(item.selector);if(!el)return;
+ currentText=item;document.getElementById('textEditorTitle').textContent=item.label;
+ textInput.value=Object.prototype.hasOwnProperty.call(textDraft,item.selector)?textDraft[item.selector]:el.textContent.trim();
+ textModal.classList.add('open');textInput.focus();
+}
+document.getElementById('cancelText').onclick=()=>textModal.classList.remove('open');
+document.getElementById('applyText').onclick=()=>{
+ if(!currentText)return;
+ textDraft[currentText.selector]=textInput.value;
+ persistDraft();
+ const el=preview.contentDocument?.querySelector(currentText.selector);if(el)el.textContent=textInput.value;
+ textModal.classList.remove('open');
+};
+document.getElementById('exportTexts').onclick=()=>{
+ if(currentText){textDraft[currentText.selector]=textInput.value;persistDraft();}
+ const blob=new Blob([JSON.stringify({type:'carte-diem-visual-draft',texts:textDraft,images:imageDraft},null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bozza-testi-carte-diem.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+const imageTargets=[{selector:'.hero .cd-scene',label:'Sfondo homepage'},...['pokemon','tcg','videogiochi','accessori'].map((name,i)=>({selector:'#categorie .visual-'+(i+1),label:'Immagine '+name}))];
+let currentImage=null;
+const imageModal=document.getElementById('imageEditor');
+function applyImageToPreview(item,data){const el=preview.contentDocument?.querySelector(item.selector);if(el)el.style.setProperty('background-image',data?'url('+JSON.stringify(data)+')':'none','important');}
+function editImage(item){currentImage=item;document.getElementById('imageEditorTitle').textContent=item.label;document.getElementById('imageEditorFile').value='';imageModal.classList.add('open');}
+document.getElementById('cancelImage').onclick=()=>imageModal.classList.remove('open');
+document.getElementById('removeImage').onclick=()=>{if(currentImage){delete imageDraft[currentImage.selector];persistDraft();preview.contentWindow.location.reload();}imageModal.classList.remove('open');};
+document.getElementById('applyImage').onclick=()=>{const f=document.getElementById('imageEditorFile').files[0];if(!f||!currentImage)return;if(f.size>1500000){alert('Seleziona un file inferiore a 1,5 MB.');return;}const reader=new FileReader();reader.onload=()=>{const data=String(reader.result);imageDraft[currentImage.selector]=data;if(persistDraft())applyImageToPreview(currentImage,data);imageModal.classList.remove('open');};reader.readAsDataURL(f);};
+async function cloudContext(){
+ const w=adminFrame.contentWindow;
+ if(!w||!w.document?.getElementById('adminContent'))throw new Error('Pannello amministrativo non ancora caricato.');
+ const logged=w.document.getElementById('adminContent');
+ // Il pannello di modifica e' disabilitato nel test, ma la sessione autenticata resta valida.
+ const sb=w.eval('sb');
+ const {data:{user},error}=await sb.auth.getUser();if(error||!user)throw new Error('Accesso amministratore richiesto.');
+ const {data:allowed,error:authError}=await sb.rpc('is_admin');if(authError||!allowed)throw new Error('Account non autorizzato.');
+ return {sb,user};
+}
+async function cloudAction(kind){
+ const status=document.getElementById('cloudStatus');status.textContent='Operazione in corso…';
+ try{
+  const {sb,user}=await cloudContext();
+  if(kind==='save'){
+   const {error}=await sb.from('visual_editor_drafts').upsert({owner_id:user.id,payload:{texts:textDraft,images:imageDraft,elements:ueData},updated_at:new Date().toISOString()},{onConflict:'owner_id'});
+   if(error)throw error;status.textContent='Bozza salvata online. Nessuna pubblicazione.';
+  }else{
+   if(!confirm('Caricare la bozza online? Sostituirà la bozza locale non salvata.')){status.textContent='Operazione annullata.';return;}
+   const {data,error}=await sb.from('visual_editor_drafts').select('payload').eq('owner_id',user.id).maybeSingle();if(error)throw error;
+   if(!data){status.textContent='Nessuna bozza online trovata.';return;}
+   for(const k of Object.keys(textDraft))delete textDraft[k];for(const k of Object.keys(imageDraft))delete imageDraft[k];
+   Object.assign(textDraft,data.payload?.texts||{});Object.assign(imageDraft,data.payload?.images||{});for(const k of Object.keys(ueData))delete ueData[k];Object.assign(ueData,data.payload?.elements||{});
+   persistDraft();preview.contentWindow.location.reload();status.textContent='Bozza online caricata.';
+  }
+ }catch(e){status.textContent='Non riuscito: '+e.message+' Verifica che la migrazione SQL sia stata applicata.';}
+}
+document.getElementById('cloudSave').onclick=()=>cloudAction('save');
+document.getElementById('cloudLoad').onclick=()=>cloudAction('load');
+const targets=[
+ {selector:'#articoli-evidenza',label:'articoli in evidenza',admin:'#cd-featured-admin'},
+ {selector:'#cd-mancolista',label:'Mancolista',admin:'#cd-mancolista-admin'},
+ {selector:'#categorie',label:'prodotti e categorie',admin:'#productForm'}
+];
+function focusAdmin(selector,label){
+ showEditor();
+ setEditorMode(selector);
+ try{
+  const d=adminFrame.contentDocument;
+  const logged=d.getElementById('adminContent');
+  if(!logged||getComputedStyle(logged).display==='none'){
+    hint.textContent='Accedi per modificare '+label+'.';
+  }else{
+    const target=d.querySelector(selector==='#catalog-management'?'#productForm':selector);
+    if(target){target.scrollIntoView({behavior:'smooth',block:'start'});hint.textContent='Strumento aperto: '+label+'. Aggiorna l’anteprima dopo il salvataggio.';}
+    else hint.textContent='Lo strumento non è ancora disponibile. Riprova tra qualche istante.';
+  }
+
+ }catch(e){hint.textContent='Impossibile accedere allo strumento amministrativo.';}
+}
+function decoratePreview(){
+ let d;try{d=preview.contentDocument;if(!d)return;}catch(e){return;}
+ d.querySelectorAll('.edit-tag').forEach(x=>x.remove());
+ if(preview.getAttribute('src').startsWith('catalogo.html')){return;} if(!preview.getAttribute('src').startsWith('index.html'))return;
+ for(const item of imageTargets){const el=d.querySelector(item.selector);if(!el)continue;if(imageDraft[item.selector])applyImageToPreview(item,imageDraft[item.selector]);if(getComputedStyle(el).position==='static')el.style.position='relative';const btn=d.createElement('button');btn.type='button';btn.className='image-edit-btn';btn.textContent='✎ Immagine';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();editImage(item);});el.appendChild(btn);}
+ for(const item of textTargets){const el=d.querySelector(item.selector);if(!el)continue;if(Object.prototype.hasOwnProperty.call(textDraft,item.selector))el.textContent=textDraft[item.selector];el.style.outline='1px dashed #ffd05e';el.style.cursor='pointer';el.title='Tocca per modificare: '+item.label;el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();editText(item);},true);}
+ for(const t of targets){
+  const el=d.querySelector(t.selector);if(!el)continue;
+  el.classList.add('edit-outline');
+  if(getComputedStyle(el).position==='static')el.style.position='relative';
+  const btn=d.createElement('button');btn.type='button';btn.className='edit-tag';btn.textContent='✎ Modifica';btn.setAttribute('aria-label','Modifica '+t.label);
+  btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();focusAdmin(t.admin,t.label);});
+  el.appendChild(btn);
+ }
+}
+
+function openCatalogProduct(card){
+ showEditor();
+ setEditorMode('#productForm');
+ const name=card.querySelector('.preview-product-name')?.textContent?.trim();
+ const code=card.querySelector('.preview-product-code')?.textContent?.trim();
+ if(!name)return;
+ const d=adminFrame.contentDocument;
+ if(!d||!d.getElementById('adminContent')||getComputedStyle(d.getElementById('adminContent')).display==='none'){
+  hint.textContent='Accedi al pannello amministrativo per modificare '+name+'.';
+ }else{
+  const search=d.getElementById('adminSearch');
+  search.value=name;
+  search.dispatchEvent(new Event('input',{bubbles:true}));
+  const rows=[...d.querySelectorAll('#rows tr')];
+  const candidates=rows.filter(row=>{
+   const label=row.querySelector('td')?.textContent?.trim()||'';
+   return label===name||label===name+' - '+code||label===name+' – '+code;
+  });
+  if(candidates.length===1){
+   const edit=candidates[0].querySelector('button');
+   if(edit){edit.click();hint.textContent='Modifica prodotto: '+name+'. Salva nel modulo per aggiornare Supabase.';}
+  }else{
+   hint.textContent=candidates.length>1?'Più prodotti con questo nome: scegli la riga corretta nel pannello.':'Prodotto cercato: '+name+'. Seleziona Modifica nella lista filtrata.';
+   search.scrollIntoView({block:'start'});
+  }
+ }
+
+}
+function decorateCatalog(d){
+ const style=d.createElement('style');style.textContent='#catalogGrid .product{position:relative!important}#catalogGrid .edit-tag{top:8px;right:8px;z-index:30}';d.head.appendChild(style);
+ const grid=d.getElementById('catalogGrid');if(!grid)return;
+ const decorate=()=>{
+  grid.querySelectorAll('.product').forEach(card=>{
+   if(card.querySelector('.edit-tag'))return;
+   const b=d.createElement('button');b.type='button';b.className='edit-tag';b.textContent='✎ Modifica';
+   b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openCatalogProduct(card);},true);
+   card.appendChild(b);
+  });
+ };
+ decorate();
+ const observer=new MutationObserver(decorate);observer.observe(grid,{childList:true});
+}
+
+
+function setEditorMode(selector){
+ let d;try{d=adminFrame.contentDocument;}catch(e){return;}if(!d)return;
+ let style=d.getElementById('visual-editor-focus');
+ if(!style){style=d.createElement('style');style.id='visual-editor-focus';d.head.appendChild(style);}
+ const hide='header,#logoutWrap,.stats,#adminContent > .panel,#adminContent > section,.admin-search,.admin-category-filters';
+ const base='body{background:#101723!important}main{max-width:850px!important;padding:12px 18px 40px!important}#syncStatus{font-size:12px;padding:8px!important}#adminContent>.stats{display:none!important}';
+ if(selector==='#catalog-management'){
+  style.textContent=base+'#adminContent>section.panel{display:none!important}#adminContent>section.panel:has(#productForm),#adminContent>section.panel:has(#rows){display:block!important;margin:8px 0!important}body>header{display:none!important}#logoutWrap{display:none!important}';
+ }else if(selector==='#productForm'){
+  style.textContent=base+'#adminContent>section.panel{display:none!important}#adminContent>section.panel:has(#productForm){display:block!important;margin:8px 0!important}body>header{display:none!important}#logoutWrap{display:none!important}';
+ }else if(selector==='#cd-featured-admin'||selector==='#cd-mancolista-admin'){
+  const id=selector.slice(1);
+  style.textContent=base+'#adminContent>section.panel{display:none!important}#adminContent>section#'+id+'{display:block!important;margin:8px 0!important}body>header{display:none!important}#logoutWrap{display:none!important}';
+ }else{
+  style.textContent='#adminContent > section.panel{display:block!important}';
+  const content=d.getElementById('adminContent');
+  if(content&&d.getElementById('logoutWrap')?.style.display!=='none')content.style.setProperty('display','block','important');
+  d.documentElement.scrollTop=0;d.body.scrollTop=0;
+ }
+}
+adminFrame.addEventListener('load',()=>{if(modal.classList.contains('open'))setEditorMode('');});
+// Universal editor attaches its own load listener after initialization.
+</script><script>
+/* Editor universale non distruttivo: le modifiche sono bozze locali/cloud. */
+const ueData=savedDraft.elements||{};
+const ueNav=document.createElement('button');ueNav.type='button';ueNav.textContent='Navigazione: DISATTIVA';
+const ueToolbar=document.createElement('div');
+ueToolbar.id='ueToolbarCarousel';
+ueToolbar.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;padding:10px 18px;background:#202a39;border-bottom:1px solid #ad8948';
+ueToolbar.innerHTML='<button id="ueToggle" type="button" aria-pressed="true">✎ Selezione elementi: ATTIVA</button><button id="ueResetPage" type="button">Ripristina bozze pagina</button>';
+document.querySelector('.controls').after(ueToolbar);
+document.getElementById('ueHeaderControls').append(ueNav,document.getElementById('ueToggle'));
+document.getElementById('cloudLoad').after(document.getElementById('ueResetPage'));
+// I tre caroselli e la descrizione sono raccolti in un unico menu richiudibile.
+const editorMenu=document.createElement('details');editorMenu.id='editorMenu';
+const menuSummary=document.createElement('summary');menuSummary.textContent='Menu editor · Strumenti e gestione';editorMenu.appendChild(menuSummary);
+const menuDescription=document.querySelector('header p');
+if(menuDescription){menuDescription.classList.add('menu-description');editorMenu.appendChild(menuDescription);}
+editorMenu.appendChild(document.querySelector('.header-actions'));
+editorMenu.appendChild(document.querySelector('.controls'));
+editorMenu.appendChild(ueToolbar);
+document.querySelector('header').after(editorMenu);
+
+let ueEnabled=true,ueSelected=null,ueOutline=null;
+ueNav.onclick=()=>{ueEnabled=false;ueNav.textContent='Navigazione: ATTIVA';document.getElementById('ueToggle').textContent='✎ Selezione elementi: DISATTIVA';document.getElementById('ueToggle').setAttribute('aria-pressed','false');};
+document.getElementById('ueToggle').onclick=()=>{ueEnabled=!ueEnabled;ueNav.textContent='Navigazione: '+(ueEnabled?'DISATTIVA':'ATTIVA');document.getElementById('ueToggle').textContent='✎ Selezione elementi: '+(ueEnabled?'ATTIVA':'DISATTIVA');document.getElementById('ueToggle').setAttribute('aria-pressed',String(ueEnabled));};
+const uePanel=document.createElement('div');
+uePanel.id='uePanel';uePanel.style.cssText='position:fixed;inset:0;z-index:300;background:#000d;display:none;align-items:center;justify-content:center;padding:12px';
+uePanel.innerHTML='<div style="background:#121b2b;color:#f7f5ee;border:1px solid #d5b36a;border-radius:14px;padding:18px;width:min(550px,100%);max-height:92dvh;overflow:auto;font:14px Arial"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><strong>✎ Modifica elemento</strong><button id="ueClose" type="button">Chiudi ✕</button></div><p id="uePath" style="overflow-wrap:anywhere;color:#e1c785"></p><label style="display:block;margin:10px 0">Testo (solo il testo diretto dell’elemento)<textarea id="ueText" rows="3" style="display:block;width:100%;margin-top:5px;background:#fff;color:#111;padding:8px"></textarea></label><label style="display:block;margin:10px 0">URL immagine / collegamento<input id="ueUrl" style="display:block;width:100%;margin-top:5px;background:#fff;color:#111;padding:8px"></label><label style="display:block;margin:10px 0">Testo alternativo immagine<input id="ueAlt" style="display:block;width:100%;margin-top:5px;background:#fff;color:#111;padding:8px"></label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label>Colore testo<input id="ueColor" type="color" style="display:block;width:100%"></label><label>Colore sfondo<input id="ueBg" type="color" style="display:block;width:100%"></label><label>Dimensione carattere (px)<input id="ueFont" type="number" min="6" max="200" style="display:block;width:100%"></label><label>Spaziatura interna (px)<input id="uePadding" type="number" min="0" max="250" style="display:block;width:100%"></label><label>Larghezza (%)<input id="ueWidth" type="number" min="1" max="100" style="display:block;width:100%"></label><label>Allineamento<select id="ueAlign" style="display:block;width:100%"><option value="">Originale</option><option value="left">Sinistra</option><option value="center">Centro</option><option value="right">Destra</option><option value="justify">Giustificato</option></select></label></div><label style="display:block;margin:12px 0"><input id="ueHide" type="checkbox"> Nascondi elemento nell’anteprima</label><div style="display:flex;flex-wrap:wrap;gap:8px"><button id="ueApply" type="button">Applica bozza</button><button id="ueRestore" type="button">Ripristina elemento</button></div><p style="color:#aeb7c8">Le modifiche qui non aggiornano il sito pubblico né il database dei prodotti.</p></div>';
+document.body.appendChild(uePanel);
+const ueGet=id=>document.getElementById('ue'+id);
+const uePage=()=>preview.getAttribute('src').split('?')[0];
+const ueKey=selector=>uePage()+'|'+selector;
+function ueSelector(el){
+ const parts=[];let n=el;
+ while(n&&n.nodeType===1&&n.tagName!=='HTML'){
+  if(n.id&&/^[A-Za-z][\w-]*$/.test(n.id)){parts.unshift('#'+n.id);break;}
+  const tag=n.tagName.toLowerCase();const parent=n.parentElement;
+  if(!parent){parts.unshift(tag);break;}
+  const same=[...parent.children].filter(x=>x.tagName===n.tagName);
+  parts.unshift(tag+(same.length>1?':nth-of-type('+(same.indexOf(n)+1)+')':''));
+  n=parent;
+ }
+ return parts.join(' > ');
+}
+function ueDirectText(el){return [...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim();}
+function ueSetText(el,value){
+ const nodes=[...el.childNodes].filter(n=>n.nodeType===3);
+ if(nodes.length){nodes[0].textContent=value;nodes.slice(1).forEach(n=>n.textContent='');}
+ else if(el.children.length===0)el.textContent=value;
+}
+function ueSafeUrl(url){if(!url)return '';try{const u=new URL(url,preview.contentWindow.location.href);return ['https:','http:'].includes(u.protocol)?url:'';}catch(e){return '';}}
+function ueApplyRecord(el,record){
+ if(!el||!record)return;
+ if(record.text!==undefined)ueSetText(el,record.text);
+ if(record.url!==undefined){const url=ueSafeUrl(record.url);if(el.tagName==='IMG'&&url)el.src=url;else if(el.tagName==='A'&&url)el.href=url;}
+ if(record.alt!==undefined&&el.tagName==='IMG')el.alt=record.alt;
+ for(const [k,prop] of [['color','color'],['background','backgroundColor'],['fontSize','fontSize'],['padding','padding'],['width','width'],['align','textAlign']]){
+  if(record[k]!==undefined)el.style[prop]=record[k];
+ }
+ if(record.hidden!==undefined)el.style.display=record.hidden?'none':'';
+}
+function ueRestoreAll(){
+ const d=preview.contentDocument;if(!d)return;
+ for(const [key,value] of Object.entries(ueData)){
+  if(!key.startsWith(uePage()+'|'))continue;
+  const selector=key.slice(uePage().length+1);
+  try{ueApplyRecord(d.querySelector(selector),value);}catch(e){}
+ }
+}
+function ueOpen(el){
+ ueSelected={el,selector:ueSelector(el),page:uePage()};
+ const record=ueData[ueKey(ueSelected.selector)]||{};
+ ueGet('Path').textContent=ueSelected.page+' → '+ueSelected.selector;
+ ueGet('Text').value=record.text??ueDirectText(el);
+ ueGet('Url').value=record.url??(el.tagName==='IMG'?el.getAttribute('src')||'':el.tagName==='A'?el.getAttribute('href')||'':'');
+ ueGet('Alt').value=record.alt??(el.tagName==='IMG'?el.alt:'');
+ const style=preview.contentWindow.getComputedStyle(el);
+ const hex=c=>{const m=c.match(/\d+/g);return m&&m.length>=3?'#'+m.slice(0,3).map(x=>Math.min(255,+x).toString(16).padStart(2,'0')).join(''):'#ffffff'};
+ ueGet('Color').value=hex(style.color);ueGet('Bg').value=hex(style.backgroundColor);
+ ueGet('Font').value=parseInt(style.fontSize)||14;ueGet('Padding').value=parseInt(style.paddingTop)||0;
+ ueGet('Width').value=record.width?parseInt(record.width):'';ueGet('Align').value=record.align||'';
+ ueGet('Hide').checked=!!record.hidden;
+ uePanel.style.display='flex';
+}
+ueGet('Close').onclick=()=>uePanel.style.display='none';
+uePanel.addEventListener('click',e=>{if(e.target===uePanel)uePanel.style.display='none';});
+ueGet('Apply').onclick=()=>{
+ if(!ueSelected)return;
+ const {el,selector,page}=ueSelected;
+ const record={text:ueGet('Text').value,url:ueGet('Url').value,alt:ueGet('Alt').value,color:ueGet('Color').value,background:ueGet('Bg').value,fontSize:ueGet('Font').value+'px',padding:ueGet('Padding').value+'px',width:ueGet('Width').value?ueGet('Width').value+'%':'',align:ueGet('Align').value,hidden:ueGet('Hide').checked};
+ if(!['IMG','A'].includes(el.tagName))delete record.url;
+ if(el.tagName!=='IMG')delete record.alt;
+ ueData[page+'|'+selector]=record;ueApplyRecord(el,record);
+ persistDraft();uePanel.style.display='none';
+};
+ueGet('Restore').onclick=()=>{if(!ueSelected)return;delete ueData[ueSelected.page+'|'+ueSelected.selector];persistDraft();uePanel.style.display='none';preview.contentWindow.location.reload();};
+document.getElementById('ueResetPage').onclick=()=>{if(!confirm('Ripristinare tutte le modifiche in bozza per questa pagina?'))return;for(const k of Object.keys(ueData))if(k.startsWith(uePage()+'|'))delete ueData[k];persistDraft();preview.contentWindow.location.reload();};
+function universalDecorate(){
+ let d;try{d=preview.contentDocument;}catch(e){ueStatus.textContent='Anteprima non accessibile: '+e.message;return;}
+ if(!d||!d.body){ueStatus.textContent='';return;}
+ if(d.__ueAttached){ueStatus.textContent='';return;}
+ d.__ueAttached=true;
+ ueStatus.textContent='';
+ ueRestoreAll();
+ d.addEventListener('click',e=>{
+  if(!ueEnabled)return;
+  const el=e.target.closest('body *');
+  if(!el||['SCRIPT','STYLE','NOSCRIPT','META','LINK'].includes(el.tagName))return;
+  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+  ueOpen(el);
+ },true);
+ d.addEventListener('mouseover',e=>{if(!ueEnabled)return;const el=e.target.closest('body *');if(!el||el===ueOutline)return;if(ueOutline)ueOutline.style.removeProperty('outline');ueOutline=el;el.style.outline='2px solid #f0b948';},true);
+ d.addEventListener('mouseout',()=>{if(ueOutline){ueOutline.style.removeProperty('outline');ueOutline=null;}},true);
+ // Non osservare tutte le mutazioni: causerebbe cicli continui quando si modifica il testo.
+
+}
+
+// L'iframe può aver terminato il caricamento prima che questo script venga eseguito.
+const ueStatus=document.createElement('strong');ueStatus.style.cssText='color:#ffe4a2;font-size:12px';ueStatus.textContent='Avvio editor…';ueToolbar.appendChild(ueStatus);
+const ueActions=document.createElement('div');ueActions.className='ue-actions-row';ueActions.style.cssText='display:flex;gap:9px;flex-wrap:nowrap;width:max-content;margin-top:0';ueToolbar.appendChild(ueActions);
+const ueButtons=[
+ {label:'📦 Gestione catalogo',selector:'#catalog-management',title:'aggiungere, modificare o eliminare prodotti'},
+ {label:'⭐ Prodotti in evidenza',selector:'#cd-featured-admin',title:'gestire i prodotti in evidenza'},
+ {label:'📋 Mancolista',selector:'#cd-mancolista-admin',title:'gestire la mancolista'}
+];
+ueButtons.forEach(({label,selector,title})=>{
+ const btn=document.createElement('button');btn.type='button';btn.textContent=label;btn.style.cssText='background:#e6b951;color:#14171e;font-weight:700';ueActions.appendChild(btn);
+ btn.onclick=()=>{
+  if(!confirm('Aprire '+title+'? Le modifiche salvate qui aggiornano il database REALE e possono essere visibili sul sito pubblico.'))return;
+  showEditor();setEditorMode(selector);hint.textContent='Gestione: '+title+'. Le modifiche salvate qui sono REALI.';
+  try{const d=adminFrame.contentDocument;const target=d.querySelector(selector==='#catalog-management'?'#productForm':selector);if(target)target.scrollIntoView({block:'start'});else adminFrame.contentWindow.scrollTo(0,0);}catch(e){}
+ };
+});
+
+// Collega immediatamente l'editor, anche quando l'evento load e' gia' passato.
+try{universalDecorate();}catch(e){ueStatus.textContent='Errore editor: '+e.message;}
+preview.addEventListener('load',()=>{try{universalDecorate();}catch(e){ueStatus.textContent='Errore editor: '+e.message;}},true);
+
+
+</script>
+<script>
+(function(){
+const gate=document.getElementById('editorAuthGate');const status=document.getElementById('editorAuthStatus');const login=document.getElementById('editorAuthLogin');
+async function verify(){
+ try{
+  const frame=document.getElementById('adminFrame');const win=frame.contentWindow;
+  const client=win.eval('sb');
+  if(!client)throw Error('Connessione non pronta');
+  const {data:{user}}=await client.auth.getUser();
+  if(!user){status.textContent='Effettua l’accesso per continuare.';login.style.display='block';return;}
+  const {data:allowed,error}=await client.rpc('is_admin');
+  if(error||!allowed){status.textContent='Questo account non è autorizzato.';login.style.display='block';return;}
+  gate.hidden=true;login.style.display='none';
+ }catch(e){status.textContent='Verifica in corso o connessione non disponibile. Riprova.';login.style.display='block';}
+}
+document.getElementById('editorAuthRetry').onclick=verify;
+document.getElementById('adminFrame').addEventListener('load',verify);
+document.getElementById('editorAuthFrame').addEventListener('load',verify);
+window.addEventListener('focus',verify);
+setTimeout(verify,800);
+})();
+</script>
+</body></html>

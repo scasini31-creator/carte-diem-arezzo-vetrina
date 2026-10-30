@@ -54,6 +54,11 @@ main>.site>iframe{display:block;flex:1 1 auto;height:100%!important;min-height:0
 #editorAuthGate{position:fixed;inset:0;z-index:999;background:#080d17;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px;color:#f8e2a3;text-align:center}
 #editorAuthGate iframe{width:min(600px,100%);height:min(65dvh,650px);min-height:330px;flex:0 1 auto;border:1px solid #a88a4a;border-radius:12px;background:#0d0d0f}
 #editorAuthGate[hidden]{display:none!important}
+
+/* Inserimento: tre comandi compatti affiancati, senza scorrimento orizzontale. */
+#editorMenu #ueToolbarCarousel{overflow-x:visible!important;padding:10px 8px!important;gap:0!important}
+#editorMenu #ueToolbarCarousel .ue-actions-row{display:flex!important;width:100%!important;max-width:100%;gap:6px!important;flex-wrap:nowrap!important}
+#editorMenu #ueToolbarCarousel .ue-actions-row button{flex:1 1 0!important;min-width:0!important;white-space:normal!important;overflow-wrap:break-word;text-align:center;line-height:1.2;padding:10px 5px!important;font-size:clamp(10px,2.7vw,14px)!important;border-radius:9px}
 </style></head><body><div id="editorAuthGate"><strong>Accesso riservato all’amministratore</strong><p id="editorAuthStatus">Verifica della sessione in corso…</p><div id="editorAuthLogin" style="display:none;width:min(600px,100%)"><p>Accedi al tuo account amministratore qui sotto.</p><iframe id="editorAuthFrame" title="Accesso amministratore"></iframe></div><button type="button" id="editorAuthRetry">Verifica accesso</button></div>
 <header><div></div><div class="header-actions"><a href="https://scasini31-creator.github.io/carte-diem-arezzo-vetrina/" target="_blank" rel="noopener">Sito pubblico ↗</a><div id="ueHeaderControls"></div></div></header>
 <div class="controls" role="group" aria-label="Pagina da visualizzare">

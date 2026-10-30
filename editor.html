@@ -60,7 +60,7 @@ main>.site>iframe{display:block;flex:1 1 auto;height:100%!important;min-height:0
 <button data-page="index.html" aria-pressed="true">Homepage</button>
 <button data-page="catalogo.html" aria-pressed="false">Catalogo</button>
 <button data-page="richieste.html" aria-pressed="false">Mancolista</button>
-<button id="refresh" type="button">Aggiorna anteprima ↻</button><button id="cloudSave" type="button">Salva bozza online</button><button id="cloudLoad" type="button">Carica bozza online</button><span id="cloudStatus" role="status" style="align-self:center;color:#ffe2a4"></span>
+<button id="refresh" type="button">Aggiorna anteprima ↻</button><button id="cloudSave" type="button">Salva bozza online</button><button id="cloudLoad" type="button">Carica bozza online</button><button id="publishPreview" type="button">Verifica pubblicazione</button><button id="publishExport" type="button">Prepara file di pubblicazione</button><span id="cloudStatus" role="status" style="align-self:center;color:#ffe2a4"></span>
 </div>
 <div id="textEditor" class="text-editor" role="dialog" aria-modal="true" aria-label="Modifica testo"><div class="text-editor-panel"><h2 id="textEditorTitle">Modifica testo</h2><label for="textEditorInput">Testo</label><textarea id="textEditorInput"></textarea><p>Le modifiche ai testi sono una bozza visibile nell'anteprima: non vengono ancora pubblicate sul sito.</p><div class="actions"><button type="button" id="applyText">Applica all'anteprima</button><button type="button" id="cancelText">Annulla</button><button type="button" id="exportTexts">Esporta bozza JSON</button></div></div></div><div id="imageEditor" class="image-editor" role="dialog" aria-modal="true" aria-label="Modifica immagine"><div class="image-editor-panel"><h2 id="imageEditorTitle">Modifica immagine</h2><p>Seleziona un'immagine per la bozza locale. Non viene caricata su Supabase né pubblicata.</p><input id="imageEditorFile" type="file" accept="image/png,image/jpeg,image/webp"><div class="actions"><button id="applyImage" type="button">Applica all'anteprima</button><button id="cancelImage" type="button">Annulla</button><button id="removeImage" type="button">Ripristina originale</button></div></div></div><main><section class="site"><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
 <section class="admin" id="editorModal" role="dialog" aria-modal="true" aria-label="Modifica contenuti"><div class="admin-shell"><div class="modal-head"><strong>✎ Modifica contenuti</strong><button type="button" id="closeEditor" aria-label="Chiudi editor">Chiudi ✕</button></div><div class="admin-hint" id="editorHint" role="status">Tocca “Modifica” su una sezione dell’anteprima per aprire il relativo strumento.</div><div class="notice">Accedi con il tuo account amministratore per gestire le bozze. ATTENZIONE: le operazioni di salvataggio effettuate nel pannello amministrativo aggiornano il database REALE. Le modifiche grafiche dell’editor rimangono invece bozze.</div><iframe id="adminFrame" title="Pannello amministratore"></iframe></div></section></main>
@@ -124,6 +124,36 @@ el('loginForm').onsubmit=async e=>{e.preventDefault();const {error}=await sb.aut
 el('logout').onclick=async()=>{await sb.auth.signOut();await checkLogin()};checkLogin();
 </script><script src="featured-admin.js"></script>
 <script src="mancolista-admin.js" defer></script>
+<script>
+/* Preflight non distruttivo: nessun token GitHub nel browser, nessuna scrittura pubblica. */
+(function(){
+const status=document.getElementById('cloudStatus');
+const getDraft=()=>({texts:typeof textDraft==='object'?textDraft:{},images:typeof imageDraft==='object'?imageDraft:{},elements:typeof ueData==='object'?ueData:{}});
+const count=o=>Object.keys(o||{}).length;
+async function preflight(){
+ try{
+  await cloudContext();
+  const d=getDraft();const total=count(d.texts)+count(d.images)+count(d.elements);
+  if(!total){status.textContent='Non ci sono modifiche grafiche da pubblicare.';return null;}
+  const page=preview.contentDocument;
+  if(!page?.body)throw Error('Anteprima non disponibile');
+  const missing=Object.keys(d.texts).filter(k=>!page.querySelector(k));
+  if(missing.length)status.textContent='Attenzione: '+missing.length+' selettori di testo non presenti nella pagina corrente.';
+  else status.textContent='Controllo completato: '+total+' modifiche in bozza. Il sito pubblico è invariato.';
+  return d;
+ }catch(e){status.textContent='Verifica non riuscita: '+e.message;return null;}
+}
+document.getElementById('publishPreview').onclick=preflight;
+document.getElementById('publishExport').onclick=async()=>{
+ const d=await preflight();if(!d)return;
+ if(!confirm('Preparare il file con le modifiche grafiche? Questo NON pubblica automaticamente sul sito.'))return;
+ const payload={format:'carte-diem-visual-publication-v1',created_at:new Date().toISOString(),pages:{[preview.getAttribute('src')||'index.html']:d}};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carte-diem-pubblicazione.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),30000);
+ status.textContent='File di pubblicazione preparato. Nessuna modifica applicata al sito pubblico.';
+};
+})();
+</script>
 </body></html></template>
 <script>
 /* Modulo amministrativo incorporato: non richiede più pagine legacy separate. */

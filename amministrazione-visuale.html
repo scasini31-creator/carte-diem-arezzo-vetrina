@@ -53,7 +53,7 @@ function focusAdmin(selector,label){
 function decoratePreview(){
  let d;try{d=preview.contentDocument;if(!d)return;}catch(e){return;}
  d.querySelectorAll('.edit-tag').forEach(x=>x.remove());
- if(!preview.getAttribute('src').startsWith('index.html'))return;
+ if(preview.getAttribute('src').startsWith('catalogo.html')){decorateCatalog(d);return;} if(!preview.getAttribute('src').startsWith('index.html'))return;
  for(const t of targets){
   const el=d.querySelector(t.selector);if(!el)continue;
   el.classList.add('edit-outline');
@@ -63,5 +63,47 @@ function decoratePreview(){
   el.appendChild(btn);
  }
 }
+
+function openCatalogProduct(card){
+ const name=card.querySelector('.preview-product-name')?.textContent?.trim();
+ const code=card.querySelector('.preview-product-code')?.textContent?.trim();
+ if(!name)return;
+ const d=adminFrame.contentDocument;
+ if(!d||!d.getElementById('adminContent')||getComputedStyle(d.getElementById('adminContent')).display==='none'){
+  hint.textContent='Accedi al pannello amministrativo per modificare '+name+'.';
+ }else{
+  const search=d.getElementById('adminSearch');
+  search.value=name;
+  search.dispatchEvent(new Event('input',{bubbles:true}));
+  const rows=[...d.querySelectorAll('#rows tr')];
+  const candidates=rows.filter(row=>{
+   const label=row.querySelector('td')?.textContent?.trim()||'';
+   return label===name||label===name+' - '+code||label===name+' – '+code;
+  });
+  if(candidates.length===1){
+   const edit=candidates[0].querySelector('button');
+   if(edit){edit.click();hint.textContent='Modifica prodotto: '+name+'. Salva nel modulo per aggiornare Supabase.';}
+  }else{
+   hint.textContent=candidates.length>1?'Più prodotti con questo nome: scegli la riga corretta nel pannello.':'Prodotto cercato: '+name+'. Seleziona Modifica nella lista filtrata.';
+   search.scrollIntoView({block:'start'});
+  }
+ }
+ if(innerWidth<761)document.querySelector('.admin').scrollIntoView({behavior:'smooth'});
+}
+function decorateCatalog(d){
+ const style=d.createElement('style');style.textContent='#catalogGrid .product{position:relative!important}#catalogGrid .edit-tag{top:8px;right:8px;z-index:30}';d.head.appendChild(style);
+ const grid=d.getElementById('catalogGrid');if(!grid)return;
+ const decorate=()=>{
+  grid.querySelectorAll('.product').forEach(card=>{
+   if(card.querySelector('.edit-tag'))return;
+   const b=d.createElement('button');b.type='button';b.className='edit-tag';b.textContent='✎ Modifica';
+   b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openCatalogProduct(card);},true);
+   card.appendChild(b);
+  });
+ };
+ decorate();
+ const observer=new MutationObserver(decorate);observer.observe(grid,{childList:true});
+}
+
 preview.addEventListener('load',decoratePreview);
 </script></body></html>

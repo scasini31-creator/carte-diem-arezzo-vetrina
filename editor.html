@@ -55,6 +55,15 @@ main>.site>iframe{display:block;flex:1 1 auto;height:100%!important;min-height:0
 #editorAuthGate iframe{width:min(600px,100%);height:min(65dvh,650px);min-height:330px;flex:0 1 auto;border:1px solid #a88a4a;border-radius:12px;background:#0d0d0f}
 #editorAuthGate[hidden]{display:none!important}
 
+/* Menu principale: tre comandi affiancati, uniformi e senza scorrimento. */
+#editorMenu>.header-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch!important;gap:6px!important;overflow-x:hidden!important;scroll-snap-type:none!important;padding:10px 8px!important;box-sizing:border-box}
+#editorMenu>.header-actions #ueHeaderControls{display:contents!important}
+#editorMenu>.header-actions>a,
+#editorMenu>.header-actions button{display:flex!important;align-items:center;justify-content:center;min-width:0!important;width:100%!important;box-sizing:border-box;text-align:center;white-space:normal!important;overflow-wrap:break-word;line-height:1.2;padding:10px 4px!important;font-size:clamp(9px,2.55vw,16px)!important;border-radius:9px;margin:0!important}
+@media(min-width:700px){
+ #editorMenu>.header-actions>a,
+ #editorMenu>.header-actions button{font-size:inherit!important}
+}
 /* Editing: due righe fisse, nessuno scorrimento laterale. */
 #editorMenu #editingControls{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important;overflow-x:hidden!important;scroll-snap-type:none!important;padding:10px 8px!important;box-sizing:border-box}
 #editorMenu #editingControls .editing-row{display:grid;width:100%;min-width:0;gap:5px;align-items:stretch}

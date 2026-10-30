@@ -388,7 +388,7 @@ const makeSubmenu=(title)=>{
  editorMenu.appendChild(section);
  return section;
 };
-const graphicSection=makeSubmenu('Pagine e operazioni principali');
+const graphicSection=makeSubmenu('Editing');
 graphicSection.appendChild(document.querySelector('.header-actions'));
 graphicSection.appendChild(document.querySelector('.controls'));
 // Pubblicazione in una riga separata e sempre riconoscibile.
@@ -398,7 +398,7 @@ const publishRow=document.createElement('div');publishRow.id='publishToolbar';pu
 const livePublish=document.createElement('button');livePublish.type='button';livePublish.id='publishLive';livePublish.textContent='Pubblica modifiche';livePublish.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(livePublish);
 const publicationSection=makeSubmenu('Pubblicazione');
 publicationSection.appendChild(publishRow);
-const contentSection=makeSubmenu('Selezione elementi e ripristino');
+const contentSection=makeSubmenu('Inserimento');
 contentSection.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
 editorMenu.style.position='relative';

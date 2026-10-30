@@ -1,0 +1,6 @@
+/* Intestazione sempre visibile durante lo scorrimento delle pagine pubbliche. */
+body > header {
+  position: sticky !important;
+  top: 0;
+  z-index: 110;
+}

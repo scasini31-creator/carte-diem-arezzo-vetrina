@@ -381,7 +381,7 @@ graphicSection.appendChild(pageControls);
 // I comandi più usati restano a portata di mano, senza cambiare gli ID o le funzioni.
 const selectionButton=document.getElementById('ueToggle');
 selectionButton.textContent='✎ Selezione elementi: ATTIVA';
-document.getElementById('refresh').after(selectionButton);
+document.getElementById('refresh').after(selectionButton,ueNav);
 const draftsSection=makeSubmenu('Gestione bozze');
 const draftsRow=document.createElement('div');
 draftsRow.className='controls';
@@ -408,7 +408,7 @@ if(exportDraft){
  advancedHint.textContent='L’esportazione JSON è disponibile nella finestra Modifica testo.';
  advancedSection.appendChild(advancedHint);
 }
-advancedRow.appendChild(ueNav);
+// Navigazione e selezione rimangono insieme nella barra principale.
 advancedSection.appendChild(advancedRow);
 // La barra contenuti non contiene più comandi duplicati.
 ueToolbar.remove();

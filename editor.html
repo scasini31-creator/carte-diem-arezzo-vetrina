@@ -371,6 +371,33 @@ const publishRow=document.createElement('div');publishRow.id='publishToolbar';pu
 editorMenu.appendChild(publishRow);
 editorMenu.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
+editorMenu.style.position='relative';
+editorMenu.style.zIndex='50';
+function attachAutoCollapse(){
+ try{
+  const frame=document.getElementById('preview');
+  const doc=frame.contentDocument;
+  if(!doc||!doc.body)return;
+  let lastY=doc.scrollingElement?.scrollTop||0;
+  const onScroll=()=>{
+   const y=doc.scrollingElement?.scrollTop||doc.documentElement.scrollTop||doc.body.scrollTop||0;
+   if(editorMenu.open&&y>lastY+2&&y>30)editorMenu.open=false;
+   lastY=y;
+  };
+  doc.addEventListener('scroll',onScroll,{passive:true,capture:true});
+  doc.defaultView?.addEventListener('scroll',onScroll,{passive:true});
+  doc.addEventListener('touchmove',e=>{
+   if(!editorMenu.open)return;
+   const dy=e.touches?.[0]?.clientY;
+   if(typeof dy==='number'&&typeof doc.__editorLastTouch==='number'&&dy<doc.__editorLastTouch-8)editorMenu.open=false;
+   doc.__editorLastTouch=dy;
+  },{passive:true});
+  doc.addEventListener('touchend',()=>{doc.__editorLastTouch=null},{passive:true});
+ }catch(e){}
+}
+document.getElementById('preview').addEventListener('load',attachAutoCollapse);
+attachAutoCollapse();
+
 
 let ueEnabled=true,ueSelected=null,ueOutline=null;
 ueNav.onclick=()=>{ueEnabled=false;ueNav.textContent='Navigazione: ATTIVA';document.getElementById('ueToggle').textContent='✎ Selezione elementi: DISATTIVA';document.getElementById('ueToggle').setAttribute('aria-pressed','false');};

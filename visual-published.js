@@ -11,6 +11,8 @@
   for(const [key,change] of Object.entries(payload.elements||{})){
    if(!key.startsWith(page+'|')||!change||typeof change!=='object')continue;
    const el=locate(key.slice(page.length+1));if(!el)continue;
+   // Preserve the original branded hero heading and its nested EM/SMALL styling.
+   if(page==='index.html'&&el.matches('h1.cd-title'))continue;
    if(typeof change.text==='string')el.textContent=change.text;
    if(typeof change.color==='string'&&change.color)el.style.color=change.color;
    if(typeof change.background==='string'&&change.background)el.style.backgroundColor=change.background;
@@ -25,7 +27,7 @@
    }
   }
   for(const [selector,value] of Object.entries(payload.texts||{})){
-   const el=locate(selector);if(el&&typeof value==='string')el.textContent=value;
+   const el=locate(selector);if(page==='index.html'&&el?.matches('h1.cd-title'))continue;if(el&&typeof value==='string')el.textContent=value;
   }
   for(const [selector,value] of Object.entries(payload.images||{})){
    const el=locate(selector);if(el&&el.tagName==='IMG'&&typeof value==='string')el.src=value;

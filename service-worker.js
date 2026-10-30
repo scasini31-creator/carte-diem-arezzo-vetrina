@@ -1,5 +1,5 @@
 /* CARTE DIEM AREZZO: cache selettiva delle sole risorse pubbliche statiche. */
-const CACHE = 'carte-diem-static-v1';
+const CACHE = 'carte-diem-static-v2';
 const STATIC = [
   './shared-base.css?v=1',
   './shared-catalog-layout.css?v=1',
@@ -43,9 +43,17 @@ self.addEventListener('fetch', event => {
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const cached = await cache.match(request, {ignoreSearch: true});
-    if (cached) return cached;
-    const response = await fetch(request);
-    if (response.ok && response.type === 'basic') await cache.put(request, response.clone());
-    return response;
+    // Mostra subito la risorsa in cache, aggiornandola in background per la prossima apertura.
+    const refresh = fetch(request, {cache: 'no-cache'}).then(async response => {
+      if (response.ok && response.type === 'basic') {
+        await cache.put(request, response.clone());
+      }
+      return response;
+    });
+    if (cached) {
+      event.waitUntil(refresh.catch(() => {}));
+      return cached;
+    }
+    return refresh;
   })());
 });

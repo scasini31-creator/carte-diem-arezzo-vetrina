@@ -154,6 +154,20 @@ document.getElementById('publishExport').onclick=async()=>{
 };
 })();
 </script>
+<script>
+/* Riordino sicuro dopo l'inizializzazione: conserva pulsanti e gestori originali. */
+window.addEventListener('load',function(){
+ const row=document.getElementById('publishToolbar');
+ if(!row)return;
+ for(const id of ['publishPreview','publishExport']){
+  const button=document.getElementById(id);
+  if(button&&button.parentElement!==row){
+   button.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';
+   row.insertBefore(button,document.getElementById('publishLive'));
+  }
+ }
+});
+</script>
 </body></html></template>
 <script>
 /* Modulo amministrativo incorporato: non richiede più pagine legacy separate. */

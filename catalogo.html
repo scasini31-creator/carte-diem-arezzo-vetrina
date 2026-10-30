@@ -224,4 +224,5 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
  document.addEventListener('keydown',e=>{if(lb.hidden)return;if(e.key==='Escape'){e.preventDefault();close()}else if(e.key==='ArrowLeft'){e.preventDefault();show(current-1)}else if(e.key==='ArrowRight'){e.preventDefault();show(current+1)}});
  photo.addEventListener('touchstart',e=>{touchStart=e.touches[0]?.clientX??null},{passive:true});photo.addEventListener('touchend',e=>{if(touchStart===null)return;let delta=(e.changedTouches[0]?.clientX??touchStart)-touchStart;if(Math.abs(delta)>45)show(current+(delta<0?1:-1));touchStart=null},{passive:true});
 })();
-</script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a class="active" href="catalogo.html"><span>▦</span>Catalogo</a><a href="richieste.html"><span>♡</span>Lista</a></nav></body></html>
+</script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a class="active" href="catalogo.html"><span>▦</span>Catalogo</a><a href="richieste.html"><span>♡</span>Lista</a></nav><script src="visual-published.js"></script>
+</body></html>

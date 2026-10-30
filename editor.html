@@ -381,7 +381,7 @@ function attachAutoCollapse(){
   let lastY=doc.scrollingElement?.scrollTop||0;
   const onScroll=()=>{
    const y=doc.scrollingElement?.scrollTop||doc.documentElement.scrollTop||doc.body.scrollTop||0;
-   if(editorMenu.open&&y>lastY+2&&y>30)editorMenu.open=false;
+   if(editorMenu.open&&Math.abs(y-lastY)>2)editorMenu.open=false;
    lastY=y;
   };
   doc.addEventListener('scroll',onScroll,{passive:true,capture:true});
@@ -389,7 +389,7 @@ function attachAutoCollapse(){
   doc.addEventListener('touchmove',e=>{
    if(!editorMenu.open)return;
    const dy=e.touches?.[0]?.clientY;
-   if(typeof dy==='number'&&typeof doc.__editorLastTouch==='number'&&dy<doc.__editorLastTouch-8)editorMenu.open=false;
+   if(typeof dy==='number'&&typeof doc.__editorLastTouch==='number'&&Math.abs(dy-doc.__editorLastTouch)>8)editorMenu.open=false;
    doc.__editorLastTouch=dy;
   },{passive:true});
   doc.addEventListener('touchend',()=>{doc.__editorLastTouch=null},{passive:true});

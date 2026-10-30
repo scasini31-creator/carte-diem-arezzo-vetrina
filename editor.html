@@ -523,9 +523,9 @@ setTimeout(verify,800);
  const feedback=document.createElement('div');
  feedback.id='publishResult';feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
  feedback.style.cssText='display:block;padding:12px 16px;background:#101b2b;color:#f4d48b;border-bottom:1px solid #ad8948;font-size:14px;line-height:1.5;white-space:normal';
- feedback.textContent='Pronto per la verifica delle bozze.';
+ feedback.hidden=true;
  row.insertAdjacentElement('afterend',feedback);
- function report(message,error){feedback.textContent=message;feedback.style.color=error?'#ffb2a7':'#f4d48b';}
+ function report(message,error){feedback.hidden=false;feedback.textContent=message;feedback.style.color=error?'#ffb2a7':'#f4d48b';}
  function draft(){return {texts:typeof textDraft==='object'?textDraft:{},images:typeof imageDraft==='object'?imageDraft:{},elements:typeof ueData==='object'?ueData:{}};}
  async function check(){
   report('Verifica in corso…');

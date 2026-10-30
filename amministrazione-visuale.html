@@ -15,7 +15,7 @@ section{min-width:0;display:flex;flex-direction:column}section+section{border-le
 iframe{width:100%;height:100%;border:0;background:white}
 .notice{font-size:12px;color:#c2c8d5;padding:9px 15px;background:#0c1220}
 @media(max-width:760px){header{padding:12px}main{height:auto;display:flex;flex-direction:column}.site{height:75dvh;min-height:380px}section+section{border-left:0;border-top:1px solid var(--line)}.controls{padding:10px}}
-.edit-tag{position:absolute;right:12px;top:12px;z-index:20;background:#ffd05e!important;color:#111!important;border:2px solid #18120a!important;border-radius:9px!important;padding:9px 12px!important;font:700 13px Arial,sans-serif!important;box-shadow:0 3px 16px #0009!important;cursor:pointer!important}.edit-outline{outline:2px dashed #ffd05e!important;outline-offset:-3px!important}.admin-hint{padding:8px 14px;background:#332714;color:#ffe5aa;font-size:12px}.site{height:100%}.admin{position:fixed;inset:0;z-index:100;background:#050810e8;padding:3vh max(10px,calc((100vw - 900px)/2));display:none;align-items:stretch;justify-content:center}.admin.open{display:flex}.admin-shell{background:#101723;border:1px solid #8c723e;border-radius:14px;box-shadow:0 20px 70px #000c;display:flex;flex-direction:column;width:100%;min-height:0;overflow:hidden}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;background:#141c2b}.modal-head button{padding:7px 12px}.admin iframe{flex:1;min-height:0}.admin-hint{min-height:30px}@media(max-width:760px){.admin{padding:8px}.admin-shell{height:100%}.site{height:75dvh}} </style></head><body>
+.edit-tag{position:absolute;right:12px;top:12px;z-index:20;background:#ffd05e!important;color:#111!important;border:2px solid #18120a!important;border-radius:9px!important;padding:9px 12px!important;font:700 13px Arial,sans-serif!important;box-shadow:0 3px 16px #0009!important;cursor:pointer!important}.edit-outline{outline:2px dashed #ffd05e!important;outline-offset:-3px!important}.admin-hint{padding:8px 14px;background:#332714;color:#ffe5aa;font-size:12px}.site{height:100%}.admin{position:fixed;inset:0;z-index:100;background:#050810e8;padding:3vh max(10px,calc((100vw - 900px)/2));display:none;align-items:stretch;justify-content:center}.admin.open{display:flex}.admin-shell{background:#101723;border:1px solid #8c723e;border-radius:14px;box-shadow:0 20px 70px #000c;display:flex;flex-direction:column;width:100%;min-height:0;overflow:hidden}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;background:#141c2b}.modal-head button{padding:7px 12px}.admin iframe{flex:1;min-height:0}.admin-hint{min-height:30px}@media(max-width:760px){.admin{padding:8px}.admin-shell{height:100%}.site{height:75dvh}} .text-editor{position:fixed;inset:0;z-index:120;background:#000c;display:none;align-items:center;justify-content:center;padding:16px}.text-editor.open{display:flex}.text-editor-panel{background:#131b2b;border:1px solid #aa8743;border-radius:14px;padding:22px;width:min(580px,100%);box-shadow:0 12px 60px #000a}.text-editor-panel label{display:block;color:#f6d795;margin:14px 0 8px}.text-editor-panel textarea{display:block;width:100%;min-height:115px;background:#080d17;color:white;border:1px solid #877249;border-radius:8px;padding:12px;font:inherit;resize:vertical}.text-editor-panel .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.text-editor-panel p{margin:10px 0;color:#c6cede}</style></head><body>
 <header><div><h1>CARTE DIEM <span>AREZZO</span> · Editor visuale</h1><p>Ambiente di sviluppo separato · il sito pubblico non viene modificato</p></div><a href="amministrazione.html" target="_blank" rel="noopener">Apri amministrazione ↗</a></header>
 <div class="controls" role="group" aria-label="Pagina da visualizzare">
 <button data-page="index.html" aria-pressed="true">Homepage</button>
@@ -23,7 +23,7 @@ iframe{width:100%;height:100%;border:0;background:white}
 <button data-page="mancolista.html" aria-pressed="false">Mancolista</button>
 <button id="refresh" type="button">Aggiorna anteprima ↻</button>
 </div>
-<main><section class="site"><div class="section-heading">Anteprima del sito</div><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
+<div id="textEditor" class="text-editor" role="dialog" aria-modal="true" aria-label="Modifica testo"><div class="text-editor-panel"><h2 id="textEditorTitle">Modifica testo</h2><label for="textEditorInput">Testo</label><textarea id="textEditorInput"></textarea><p>Le modifiche ai testi sono una bozza visibile nell'anteprima: non vengono ancora pubblicate sul sito.</p><div class="actions"><button type="button" id="applyText">Applica all'anteprima</button><button type="button" id="cancelText">Annulla</button><button type="button" id="exportTexts">Esporta bozza JSON</button></div></div></div><main><section class="site"><div class="section-heading">Anteprima del sito</div><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
 <section class="admin" id="editorModal" role="dialog" aria-modal="true" aria-label="Modifica contenuti"><div class="admin-shell"><div class="modal-head"><strong>✎ Modifica contenuti</strong><button type="button" id="closeEditor" aria-label="Chiudi editor">Chiudi ✕</button></div><div class="admin-hint" id="editorHint" role="status">Tocca “Modifica” su una sezione dell’anteprima per aprire il relativo strumento.</div><div class="notice">Accedi nel riquadro sottostante con il tuo account amministratore. Le modifiche salvate qui sono reali: aggiorna l'anteprima per vederle.</div><iframe id="adminFrame" title="Pannello amministratore" src="amministrazione.html"></iframe></div></section></main>
 <script>
 const preview=document.getElementById('preview');
@@ -36,6 +36,34 @@ function showEditor(){modal.classList.add('open');document.body.style.overflow='
 function closeEditor(){modal.classList.remove('open');document.body.style.overflow='';try{preview.contentWindow.location.reload()}catch(e){} }
 document.getElementById('closeEditor').addEventListener('click',closeEditor);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeEditor();});
+const textTargets=[
+ {selector:'.cd-intro',label:'Introduzione homepage'},
+ {selector:'.cd-kicker',label:'Sottotitolo homepage'},
+ {selector:'.cd-action',label:'Slogan homepage'},
+ {selector:'#chi-siamo strong',label:'Titolo Chi siamo'},
+ {selector:'#categorie .sub',label:'Descrizione categorie'},
+ {selector:'#contatti .eyebrow',label:'Titolo contatti'}
+];
+const textDraft={};let currentText=null;
+const textModal=document.getElementById('textEditor'),textInput=document.getElementById('textEditorInput');
+function editText(item){
+ const d=preview.contentDocument,el=d.querySelector(item.selector);if(!el)return;
+ currentText=item;document.getElementById('textEditorTitle').textContent=item.label;
+ textInput.value=Object.prototype.hasOwnProperty.call(textDraft,item.selector)?textDraft[item.selector]:el.textContent.trim();
+ textModal.classList.add('open');textInput.focus();
+}
+document.getElementById('cancelText').onclick=()=>textModal.classList.remove('open');
+document.getElementById('applyText').onclick=()=>{
+ if(!currentText)return;
+ textDraft[currentText.selector]=textInput.value;
+ const el=preview.contentDocument?.querySelector(currentText.selector);if(el)el.textContent=textInput.value;
+ textModal.classList.remove('open');
+};
+document.getElementById('exportTexts').onclick=()=>{
+ if(currentText)textDraft[currentText.selector]=textInput.value;
+ const blob=new Blob([JSON.stringify({type:'carte-diem-text-draft',texts:textDraft},null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bozza-testi-carte-diem.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
 const targets=[
  {selector:'#articoli-evidenza',label:'articoli in evidenza',admin:'#cd-featured-admin'},
  {selector:'#cd-mancolista',label:'Mancolista',admin:'#cd-mancolista-admin'},
@@ -61,6 +89,7 @@ function decoratePreview(){
  let d;try{d=preview.contentDocument;if(!d)return;}catch(e){return;}
  d.querySelectorAll('.edit-tag').forEach(x=>x.remove());
  if(preview.getAttribute('src').startsWith('catalogo.html')){decorateCatalog(d);return;} if(!preview.getAttribute('src').startsWith('index.html'))return;
+ for(const item of textTargets){const el=d.querySelector(item.selector);if(!el)continue;if(Object.prototype.hasOwnProperty.call(textDraft,item.selector))el.textContent=textDraft[item.selector];el.style.outline='1px dashed #ffd05e';el.style.cursor='pointer';el.title='Tocca per modificare: '+item.label;el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();editText(item);},true);}
  for(const t of targets){
   const el=d.querySelector(t.selector);if(!el)continue;
   el.classList.add('edit-outline');

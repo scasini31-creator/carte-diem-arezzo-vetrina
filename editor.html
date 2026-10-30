@@ -382,7 +382,8 @@ const publishRow=document.createElement('div');publishRow.id='publishToolbar';pu
 
 ['publishPreview','publishExport'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(b);}});
 const livePublish=document.createElement('button');livePublish.type='button';livePublish.id='publishLive';livePublish.textContent='Pubblica modifiche';livePublish.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(livePublish);
-const publishLabel=document.createElement('div');publishLabel.textContent='Pubblicazione';publishLabel.style.cssText='padding:11px 16px 0;background:#172234;color:#f3ca67;font-weight:700;font-size:15px';graphicSection.appendChild(publishLabel);graphicSection.appendChild(publishRow);
+const publicationSection=makeSubmenu('Pubblicazione');
+publicationSection.appendChild(publishRow);
 const contentSection=makeSubmenu('Selezione elementi e ripristino');
 contentSection.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);

@@ -293,6 +293,13 @@ header{
   #cd-install-btn,
   #cd-install-btn[style*="display: block"] {display:none!important;}
 }
+#cd-exit-btn{display:none!important;position:absolute!important;top:50%!important;right:12px!important;transform:translateY(-50%)!important;margin:0!important;padding:0!important;width:42px!important;height:42px!important;border:1px solid #d4af65!important;border-radius:10px!important;background:#171717!important;color:#f4d58a!important;align-items:center!important;justify-content:center!important;z-index:100!important;cursor:pointer!important}
+@media (display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){
+ #cd-exit-btn{display:flex!important}
+ #cd-share-btn{right:62px!important}
+}
+html.cd-installed-app #cd-exit-btn{display:flex!important}
+html.cd-installed-app #cd-share-btn{right:62px!important}
 </style>
 
 <style>
@@ -481,7 +488,7 @@ header{
 
 <link rel="stylesheet" href="shared-sticky-header.css?v=1"></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="#chi-siamo">Chi siamo</a><a href="#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav><button id="cd-install-btn" type="button"
 aria-label="Installa CARTE DIEM"
-title="Installa CARTE DIEM"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></button><button id="cd-share-btn" type="button" aria-label="Condividi CARTE DIEM AREZZO" title="Condividi il sito"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.9 7.6-4.8M8.2 13.1l7.6 4.8"/></svg></button></header>
+title="Installa CARTE DIEM"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></button><button id="cd-share-btn" type="button" aria-label="Condividi CARTE DIEM AREZZO" title="Condividi il sito"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.9 7.6-4.8M8.2 13.1l7.6 4.8"/></svg></button><button id="cd-exit-btn" type="button" aria-label="Esci dall'app" title="Esci dall'app"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg></button></header>
 
 <div id="cd-install-help" role="status">
   Per aggiungere CARTE DIEM alla schermata Home,
@@ -637,5 +644,20 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+</script>
+<script>
+(function(){
+ const installed=window.matchMedia('(display-mode: standalone)').matches||window.matchMedia('(display-mode: fullscreen)').matches||window.matchMedia('(display-mode: minimal-ui)').matches||window.navigator.standalone===true;
+ if(!installed)return;
+ document.documentElement.classList.add('cd-installed-app');
+ const exit=document.getElementById('cd-exit-btn');
+ if(!exit)return;
+ exit.addEventListener('click',function(){
+  if(!window.confirm("Vuoi uscire da Vetrina Carte Diem?"))return;
+  window.close();
+  // Android e i browser possono impedire la chiusura programmata delle PWA.
+  window.alert("Se l'app non si è chiusa, usa il tasto o gesto Indietro del telefono oppure torna alla schermata Home.");
+ });
+})();
 </script>
 </body></html>

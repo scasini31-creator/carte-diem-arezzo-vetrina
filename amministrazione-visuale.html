@@ -21,7 +21,7 @@ iframe{width:100%;height:100%;border:0;background:white}
 <button data-page="index.html" aria-pressed="true">Homepage</button>
 <button data-page="catalogo.html" aria-pressed="false">Catalogo</button>
 <button data-page="mancolista.html" aria-pressed="false">Mancolista</button>
-<button id="refresh" type="button">Aggiorna anteprima ↻</button>
+<button id="refresh" type="button">Aggiorna anteprima ↻</button><button id="cloudSave" type="button">Salva bozza online</button><button id="cloudLoad" type="button">Carica bozza online</button><span id="cloudStatus" role="status" style="align-self:center;color:#ffe2a4"></span>
 </div>
 <div id="textEditor" class="text-editor" role="dialog" aria-modal="true" aria-label="Modifica testo"><div class="text-editor-panel"><h2 id="textEditorTitle">Modifica testo</h2><label for="textEditorInput">Testo</label><textarea id="textEditorInput"></textarea><p>Le modifiche ai testi sono una bozza visibile nell'anteprima: non vengono ancora pubblicate sul sito.</p><div class="actions"><button type="button" id="applyText">Applica all'anteprima</button><button type="button" id="cancelText">Annulla</button><button type="button" id="exportTexts">Esporta bozza JSON</button></div></div></div><div id="imageEditor" class="image-editor" role="dialog" aria-modal="true" aria-label="Modifica immagine"><div class="image-editor-panel"><h2 id="imageEditorTitle">Modifica immagine</h2><p>Seleziona un'immagine per la bozza locale. Non viene caricata su Supabase né pubblicata.</p><input id="imageEditorFile" type="file" accept="image/png,image/jpeg,image/webp"><div class="actions"><button id="applyImage" type="button">Applica all'anteprima</button><button id="cancelImage" type="button">Annulla</button><button id="removeImage" type="button">Ripristina originale</button></div></div></div><main><section class="site"><div class="section-heading">Anteprima del sito</div><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
 <section class="admin" id="editorModal" role="dialog" aria-modal="true" aria-label="Modifica contenuti"><div class="admin-shell"><div class="modal-head"><strong>✎ Modifica contenuti</strong><button type="button" id="closeEditor" aria-label="Chiudi editor">Chiudi ✕</button></div><div class="admin-hint" id="editorHint" role="status">Tocca “Modifica” su una sezione dell’anteprima per aprire il relativo strumento.</div><div class="notice">Accedi nel riquadro sottostante con il tuo account amministratore. Le modifiche salvate qui sono reali: aggiorna l'anteprima per vederle.</div><iframe id="adminFrame" title="Pannello amministratore" src="amministrazione.html"></iframe></div></section></main>
@@ -76,6 +76,33 @@ function editImage(item){currentImage=item;document.getElementById('imageEditorT
 document.getElementById('cancelImage').onclick=()=>imageModal.classList.remove('open');
 document.getElementById('removeImage').onclick=()=>{if(currentImage){delete imageDraft[currentImage.selector];persistDraft();preview.contentWindow.location.reload();}imageModal.classList.remove('open');};
 document.getElementById('applyImage').onclick=()=>{const f=document.getElementById('imageEditorFile').files[0];if(!f||!currentImage)return;if(f.size>1500000){alert('Seleziona un file inferiore a 1,5 MB.');return;}const reader=new FileReader();reader.onload=()=>{const data=String(reader.result);imageDraft[currentImage.selector]=data;if(persistDraft())applyImageToPreview(currentImage,data);imageModal.classList.remove('open');};reader.readAsDataURL(f);};
+async function cloudContext(){
+ const w=adminFrame.contentWindow;
+ if(!w||!w.sb)throw new Error('Apri una modifica e accedi come amministratore prima di usare il salvataggio online.');
+ const sb=w.sb;
+ const {data:{user},error}=await sb.auth.getUser();if(error||!user)throw new Error('Accesso amministratore richiesto.');
+ const {data:allowed,error:authError}=await sb.rpc('is_admin');if(authError||!allowed)throw new Error('Account non autorizzato.');
+ return {sb,user};
+}
+async function cloudAction(kind){
+ const status=document.getElementById('cloudStatus');status.textContent='Operazione in corso…';
+ try{
+  const {sb,user}=await cloudContext();
+  if(kind==='save'){
+   const {error}=await sb.from('visual_editor_drafts').upsert({owner_id:user.id,payload:{texts:textDraft,images:imageDraft},updated_at:new Date().toISOString()},{onConflict:'owner_id'});
+   if(error)throw error;status.textContent='Bozza salvata online. Nessuna pubblicazione.';
+  }else{
+   if(!confirm('Caricare la bozza online? Sostituirà la bozza locale non salvata.')){status.textContent='Operazione annullata.';return;}
+   const {data,error}=await sb.from('visual_editor_drafts').select('payload').eq('owner_id',user.id).maybeSingle();if(error)throw error;
+   if(!data){status.textContent='Nessuna bozza online trovata.';return;}
+   for(const k of Object.keys(textDraft))delete textDraft[k];for(const k of Object.keys(imageDraft))delete imageDraft[k];
+   Object.assign(textDraft,data.payload?.texts||{});Object.assign(imageDraft,data.payload?.images||{});
+   persistDraft();preview.contentWindow.location.reload();status.textContent='Bozza online caricata.';
+  }
+ }catch(e){status.textContent='Non riuscito: '+e.message+' Verifica che la migrazione SQL sia stata applicata.';}
+}
+document.getElementById('cloudSave').onclick=()=>cloudAction('save');
+document.getElementById('cloudLoad').onclick=()=>cloudAction('load');
 const targets=[
  {selector:'#articoli-evidenza',label:'articoli in evidenza',admin:'#cd-featured-admin'},
  {selector:'#cd-mancolista',label:'Mancolista',admin:'#cd-mancolista-admin'},

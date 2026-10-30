@@ -60,7 +60,7 @@ main>.site>iframe{display:block;flex:1 1 auto;height:100%!important;min-height:0
 <button data-page="index.html" aria-pressed="true">Homepage</button>
 <button data-page="catalogo.html" aria-pressed="false">Catalogo</button>
 <button data-page="richieste.html" aria-pressed="false">Mancolista</button>
-<button id="refresh" type="button">Aggiorna anteprima ↻</button><button id="cloudSave" type="button">Salva bozza online</button><button id="cloudLoad" type="button">Carica bozza online</button><button id="publishPreview" type="button">Verifica pubblicazione</button><button id="publishExport" type="button">Prepara file di pubblicazione</button><span id="cloudStatus" role="status" style="align-self:center;color:#ffe2a4"></span>
+<button id="refresh" type="button">Aggiorna anteprima ↻</button><button id="cloudSave" type="button">Salva bozza online</button><button id="cloudLoad" type="button">Carica bozza online</button><button id="publishPreview" type="button" onclick="document.getElementById('publishFeedback').textContent='Verifica avviata…'">Verifica pubblicazione</button><button id="publishExport" type="button" onclick="document.getElementById('publishFeedback').textContent='Preparazione file avviata…'">Prepara file di pubblicazione</button><div id="publishFeedback" role="status" aria-live="polite" style="flex:0 0 100%;padding:10px;color:#ffe2a4;background:#101b2c;border:1px solid #ad8948;border-radius:7px">Pronto: premi Verifica pubblicazione.</div><span id="cloudStatus" role="status" style="align-self:center;color:#ffe2a4"></span>
 </div>
 <div id="textEditor" class="text-editor" role="dialog" aria-modal="true" aria-label="Modifica testo"><div class="text-editor-panel"><h2 id="textEditorTitle">Modifica testo</h2><label for="textEditorInput">Testo</label><textarea id="textEditorInput"></textarea><p>Le modifiche ai testi sono una bozza visibile nell'anteprima: non vengono ancora pubblicate sul sito.</p><div class="actions"><button type="button" id="applyText">Applica all'anteprima</button><button type="button" id="cancelText">Annulla</button><button type="button" id="exportTexts">Esporta bozza JSON</button></div></div></div><div id="imageEditor" class="image-editor" role="dialog" aria-modal="true" aria-label="Modifica immagine"><div class="image-editor-panel"><h2 id="imageEditorTitle">Modifica immagine</h2><p>Seleziona un'immagine per la bozza locale. Non viene caricata su Supabase né pubblicata.</p><input id="imageEditorFile" type="file" accept="image/png,image/jpeg,image/webp"><div class="actions"><button id="applyImage" type="button">Applica all'anteprima</button><button id="cancelImage" type="button">Annulla</button><button id="removeImage" type="button">Ripristina originale</button></div></div></div><main><section class="site"><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
 <section class="admin" id="editorModal" role="dialog" aria-modal="true" aria-label="Modifica contenuti"><div class="admin-shell"><div class="modal-head"><strong>✎ Modifica contenuti</strong><button type="button" id="closeEditor" aria-label="Chiudi editor">Chiudi ✕</button></div><div class="admin-hint" id="editorHint" role="status">Tocca “Modifica” su una sezione dell’anteprima per aprire il relativo strumento.</div><div class="notice">Accedi con il tuo account amministratore per gestire le bozze. ATTENZIONE: le operazioni di salvataggio effettuate nel pannello amministrativo aggiornano il database REALE. Le modifiche grafiche dell’editor rimangono invece bozze.</div><iframe id="adminFrame" title="Pannello amministratore"></iframe></div></section></main>
@@ -341,6 +341,7 @@ const publishLabel=document.createElement('strong');publishLabel.textContent='Pu
 ['publishPreview','publishExport'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(b);}});
 editorMenu.appendChild(publishRow);
 const publishStatus=document.createElement('div');publishStatus.id='publishStatus';publishStatus.textContent='Nessuna verifica eseguita.';publishStatus.style.cssText='padding:9px 15px 12px;color:#ffe2a4;font-size:13px;background:#111a29;border-bottom:1px solid #ad8948;white-space:normal';publishStatus.setAttribute('role','status');publishStatus.setAttribute('aria-live','polite');editorMenu.appendChild(publishStatus);
+const feedback=document.getElementById('publishFeedback');publishRow.after(feedback);feedback.style.flex='none';
 editorMenu.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
 
@@ -488,7 +489,7 @@ setTimeout(verify,800);
 /* Preflight non distruttivo: nessun token GitHub nel browser, nessuna scrittura pubblica. */
 (function(){
 const status=document.getElementById('publishStatus');
-function announce(message,type='info'){status.textContent=message;status.style.color=type==='error'?'#ffb3a8':type==='ok'?'#baf3c5':'#ffe2a4';status.setAttribute('role','status');status.setAttribute('aria-live','polite');}
+function announce(message,type='info'){document.getElementById('publishFeedback').textContent=message;status.textContent=message;status.style.color=type==='error'?'#ffb3a8':type==='ok'?'#baf3c5':'#ffe2a4';status.setAttribute('role','status');status.setAttribute('aria-live','polite');}
 const getDraft=()=>({texts:typeof textDraft==='object'?textDraft:{},images:typeof imageDraft==='object'?imageDraft:{},elements:typeof ueData==='object'?ueData:{}});
 const count=o=>Object.keys(o||{}).length;
 async function preflight(){
@@ -505,15 +506,15 @@ async function preflight(){
   return d;
  }catch(e){announce('Verifica non riuscita: '+e.message,'error');return null;}
 }
-document.getElementById('publishPreview').onclick=preflight;
-document.getElementById('publishExport').onclick=async()=>{
+document.getElementById('publishPreview').addEventListener('click',preflight);
+document.getElementById('publishExport').addEventListener('click',async()=>{
  const d=await preflight();if(!d)return;
  if(!confirm('Preparare il file con le modifiche grafiche? Questo NON pubblica automaticamente sul sito.'))return;
  const payload={format:'carte-diem-visual-publication-v1',created_at:new Date().toISOString(),pages:{[preview.getAttribute('src')||'index.html']:d}};
  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carte-diem-pubblicazione.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),30000);
  announce('File di pubblicazione preparato. Nessuna modifica applicata al sito pubblico.','ok');
-};
+});
 })();
 </script>
 </body></html>

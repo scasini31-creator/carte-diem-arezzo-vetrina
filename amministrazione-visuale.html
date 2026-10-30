@@ -78,8 +78,10 @@ document.getElementById('removeImage').onclick=()=>{if(currentImage){delete imag
 document.getElementById('applyImage').onclick=()=>{const f=document.getElementById('imageEditorFile').files[0];if(!f||!currentImage)return;if(f.size>1500000){alert('Seleziona un file inferiore a 1,5 MB.');return;}const reader=new FileReader();reader.onload=()=>{const data=String(reader.result);imageDraft[currentImage.selector]=data;if(persistDraft())applyImageToPreview(currentImage,data);imageModal.classList.remove('open');};reader.readAsDataURL(f);};
 async function cloudContext(){
  const w=adminFrame.contentWindow;
- if(!w||!w.sb)throw new Error('Apri una modifica e accedi come amministratore prima di usare il salvataggio online.');
- const sb=w.sb;
+ if(!w||!w.document?.getElementById('adminContent'))throw new Error('Pannello amministrativo non ancora caricato.');
+ const logged=w.document.getElementById('adminContent');
+ if(w.getComputedStyle(logged).display==='none')throw new Error('Apri Modifica e accedi come amministratore.');
+ const sb=w.eval('sb');
  const {data:{user},error}=await sb.auth.getUser();if(error||!user)throw new Error('Accesso amministratore richiesto.');
  const {data:allowed,error:authError}=await sb.rpc('is_admin');if(authError||!allowed)throw new Error('Account non autorizzato.');
  return {sb,user};

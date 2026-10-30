@@ -296,7 +296,10 @@ header{
   display:flex!important;
 }
 #cd-share-btn{right:12px!important;display:flex!important;cursor:pointer!important;}
-@media (display-mode: standalone){#cd-install-btn{display:none!important;}}
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  #cd-install-btn,
+  #cd-install-btn[style*="display: block"] {display:none!important;}
+}
 </style>
 
 <style>
@@ -580,16 +583,20 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
   const btn = document.getElementById('cd-install-btn');
   const help = document.getElementById('cd-install-help');
   const installed = () =>
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
+    ['standalone','fullscreen','minimal-ui'].some(mode => window.matchMedia('(display-mode: '+mode+')').matches) ||
+    window.navigator.standalone === true ||
+    document.referrer.startsWith('android-app://');
 
-  if (!installed()) btn.style.display = 'block';
-  else btn.style.display = 'none';
+  const syncInstallButton = () => {
+    btn.style.setProperty('display', installed() ? 'none' : 'block', 'important');
+    if (installed()) help.style.display = 'none';
+  };
+  syncInstallButton();
 
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     installPrompt = e;
-    if (!installed()) btn.style.display = 'block';
+    syncInstallButton();
   });
 
   btn.addEventListener('click', async () => {
@@ -617,11 +624,12 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
       window.prompt('Copia il link del sito:', shareUrl);
     }
   });
-  window.matchMedia('(display-mode: standalone)').addEventListener?.('change', () => {
-    btn.style.display = installed() ? 'none' : 'block';
+  ['standalone','fullscreen','minimal-ui'].forEach(mode => {
+    window.matchMedia('(display-mode: '+mode+')').addEventListener?.('change', syncInstallButton);
   });
+  window.addEventListener('pageshow', syncInstallButton);
   window.addEventListener('appinstalled', () => {
-    btn.style.display = 'none';
+    btn.style.setProperty('display','none','important');
     help.style.display = 'none';
   });
 })();

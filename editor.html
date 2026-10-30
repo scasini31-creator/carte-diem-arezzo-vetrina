@@ -403,6 +403,10 @@ contentSection.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
 editorMenu.style.position='relative';
 editorMenu.style.zIndex='50';
+// I tre comandi di accesso e navigazione restano visibili nel menu principale.
+const mainMenuActions=graphicSection.querySelector('.header-actions');
+if(mainMenuActions)editorMenu.insertBefore(mainMenuActions,graphicSection);
+
 // Sposta i pulsanti esistenti soltanto dopo aver collegato il menu al documento.
 for(const id of ['publishPreview','publishExport']){
  const button=document.getElementById(id);

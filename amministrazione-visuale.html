@@ -43,6 +43,7 @@ const targets=[
 ];
 function focusAdmin(selector,label){
  showEditor();
+ setEditorMode(selector);
  try{
   const d=adminFrame.contentDocument;
   const logged=d.getElementById('adminContent');
@@ -72,6 +73,7 @@ function decoratePreview(){
 
 function openCatalogProduct(card){
  showEditor();
+ setEditorMode('#productForm');
  const name=card.querySelector('.preview-product-name')?.textContent?.trim();
  const code=card.querySelector('.preview-product-code')?.textContent?.trim();
  if(!name)return;
@@ -112,5 +114,22 @@ function decorateCatalog(d){
  const observer=new MutationObserver(decorate);observer.observe(grid,{childList:true});
 }
 
+
+function setEditorMode(selector){
+ let d;try{d=adminFrame.contentDocument;}catch(e){return;}if(!d)return;
+ let style=d.getElementById('visual-editor-focus');
+ if(!style){style=d.createElement('style');style.id='visual-editor-focus';d.head.appendChild(style);}
+ const hide='header,#logoutWrap,.stats,#adminContent > .panel,#adminContent > section,.admin-search,.admin-category-filters';
+ const base='body{background:#101723!important}main{max-width:850px!important;padding:12px 18px 40px!important}#syncStatus{font-size:12px;padding:8px!important}#adminContent>.stats{display:none!important}';
+ if(selector==='#productForm'){
+  style.textContent=base+'#adminContent>section.panel{display:none!important}#adminContent>section.panel:has(#productForm){display:block!important;margin:8px 0!important}body>header{display:none!important}#logoutWrap{display:none!important}';
+ }else if(selector==='#cd-featured-admin'||selector==='#cd-mancolista-admin'){
+  const id=selector.slice(1);
+  style.textContent=base+'#adminContent>section.panel{display:none!important}#adminContent>section#'+id+'{display:block!important;margin:8px 0!important}body>header{display:none!important}#logoutWrap{display:none!important}';
+ }else{
+  style.textContent='';
+ }
+}
+adminFrame.addEventListener('load',()=>{if(modal.classList.contains('open'))setEditorMode('#productForm');});
 preview.addEventListener('load',decoratePreview);
 </script></body></html>

@@ -9,13 +9,13 @@ h1{font-size:19px;margin:0;letter-spacing:.5px}h1 span{color:var(--gold)}p{color
 a,button{border:1px solid #aa8743;border-radius:9px;padding:11px 14px;background:#151b29;color:var(--gold);text-decoration:none;cursor:pointer;font:inherit}
 button[aria-pressed="true"]{background:var(--gold);color:#111;font-weight:700}
 .controls{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line);background:#101723}
-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(290px,35%);height:calc(100dvh - 139px);min-height:450px}
-section{min-width:0;display:flex;flex-direction:column}section+section{border-left:1px solid var(--line)}
+main{height:calc(100dvh - 139px);min-height:450px}
+section{min-width:0;display:flex;flex-direction:column}section+section{border-left:0}
 .section-heading{padding:10px 14px;background:#141c2b;color:var(--gold);font-weight:700;border-bottom:1px solid var(--line)}
 iframe{width:100%;height:100%;border:0;background:white}
 .notice{font-size:12px;color:#c2c8d5;padding:9px 15px;background:#0c1220}
-@media(max-width:760px){header{padding:12px}main{height:auto;display:flex;flex-direction:column}.site{height:65dvh;min-height:380px}.admin{height:70dvh;min-height:460px}section+section{border-left:0;border-top:1px solid var(--line)}.controls{padding:10px}}
-.edit-tag{position:absolute;right:12px;top:12px;z-index:20;background:#ffd05e!important;color:#111!important;border:2px solid #18120a!important;border-radius:9px!important;padding:9px 12px!important;font:700 13px Arial,sans-serif!important;box-shadow:0 3px 16px #0009!important;cursor:pointer!important}.edit-outline{outline:2px dashed #ffd05e!important;outline-offset:-3px!important}.admin-hint{padding:8px 14px;background:#332714;color:#ffe5aa;font-size:12px}</style></head><body>
+@media(max-width:760px){header{padding:12px}main{height:auto;display:flex;flex-direction:column}.site{height:75dvh;min-height:380px}section+section{border-left:0;border-top:1px solid var(--line)}.controls{padding:10px}}
+.edit-tag{position:absolute;right:12px;top:12px;z-index:20;background:#ffd05e!important;color:#111!important;border:2px solid #18120a!important;border-radius:9px!important;padding:9px 12px!important;font:700 13px Arial,sans-serif!important;box-shadow:0 3px 16px #0009!important;cursor:pointer!important}.edit-outline{outline:2px dashed #ffd05e!important;outline-offset:-3px!important}.admin-hint{padding:8px 14px;background:#332714;color:#ffe5aa;font-size:12px}.site{height:100%}.admin{position:fixed;inset:0;z-index:100;background:#050810e8;padding:3vh max(10px,calc((100vw - 900px)/2));display:none;align-items:stretch;justify-content:center}.admin.open{display:flex}.admin-shell{background:#101723;border:1px solid #8c723e;border-radius:14px;box-shadow:0 20px 70px #000c;display:flex;flex-direction:column;width:100%;min-height:0;overflow:hidden}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;background:#141c2b}.modal-head button{padding:7px 12px}.admin iframe{flex:1;min-height:0}.admin-hint{min-height:30px}@media(max-width:760px){.admin{padding:8px}.admin-shell{height:100%}.site{height:75dvh}} </style></head><body>
 <header><div><h1>CARTE DIEM <span>AREZZO</span> · Editor visuale</h1><p>Ambiente di sviluppo separato · il sito pubblico non viene modificato</p></div><a href="amministrazione.html" target="_blank" rel="noopener">Apri amministrazione ↗</a></header>
 <div class="controls" role="group" aria-label="Pagina da visualizzare">
 <button data-page="index.html" aria-pressed="true">Homepage</button>
@@ -24,30 +24,36 @@ iframe{width:100%;height:100%;border:0;background:white}
 <button id="refresh" type="button">Aggiorna anteprima ↻</button>
 </div>
 <main><section class="site"><div class="section-heading">Anteprima del sito</div><iframe id="preview" title="Anteprima sito" src="index.html"></iframe></section>
-<section class="admin"><div class="section-heading">Strumenti amministrativi esistenti</div><div class="admin-hint" id="editorHint" role="status">Tocca “Modifica” su una sezione dell’anteprima per aprire il relativo strumento.</div><div class="notice">Accedi nel riquadro sottostante con il tuo account amministratore. Le modifiche salvate qui sono reali: aggiorna l'anteprima per vederle.</div><iframe id="adminFrame" title="Pannello amministratore" src="amministrazione.html"></iframe></section></main>
+<section class="admin" id="editorModal" role="dialog" aria-modal="true" aria-label="Modifica contenuti"><div class="admin-shell"><div class="modal-head"><strong>✎ Modifica contenuti</strong><button type="button" id="closeEditor" aria-label="Chiudi editor">Chiudi ✕</button></div><div class="admin-hint" id="editorHint" role="status">Tocca “Modifica” su una sezione dell’anteprima per aprire il relativo strumento.</div><div class="notice">Accedi nel riquadro sottostante con il tuo account amministratore. Le modifiche salvate qui sono reali: aggiorna l'anteprima per vederle.</div><iframe id="adminFrame" title="Pannello amministratore" src="amministrazione.html"></iframe></div></section></main>
 <script>
 const preview=document.getElementById('preview');
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{preview.src=b.dataset.page;document.querySelectorAll('[data-page]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
 document.getElementById('refresh').addEventListener('click',()=>{try{preview.contentWindow.location.reload()}catch(e){preview.src=preview.getAttribute('src')}});
 
 const adminFrame=document.getElementById('adminFrame'),hint=document.getElementById('editorHint');
+const modal=document.getElementById('editorModal');
+function showEditor(){modal.classList.add('open');document.body.style.overflow='hidden';document.getElementById('closeEditor').focus();}
+function closeEditor(){modal.classList.remove('open');document.body.style.overflow='';try{preview.contentWindow.location.reload()}catch(e){} }
+document.getElementById('closeEditor').addEventListener('click',closeEditor);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeEditor();});
 const targets=[
  {selector:'#articoli-evidenza',label:'articoli in evidenza',admin:'#cd-featured-admin'},
  {selector:'#cd-mancolista',label:'Mancolista',admin:'#cd-mancolista-admin'},
  {selector:'#categorie',label:'prodotti e categorie',admin:'#productForm'}
 ];
 function focusAdmin(selector,label){
+ showEditor();
  try{
   const d=adminFrame.contentDocument;
   const logged=d.getElementById('adminContent');
   if(!logged||getComputedStyle(logged).display==='none'){
-    hint.textContent='Accedi nel pannello amministratore qui sotto per modificare '+label+'.';
+    hint.textContent='Accedi per modificare '+label+'.';
   }else{
     const target=d.querySelector(selector);
     if(target){target.scrollIntoView({behavior:'smooth',block:'start'});hint.textContent='Strumento aperto: '+label+'. Aggiorna l’anteprima dopo il salvataggio.';}
     else hint.textContent='Lo strumento non è ancora disponibile. Riprova tra qualche istante.';
   }
-  if(innerWidth<761)document.querySelector('.admin').scrollIntoView({behavior:'smooth'});
+
  }catch(e){hint.textContent='Impossibile accedere allo strumento amministrativo.';}
 }
 function decoratePreview(){
@@ -65,6 +71,7 @@ function decoratePreview(){
 }
 
 function openCatalogProduct(card){
+ showEditor();
  const name=card.querySelector('.preview-product-name')?.textContent?.trim();
  const code=card.querySelector('.preview-product-code')?.textContent?.trim();
  if(!name)return;
@@ -88,7 +95,7 @@ function openCatalogProduct(card){
    search.scrollIntoView({block:'start'});
   }
  }
- if(innerWidth<761)document.querySelector('.admin').scrollIntoView({behavior:'smooth'});
+
 }
 function decorateCatalog(d){
  const style=d.createElement('style');style.textContent='#catalogGrid .product{position:relative!important}#catalogGrid .edit-tag{top:8px;right:8px;z-index:30}';d.head.appendChild(style);

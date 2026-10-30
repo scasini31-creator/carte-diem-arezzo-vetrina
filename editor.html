@@ -385,6 +385,27 @@ const livePublish=document.createElement('button');livePublish.type='button';liv
 graphicSection.appendChild(publishRow);
 const contentSection=makeSubmenu('Gestione contenuti');
 contentSection.appendChild(ueToolbar);
+// Riorganizzazione conservativa: tutti i pulsanti esistenti mantengono ID e gestori.
+// Spostiamo i nodi già creati, senza duplicarli né rimuovere la barra originale.
+const pageControls=document.querySelector('.controls');
+const refreshButton=document.getElementById('refresh');
+const saveButton=document.getElementById('cloudSave');
+const selectButton=document.getElementById('ueToggle');
+pageControls.append(refreshButton,selectButton,saveButton);
+const draftsSection=makeSubmenu('Gestione bozze');
+const draftsControls=document.createElement('div');
+draftsControls.className='controls';
+draftsControls.setAttribute('role','group');
+draftsControls.setAttribute('aria-label','Gestione bozze');
+draftsControls.append(document.getElementById('cloudLoad'),document.getElementById('ueResetPage'));
+draftsSection.appendChild(draftsControls);
+const publicationSection=makeSubmenu('Pubblicazione');
+publicationSection.appendChild(publishRow);
+const advancedSection=makeSubmenu('Strumenti avanzati');
+const advancedNote=document.createElement('p');
+advancedNote.style.cssText='padding:8px 18px;color:#d4c8af;font-size:14px;line-height:1.5';
+advancedNote.textContent='Esporta bozza JSON è disponibile nella finestra Modifica testo. Ripristina originale è disponibile nella finestra Modifica immagine.';
+advancedSection.appendChild(advancedNote);
 document.querySelector('header').after(editorMenu);
 editorMenu.style.position='relative';
 editorMenu.style.zIndex='50';

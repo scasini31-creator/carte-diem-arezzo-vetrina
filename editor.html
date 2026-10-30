@@ -55,6 +55,15 @@ main>.site>iframe{display:block;flex:1 1 auto;height:100%!important;min-height:0
 #editorAuthGate iframe{width:min(600px,100%);height:min(65dvh,650px);min-height:330px;flex:0 1 auto;border:1px solid #a88a4a;border-radius:12px;background:#0d0d0f}
 #editorAuthGate[hidden]{display:none!important}
 
+/* Editing: due righe fisse, nessuno scorrimento laterale. */
+#editorMenu #editingControls{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important;overflow-x:hidden!important;scroll-snap-type:none!important;padding:10px 8px!important;box-sizing:border-box}
+#editorMenu #editingControls .editing-row{display:grid;width:100%;min-width:0;gap:5px;align-items:stretch}
+#editorMenu #editingControls .editing-pages{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 38px}
+#editorMenu #editingControls .editing-drafts{grid-template-columns:repeat(3,minmax(0,1fr))}
+#editorMenu #editingControls .editing-row>button{min-width:0;width:100%;margin:0!important;box-sizing:border-box;white-space:nowrap!important;overflow:hidden;text-overflow:clip;text-align:center;padding:10px 2px!important;font-size:clamp(9px,2.55vw,16px)!important;line-height:1.2}
+#editorMenu #editingControls #refresh{font-size:20px!important;padding:8px 0!important}
+#editorMenu #editingControls #cloudStatus{white-space:normal;min-width:0}
+@media(min-width:700px){#editorMenu #editingControls .editing-row>button{font-size:inherit!important}}
 /* Pubblicazione: tre pulsanti uniformi e affiancati come in Inserimento. */
 #editorMenu #publishToolbar{display:flex!important;width:100%!important;max-width:100%;box-sizing:border-box;gap:6px!important;overflow-x:hidden!important;white-space:normal!important;padding:10px 8px!important;align-items:stretch!important}
 #editorMenu #publishToolbar>button{flex:1 1 0!important;width:0!important;min-width:0!important;box-sizing:border-box;white-space:normal!important;overflow-wrap:normal;word-break:normal;text-align:center;line-height:1.2;padding:10px 5px!important;font-size:inherit!important;border-radius:9px;display:flex;align-items:center;justify-content:center}
@@ -418,6 +427,26 @@ editorMenu.style.zIndex='50';
 // I tre comandi di accesso e navigazione restano visibili nel menu principale.
 const mainMenuActions=graphicSection.querySelector('.header-actions');
 if(mainMenuActions)editorMenu.insertBefore(mainMenuActions,graphicSection);
+
+// Riorganizzazione Editing: eseguita dopo l'inserimento del menu, senza ricreare i pulsanti.
+const editingControls=graphicSection.querySelector('.controls');
+if(editingControls){
+ editingControls.id='editingControls';
+ const pagesRow=document.createElement('div');pagesRow.className='editing-row editing-pages';
+ const draftsRow=document.createElement('div');draftsRow.className='editing-row editing-drafts';
+ const pages=[...editingControls.querySelectorAll('button[data-page]')];
+ const refreshButton=document.getElementById('refresh');
+ const draftButtons=['cloudSave','cloudLoad','ueResetPage'].map(id=>document.getElementById(id));
+ if(pages.length===3&&refreshButton&&draftButtons.every(Boolean)){
+  refreshButton.textContent='↻';
+  refreshButton.title='Aggiorna anteprima';
+  refreshButton.setAttribute('aria-label','Aggiorna anteprima');
+  pagesRow.append(...pages,refreshButton);
+  draftsRow.append(...draftButtons);
+  editingControls.prepend(draftsRow);
+  editingControls.prepend(pagesRow);
+ }
+}
 
 // Sposta i pulsanti esistenti soltanto dopo aver collegato il menu al documento.
 for(const id of ['publishPreview','publishExport']){

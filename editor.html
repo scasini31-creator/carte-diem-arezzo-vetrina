@@ -376,45 +376,19 @@ const makeSubmenu=(title)=>{
 };
 const graphicSection=makeSubmenu('Editor grafico');
 graphicSection.appendChild(document.querySelector('.header-actions'));
-const pageControls=document.querySelector('.controls');
-graphicSection.appendChild(pageControls);
-// I comandi più usati restano a portata di mano, senza cambiare gli ID o le funzioni.
-const selectionButton=document.getElementById('ueToggle');
-selectionButton.textContent='✎ Selezione elementi: ATTIVA';
-document.getElementById('refresh').after(selectionButton,ueNav);
-const draftsSection=makeSubmenu('Gestione bozze');
-const draftsRow=document.createElement('div');
-draftsRow.className='controls';
-draftsRow.setAttribute('role','group');
-draftsRow.setAttribute('aria-label','Gestione bozze');
-draftsRow.append(document.getElementById('cloudLoad'),document.getElementById('ueResetPage'));
-draftsSection.appendChild(draftsRow);
-const publicationSection=makeSubmenu('Pubblicazione');
-const publishRow=document.createElement('div');
-publishRow.id='publishToolbar';
-publishRow.style.cssText='display:flex;align-items:center;gap:9px;overflow-x:auto;white-space:nowrap;padding:10px 14px;background:#172234;border-top:1px solid #ad8948;border-bottom:1px solid #ad8948';
+graphicSection.appendChild(document.querySelector('.controls'));
+// Pubblicazione in una riga separata e sempre riconoscibile.
+const publishRow=document.createElement('div');publishRow.id='publishToolbar';publishRow.style.cssText='display:flex;align-items:center;gap:9px;overflow-x:auto;white-space:nowrap;padding:10px 14px;background:#172234;border-top:1px solid #ad8948;border-bottom:1px solid #ad8948';
+
 ['publishPreview','publishExport'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(b);}});
 const livePublish=document.createElement('button');livePublish.type='button';livePublish.id='publishLive';livePublish.textContent='Pubblica modifiche';livePublish.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(livePublish);
-publicationSection.appendChild(publishRow);
-const advancedSection=makeSubmenu('Strumenti avanzati');
-const advancedRow=document.createElement('div');
-advancedRow.className='controls';
-advancedRow.setAttribute('role','group');
-advancedRow.setAttribute('aria-label','Strumenti avanzati');
-const exportDraft=document.getElementById('exportTexts');
-if(exportDraft){
- const advancedHint=document.createElement('p');
- advancedHint.style.cssText='padding:0 16px;color:#d7c6a3';
- advancedHint.textContent='L’esportazione JSON è disponibile nella finestra Modifica testo.';
- advancedSection.appendChild(advancedHint);
-}
-// Navigazione e selezione rimangono insieme nella barra principale.
-advancedSection.appendChild(advancedRow);
-// La barra contenuti non contiene più comandi duplicati.
-ueToolbar.remove();
+graphicSection.appendChild(publishRow);
+const contentSection=makeSubmenu('Gestione contenuti');
+contentSection.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);
 editorMenu.style.position='relative';
 editorMenu.style.zIndex='50';
+
 let ueEnabled=true,ueSelected=null,ueOutline=null;
 ueNav.onclick=()=>{ueEnabled=false;ueNav.textContent='Navigazione: ATTIVA';document.getElementById('ueToggle').textContent='✎ Selezione elementi: DISATTIVA';document.getElementById('ueToggle').setAttribute('aria-pressed','false');};
 document.getElementById('ueToggle').onclick=()=>{ueEnabled=!ueEnabled;ueNav.textContent='Navigazione: '+(ueEnabled?'DISATTIVA':'ATTIVA');document.getElementById('ueToggle').textContent='✎ Selezione elementi: '+(ueEnabled?'ATTIVA':'DISATTIVA');document.getElementById('ueToggle').setAttribute('aria-pressed',String(ueEnabled));};

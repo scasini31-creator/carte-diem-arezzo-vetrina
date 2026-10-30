@@ -381,6 +381,7 @@ graphicSection.appendChild(document.querySelector('.controls'));
 const publishRow=document.createElement('div');publishRow.id='publishToolbar';publishRow.style.cssText='display:flex;align-items:center;gap:9px;overflow-x:auto;white-space:nowrap;padding:10px 14px;background:#172234;border-top:1px solid #ad8948;border-bottom:1px solid #ad8948';
 
 ['publishPreview','publishExport'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(b);}});
+const livePublish=document.createElement('button');livePublish.type='button';livePublish.id='publishLive';livePublish.textContent='Pubblica modifiche';livePublish.style.cssText='flex:0 0 auto;background:#e6b951;color:#121824;font-weight:700;padding:12px 15px;border-radius:10px';publishRow.appendChild(livePublish);
 graphicSection.appendChild(publishRow);
 const contentSection=makeSubmenu('Gestione contenuti');
 contentSection.appendChild(ueToolbar);
@@ -555,6 +556,23 @@ setTimeout(verify,800);
   }catch(e){report('Verifica non riuscita: '+(e?.message||String(e)),true);return null;}
  }
  verifyButton.addEventListener('click',check);
+ const publishButton=document.getElementById('publishLive');
+ if(publishButton)publishButton.addEventListener('click',async()=>{
+  const data=await check();if(!data)return;
+  const page=(preview.getAttribute('src')||'index.html').split('?')[0];
+  if(!['index.html','catalogo.html','richieste.html'].includes(page)){report('Pagina non supportata.',true);return;}
+  const changes=Object.keys(data.texts).length+Object.keys(data.images).length+Object.keys(data.elements).length;
+  if(!confirm('Pubblicare '+changes+' modifiche grafiche sulla pagina '+page+'? Saranno visibili a tutti. La pubblicazione non modifica i prodotti.')){report('Pubblicazione annullata.');return;}
+  publishButton.disabled=true;report('Pubblicazione in corso…');
+  try{
+   const {sb,user}=await cloudContext();
+   const {error}=await sb.from('visual_editor_published').upsert({page,payload:data,published_by:user.id,updated_at:new Date().toISOString()},{onConflict:'page'});
+   if(error)throw error;
+   report('Modifiche pubblicate per '+page+'. Ricarica il sito pubblico per verificarle.');
+  }catch(e){report('Pubblicazione non riuscita: '+(e?.message||String(e)),true);}
+  finally{publishButton.disabled=false;}
+ });
+
  exportButton.addEventListener('click',async()=>{
   const data=await check();if(!data)return;
   if(!confirm('Preparare il file JSON delle modifiche? Non verrà pubblicato nulla.'))return;

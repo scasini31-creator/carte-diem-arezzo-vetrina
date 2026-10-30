@@ -1,0 +1,5 @@
+
+@media (max-width:800px){
+  nav.mobile-dock{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;column-gap:0!important;row-gap:0!important;justify-content:stretch!important;align-items:stretch!important;width:100%!important;max-width:none!important;left:0!important;right:0!important;box-sizing:border-box!important;}
+  nav.mobile-dock>a{display:flex!important;width:100%!important;min-width:0!important;justify-self:stretch!important;align-items:center!important;justify-content:center!important;text-align:center!important;}
+}

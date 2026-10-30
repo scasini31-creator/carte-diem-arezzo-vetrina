@@ -81,4 +81,5 @@ function renderRequests(){const items=selectedProducts();document.getElementById
 document.getElementById('sendWhatsApp').onclick=()=>{if(!selectedProducts().length)return;window.open('https://wa.me/'+whatsappNumber+'?text='+encodeURIComponent(requestMessage()),'_blank','noopener,noreferrer')};
 document.getElementById('copyRequest').onclick=async()=>{if(!selectedProducts().length)return;const msg=requestMessage();try{await navigator.clipboard.writeText(msg);document.getElementById('copyFeedback').textContent='Messaggio copiato.'}catch(e){window.prompt('Copia il messaggio:',msg)}};
 loadProducts().then(data=>{products=data;renderRequests()}).catch(e=>{document.getElementById('requestEmpty').textContent='Errore caricamento prodotti: '+e.message});
-</script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a href="catalogo.html"><span>▦</span>Catalogo</a><a class="active" href="richieste.html"><span>♡</span>Lista</a></nav></body></html>
+</script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a href="catalogo.html"><span>▦</span>Catalogo</a><a class="active" href="richieste.html"><span>♡</span>Lista</a></nav><script src="visual-published.js"></script>
+</body></html>

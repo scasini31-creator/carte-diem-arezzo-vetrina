@@ -186,4 +186,13 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
  photo.addEventListener('touchstart',e=>{touchStart=e.touches[0]?.clientX??null},{passive:true});photo.addEventListener('touchend',e=>{if(touchStart===null)return;let delta=(e.changedTouches[0]?.clientX??touchStart)-touchStart;if(Math.abs(delta)>45)show(current+(delta<0?1:-1));touchStart=null},{passive:true});
 })();
 </script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a class="active" href="catalogo.html"><span>▦</span>Catalogo</a><a href="richieste.html"><span>♡</span>Lista</a></nav><script src="visual-published.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(error => {
+      console.warn('Cache PWA non disponibile:', error);
+    });
+  });
+}
+</script>
 </body></html>

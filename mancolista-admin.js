@@ -23,9 +23,9 @@
   function showImage(url) { preview.replaceChildren(); if (!url) return; const img = document.createElement('img'); img.src = url; img.alt = 'Anteprima immagine'; img.style.cssText = 'max-width:140px;max-height:180px;object-fit:contain'; preview.appendChild(img); }
   file.onchange = () => { if (file.files[0]) showImage(URL.createObjectURL(file.files[0])); else showImage(existingImage); };
   async function uploadImage(f) {
-    if (!f.type.startsWith('image/')) throw new Error('Seleziona un file immagine.');
+    if (!['image/jpeg','image/png','image/webp'].includes(f.type)) throw new Error('Sono ammesse solo immagini JPG, PNG o WebP.');
     if (f.size > 8 * 1024 * 1024) throw new Error('Immagine troppo grande (massimo 8 MB).');
-    const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    const ext = ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'})[f.type];
     const path = 'mancolista/' + crypto.randomUUID() + '.' + ext;
     const { error } = await sb.storage.from('product-images').upload(path, f, { contentType: f.type, upsert: false });
     if (error) throw error;

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="it"><head><meta name="referrer" content="strict-origin-when-cross-origin"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Editor visuale · Carte Diem Arezzo</title>
 <style>
 :root{color-scheme:dark;--gold:#ffd05e;--bg:#080d17;--panel:#101723;--line:#5b4c36}
@@ -163,7 +163,7 @@ let passwordRecoveryActive=false;
 function showNewPasswordPanel(){passwordRecoveryActive=true;el('loginPanel').style.display='none';el('adminContent').style.display='none';el('logoutWrap').style.display='none';el('newPasswordPanel').style.display='';status.textContent='Recupero password: scegli una nuova password.'}
 // Supabase v2 riconosce il link di recupero e genera l'evento PASSWORD_RECOVERY.
 sb.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY')showNewPasswordPanel()});
-el('forgotPassword').onclick=()=>{window.top.location.href=new URL('amministrazione.html',window.top.location.href).href};
+el('forgotPassword').onclick=()=>{el('recoveryForm').style.display='grid';el('recoveryEmail').value=el('loginEmail').value;el('recoveryEmail').focus()};
 el('recoveryCancel').onclick=()=>{el('recoveryForm').style.display='none';el('recoveryMessage').textContent=''};
 el('recoveryForm').onsubmit=async e=>{e.preventDefault();const btn=el('recoverySubmit');btn.disabled=true;el('recoveryMessage').textContent='Invio in corso…';try{const {error}=await sb.auth.resetPasswordForEmail(el('recoveryEmail').value.trim(),{redirectTo:new URL('amministrazione.html',location.href).href});if(error)throw error;el('recoveryMessage').textContent='Se l’indirizzo è registrato, riceverai un’email con il collegamento per reimpostare la password. Controlla anche lo spam.'}catch(err){el('recoveryMessage').textContent='Impossibile inviare l’email: '+err.message}finally{btn.disabled=false}};
 el('newPasswordForm').onsubmit=async e=>{e.preventDefault();const pwd=el('newPassword').value;if(pwd!==el('newPasswordConfirm').value){el('newPasswordMessage').textContent='Le due password non coincidono.';return}const btn=el('newPasswordSubmit');btn.disabled=true;el('newPasswordMessage').textContent='Salvataggio in corso…';try{const {error}=await sb.auth.updateUser({password:pwd});if(error)throw error;el('newPasswordMessage').textContent='Password aggiornata. Ora puoi accedere con la nuova password.';el('newPasswordForm').reset();await sb.auth.signOut();passwordRecoveryActive=false;el('newPasswordPanel').style.display='none';history.replaceState(null,'',location.pathname);await checkLogin()}catch(err){el('newPasswordMessage').textContent='Impossibile aggiornare la password: '+err.message}finally{btn.disabled=false}};
@@ -277,7 +277,7 @@ function applyImageToPreview(item,data){const el=preview.contentDocument?.queryS
 function editImage(item){currentImage=item;document.getElementById('imageEditorTitle').textContent=item.label;document.getElementById('imageEditorFile').value='';imageModal.classList.add('open');}
 document.getElementById('cancelImage').onclick=()=>imageModal.classList.remove('open');
 document.getElementById('removeImage').onclick=()=>{if(currentImage){delete imageDraft[currentImage.selector];persistDraft();preview.contentWindow.location.reload();}imageModal.classList.remove('open');};
-document.getElementById('applyImage').onclick=()=>{const f=document.getElementById('imageEditorFile').files[0];if(!f||!currentImage)return;if(f.size>1500000){alert('Seleziona un file inferiore a 1,5 MB.');return;}const reader=new FileReader();reader.onload=()=>{const data=String(reader.result);imageDraft[currentImage.selector]=data;if(persistDraft())applyImageToPreview(currentImage,data);imageModal.classList.remove('open');};reader.readAsDataURL(f);};
+document.getElementById('applyImage').onclick=()=>{const f=document.getElementById('imageEditorFile').files[0];if(!f||!currentImage)return;if(!['image/jpeg','image/png','image/webp'].includes(f.type)){alert('Formato immagine non consentito.');return;}if(f.size>1500000){alert('Seleziona un file inferiore a 1,5 MB.');return;}const reader=new FileReader();reader.onload=()=>{const data=String(reader.result);imageDraft[currentImage.selector]=data;if(persistDraft())applyImageToPreview(currentImage,data);imageModal.classList.remove('open');};reader.readAsDataURL(f);};
 async function cloudContext(){
  const w=adminFrame.contentWindow;
  if(!w||!w.document?.getElementById('adminContent'))throw new Error('Pannello amministrativo non ancora caricato.');

@@ -37,7 +37,7 @@
 
       const gruppo = p.catalog_group || 'pokemon';
       link.href = 'catalogo.html?catalogo=' +
-        encodeURIComponent(gruppo);
+        encodeURIComponent(gruppo) + '&prodotto=' + encodeURIComponent(String(p.id));
 
       const imageBox = document.createElement('div');
       imageBox.className = 'cd-featured-image-box';

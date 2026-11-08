@@ -190,7 +190,7 @@ loadProducts().then(data=>{
   if(requestedId){
     const index=products.findIndex(p=>String(p.id)===requestedId && (p.catalog_group||'pokemon')===currentGroup);
     if(index!==-1){
-      const allGroupIds=products.map((p,i)=>i).filter(i=>(p.catalog_group||'pokemon')===currentGroup&&p[2]!=='funko');
+      const allGroupIds=products.map((p,i)=>i).filter(i=>{const p=products[i];return (p.catalog_group||'pokemon')===currentGroup&&p[2]!=='funko'});
       const position=allGroupIds.indexOf(index);
       if(position!==-1)currentPage=Math.floor(position/PAGE_SIZE)+1;
       render();

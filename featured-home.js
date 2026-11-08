@@ -39,29 +39,24 @@
       link.href = 'catalogo.html?catalogo=' +
         encodeURIComponent(gruppo);
 
+      const imageBox = document.createElement('div');
+      imageBox.className = 'cd-featured-image-box';
       const img = document.createElement('img');
       img.loading = 'lazy';
       img.alt = p[0] || 'Articolo Carte Diem';
       img.src = (p[7] && p[7][0]) || 'logo-ottimizzato.webp';
-      img.style.cssText =
-        'width:100%;aspect-ratio:3/4;object-fit:contain;display:block';
+      imageBox.appendChild(img);
 
       const nome = document.createElement('strong');
+      nome.className = 'cd-featured-name';
       nome.textContent = p[0] || 'Articolo';
+      nome.title = nome.textContent;
 
       const dettagli = document.createElement('div');
-      dettagli.style.padding = '12px';
-
+      dettagli.className = 'cd-featured-card-body';
       dettagli.appendChild(nome);
 
-      if (p[1]) {
-        const sigla = document.createElement('p');
-        sigla.textContent = p[1];
-        dettagli.appendChild(sigla);
-      }
-
-
-      link.append(img, dettagli);
+      link.append(imageBox, dettagli);
       track.appendChild(link);
     }
 

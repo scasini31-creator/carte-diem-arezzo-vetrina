@@ -28,6 +28,11 @@
 #catalogGrid .photo .preview-pair.one img{flex:1 1 100%;width:100%}
 #catalogGrid .photo:has(.preview-pair) .demo{display:none}
 #catalogGrid .product-info{position:relative;z-index:1;min-width:0;background:var(--surface)}
+</style><style id="product-detail-header-clearance">
+/* Keep the product sheet below the sticky site header on all viewports. */
+#overlay{box-sizing:border-box;align-items:start;overflow-y:auto;padding-top:calc(104px + env(safe-area-inset-top, 0px));padding-bottom:18px}
+#detail{margin:0 auto;max-height:calc(100dvh - 122px - env(safe-area-inset-top, 0px))}
+@media(min-width:651px){#overlay{padding-top:105px}#detail{max-height:calc(100dvh - 123px)}}
 </style><style id="gallery-horizontal-fix">
 /* Product detail: straight, compact horizontal thumbnails, independent of preview cards. */
 #detailPhoto.photo{height:235px!important;min-height:0!important;display:block!important;overflow:hidden!important;background:#121212}

@@ -184,7 +184,22 @@ function showCatalog(group){
 }
 showCatalog(initialGroup);
 window.addEventListener('popstate',()=>showCatalog(new URLSearchParams(location.search).get('catalogo')));
-loadProducts().then(data=>{products=data;render()}).catch(e=>{document.getElementById('count').textContent='Errore caricamento catalogo';console.error(e)});
+loadProducts().then(data=>{
+  products=data;
+  const requestedId=new URLSearchParams(location.search).get('prodotto');
+  if(requestedId){
+    const index=products.findIndex(p=>String(p.id)===requestedId && (p.catalog_group||'pokemon')===currentGroup);
+    if(index!==-1){
+      const allGroupIds=products.map((p,i)=>i).filter(i=>(p.catalog_group||'pokemon')===currentGroup&&p[2]!=='funko');
+      const position=allGroupIds.indexOf(index);
+      if(position!==-1)currentPage=Math.floor(position/PAGE_SIZE)+1;
+      render();
+      openDetail(index);
+      return;
+    }
+  }
+  render();
+}).catch(e=>{document.getElementById('count').textContent='Errore caricamento catalogo';console.error(e)});
 </script><script>
 const reqKey='carte-diem-richieste-v1';
 function getRequests(){try{return JSON.parse(localStorage.getItem(reqKey)||'[]')}catch(e){return []}}

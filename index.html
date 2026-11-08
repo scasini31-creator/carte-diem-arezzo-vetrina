@@ -456,39 +456,34 @@ html.cd-installed-app #cd-share-btn{right:62px!important}
 
 
 <style id="cd-uniform-spacing">
-/* Spaziatura uniforme homepage */
-#categorie,
-#articoli-evidenza,
-#cd-mancolista {
-  padding-top: 24px !important;
-  padding-bottom: 24px !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+/* Ritmo verticale compatto e coerente fra le tre sezioni principali. */
+#categorie,#articoli-evidenza,#cd-mancolista{
+  padding-top:18px!important;
+  padding-bottom:18px!important;
+  margin-top:0!important;
+  margin-bottom:0!important;
+  min-height:0!important;
 }
-
-#categorie .section-title,
-#articoli-evidenza .section-title,
-#cd-mancolista .section-title {
-  margin-top: 0 !important;
-  margin-bottom: 24px !important;
+#categorie .section-title,#articoli-evidenza .section-title,#cd-mancolista .section-title{
+  margin:0 0 14px!important;
 }
-
-#categorie .sub,
-#articoli-evidenza .sub,
-#cd-mancolista .sub {
-  margin-top: 0 !important;
-  margin-bottom: 24px !important;
+#categorie .grid{
+  margin-top:0!important;
+  margin-bottom:0!important;
 }
-
-#cd-featured-track,
-#cd-mancolista-track {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+#cd-featured-track,#cd-mancolista-track{
+  margin-top:0!important;
+  margin-bottom:0!important;
+  padding-top:0!important;
+  padding-bottom:0!important;
 }
-
-#articoli-evidenza,
-#cd-mancolista {
-  min-height: 0 !important;
+#cd-mancolista .cd-mancolista-action{margin:14px auto 0!important}
+@media(max-width:800px){
+  #categorie,#articoli-evidenza,#cd-mancolista{
+    padding-top:16px!important;
+    padding-bottom:16px!important;
+  }
+  #categorie .grid{margin:0 -13px!important;padding:3px 14px 10px!important}
 }
 </style>
 
@@ -503,11 +498,11 @@ title="Installa CARTE DIEM"><svg aria-hidden="true" viewBox="0 0 24 24" width="2
 </div>
 
 <section class="hero" id="home"><div aria-hidden="true" class="cd-scene"></div><div class="cd-hero-content"><p class="cd-kicker">IL MONDO DEL COLLEZIONISMO</p><h1 class="cd-title">CARTE <em>DIEM</em><small>AREZZO</small></h1><p class="cd-action">VENDO · COMPRO · SCAMBIO</p><p class="cd-intro">Carte da collezione, prodotti sigillati e pezzi speciali. Scopri il nostro catalogo e contattaci per informazioni e disponibilità.</p><div class="cd-hero-buttons"><a class="cd-primary" href="catalogo.html">▣   ESPLORA IL CATALOGO <span>›</span></a><a class="cd-outline" href="#contatti">✉   CONTATTACI <span>›</span></a></div></div></section>
-<main><section class="container" id="categorie"><h2 class="section-title">LE NOSTRE CATEGORIE</h2><p class="sub">Seleziona una categoria per esplorare il catalogo dedicato.</p><div class="grid"><a class="category" href="catalogo.html?catalogo=pokemon"><div aria-hidden="true" class="cd-category-visual visual-1"><div class="cd-mini-card mini-1"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">✦</span><strong>TCG Pokémon</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=tcg"><div aria-hidden="true" class="cd-category-visual visual-2"><div class="cd-mini-card mini-2"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">◇</span><strong>Altri TCG</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=collezione"><div aria-hidden="true" class="cd-category-visual visual-5"></div><div class="cd-category-copy"><span class="cd-category-mark">✧</span><strong>Oggetti da collezione</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=videogiochi"><div aria-hidden="true" class="cd-category-visual visual-3"><div class="cd-mini-card mini-3"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">▣</span><strong>Consoles e Videogames</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=accessori"><div aria-hidden="true" class="cd-category-visual visual-4"><div class="cd-mini-card mini-4"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">✧</span><strong>Accessori</strong><span class="cd-arrow">›</span></div></a></div></section>
+<main><section class="container" id="categorie"><h2 class="section-title">LE NOSTRE CATEGORIE</h2><div class="grid"><a class="category" href="catalogo.html?catalogo=pokemon"><div aria-hidden="true" class="cd-category-visual visual-1"><div class="cd-mini-card mini-1"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">✦</span><strong>TCG Pokémon</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=tcg"><div aria-hidden="true" class="cd-category-visual visual-2"><div class="cd-mini-card mini-2"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">◇</span><strong>Altri TCG</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=collezione"><div aria-hidden="true" class="cd-category-visual visual-5"></div><div class="cd-category-copy"><span class="cd-category-mark">✧</span><strong>Oggetti da collezione</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=videogiochi"><div aria-hidden="true" class="cd-category-visual visual-3"><div class="cd-mini-card mini-3"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">▣</span><strong>Consoles e Videogames</strong><span class="cd-arrow">›</span></div></a><a class="category" href="catalogo.html?catalogo=accessori"><div aria-hidden="true" class="cd-category-visual visual-4"><div class="cd-mini-card mini-4"><div class="cd-mini-ball"></div></div><div class="cd-mini-card mini-second"><div class="cd-mini-ball"></div></div></div><div class="cd-category-copy"><span class="cd-category-mark">✧</span><strong>Accessori</strong><span class="cd-arrow">›</span></div></a></div></section>
 
 <section class="container cd-featured" id="articoli-evidenza" aria-labelledby="cd-featured-title">
   <h2 class="section-title" id="cd-featured-title">ARTICOLI IN EVIDENZA</h2>
-  <p class="sub">Una selezione speciale dal nostro catalogo.</p>
+  
   <div class="cd-featured-track" id="cd-featured-track">
     <p class="cd-featured-empty">Presto troverai qui i nostri articoli in evidenza.</p>
   </div>
@@ -519,9 +514,7 @@ aria-labelledby="cd-mancolista-title">
   <h2 class="section-title" id="cd-mancolista-title">
     LA NOSTRA MANCOLISTA
   </h2>
-  <p class="sub">
-    Queste sono alcune delle carte che stiamo cercando!
-  </p>
+
   <div class="cd-featured-track" id="cd-mancolista-track">
     
   </div>
@@ -639,7 +632,7 @@ aria-labelledby="cd-mancolista-title">
   });
 })();
 </script>
-<script src="featured-home.js"></script>
+<script src="featured-home.js?v=4"></script>
 <script src="mancolista-home.js"></script>
 <script src="visual-published.js"></script>
 <script>

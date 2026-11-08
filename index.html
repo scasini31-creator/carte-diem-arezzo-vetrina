@@ -478,6 +478,36 @@ html.cd-installed-app #cd-share-btn{right:62px!important}
 }
 #cd-featured-track .cd-featured-card-body p{display:none!important}
 </style>
+<style id="cd-home-card-visual-unified">
+/* Stesso fondo nero del catalogo e font Georgia delle categorie. */
+#cd-featured-track .cd-featured-image-box,
+#cd-mancolista-track .cd-mancolista-image-box {
+  width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:#000!important;
+}
+#cd-featured-track .cd-featured-image-box img,
+#cd-mancolista-track .cd-mancolista-image-box img {
+  width:100%!important;height:100%!important;object-fit:contain!important;
+  aspect-ratio:auto!important;display:block!important;
+}
+#cd-featured-track .cd-featured-card,
+#cd-mancolista-track .cd-featured-card {display:flex;flex-direction:column;align-self:stretch}
+#cd-featured-track .cd-featured-name,
+#cd-mancolista-track .cd-mancolista-name,
+#cd-mancolista-track .cd-mancolista-expansion {
+  font-family:Georgia,serif!important;font-weight:normal!important;
+  color:#fff!important;text-align:center!important;text-shadow:none!important;
+}
+#cd-featured-track .cd-featured-name,
+#cd-mancolista-track .cd-mancolista-name {
+  font-size:clamp(13px,1.5vw,17px)!important;line-height:1.2!important;
+  display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  line-clamp:3;overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere;
+  height:3.6em!important;max-height:3.6em!important;
+}
+#cd-mancolista-track .cd-mancolista-details {padding:7px 6px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+#cd-mancolista-track .cd-mancolista-expansion {font-size:12px!important;line-height:1.2!important;margin:0!important}
+</style>
 <style id="cd-uniform-spacing">
 /* Ritmo verticale compatto e coerente fra le tre sezioni principali. */
 #categorie,#articoli-evidenza,#cd-mancolista{
@@ -655,8 +685,8 @@ aria-labelledby="cd-mancolista-title">
   });
 })();
 </script>
-<script src="featured-home.js?v=5"></script>
-<script src="mancolista-home.js"></script>
+<script src="featured-home.js?v=6"></script>
+<script src="mancolista-home.js?v=2"></script>
 <script src="visual-published.js"></script>
 <script>
 if ('serviceWorker' in navigator) {

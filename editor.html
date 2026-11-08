@@ -219,6 +219,8 @@ window.addEventListener('load',function(){
 });
 </script>
 </body></html></template>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js?v=20261108-maintenance"></script>
 <script>
 /* Modulo amministrativo incorporato: non richiede più pagine legacy separate. */
 const integratedAdminHTML=document.getElementById('editorIntegratedAdmin').innerHTML;
@@ -471,11 +473,8 @@ maintenanceRow.append(maintenanceStatus,maintenanceButton);
 maintenanceSection.appendChild(maintenanceRow);
 let maintenanceActive=false;
 function maintenanceClient(){
- const w=adminFrame.contentWindow;
- if(!w||!w.document?.getElementById('adminContent'))throw Error('Pannello amministrativo non ancora caricato. Riprova tra qualche istante.');
- const client=w.eval('sb');
- if(!client)throw Error('Connessione al database non pronta.');
- return client;
+ if(typeof sb==='undefined')throw Error('Connessione Supabase non disponibile. Aggiorna la pagina.');
+ return sb;
 }
 async function refreshMaintenance(){
  maintenanceButton.disabled=true;
@@ -490,9 +489,11 @@ async function refreshMaintenance(){
 }
 maintenanceSection.addEventListener('toggle',()=>{if(maintenanceSection.open)refreshMaintenance();});
 maintenanceButton.addEventListener('click',async()=>{
- let client;
- try{({sb:client}=await cloudContext());}
- catch(err){maintenanceStatus.textContent='Accesso richiesto: apri Gestione catalogo ed effettua il login, poi riprova. '+(err?.message||'');return;}
+ const client=maintenanceClient();
+ const {data:{user},error:userError}=await client.auth.getUser();
+ if(userError||!user){maintenanceStatus.textContent='Accedi come amministratore tramite Gestione catalogo, poi riprova.';return;}
+ const {data:allowed,error:authError}=await client.rpc('is_admin');
+ if(authError||!allowed){maintenanceStatus.textContent='Account non autorizzato.';return;}
  const next=!maintenanceActive;
  if(!confirm(next?'Attivare la modalità allestimento e nascondere tutti gli articoli al pubblico?':'Disattivare la modalità allestimento e mostrare nuovamente gli articoli?'))return;
  maintenanceButton.disabled=true;maintenanceStatus.textContent='Salvataggio in corso…';

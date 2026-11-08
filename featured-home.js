@@ -11,6 +11,7 @@
   }
 
   try {
+    if(await window.cdStorefrontReady){return;}
     // Evita di scaricare l'intero catalogo quando non ci sono articoli in evidenza.
     const evidenza = await loadFeaturedProducts();
     if (!evidenza.length) {

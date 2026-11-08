@@ -11,7 +11,7 @@
   if(stack[stack.length-1]!==current){stack.push(current);setStack(stack)}
   function isHome(){return current==='index.html'}
   function exitStorefront(){
-    if(!confirm('Vuoi chiudere la vetrina?'))return;
+    
     /* Browsers may refuse to close a tab not opened by script. */
     window.close();
     if(document.visibilityState==='visible'){

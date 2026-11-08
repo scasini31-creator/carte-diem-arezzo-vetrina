@@ -687,4 +687,44 @@ setTimeout(verify,800);
  });
 })();
 </script>
-</body></html>
+<style id="cd-admin-mobile-back-style">
+@media(max-width:800px){
+ #cdAdminBack{position:fixed;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:1100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:76px;min-height:60px;padding:7px 12px;background:#090b14f5;color:#f3f4fa;border:1px solid #b48b50;border-radius:11px;font:400 11px Arial,sans-serif;box-shadow:0 3px 15px #0009;cursor:pointer}
+ #cdAdminBack span{font:400 26px/1 Arial,sans-serif}
+ #cdAdminBack:focus-visible{outline:2px solid #ffd05e;outline-offset:2px}
+}
+@media(min-width:801px){#cdAdminBack{display:none}}
+</style>
+<button type="button" id="cdAdminBack" aria-label="Indietro"><span aria-hidden="true">↩</span>Indietro</button>
+<script>
+(function(){
+ const back=document.getElementById('cdAdminBack');
+ const preview=document.getElementById('preview');
+ const historyPages=['index.html'];
+ const pageName=()=>{try{return new URL(preview.getAttribute('src')||'index.html',location.href).pathname.split('/').pop()}catch(_){return 'index.html'}};
+ document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{
+   const p=b.dataset.page;if(historyPages[historyPages.length-1]!==p)historyPages.push(p);
+ }));
+ function backAction(){
+   const modal=document.getElementById('editorModal');
+   if(modal?.classList.contains('open')){document.getElementById('closeEditor')?.click();return}
+   const text=document.getElementById('textEditor');
+   if(text?.classList.contains('open')){document.getElementById('cancelText')?.click();return}
+   const image=document.getElementById('imageEditor');
+   if(image?.classList.contains('open')){document.getElementById('cancelImage')?.click();return}
+   const menu=document.getElementById('editorMenu');
+   if(menu?.open){menu.open=false;return}
+   if(pageName()!=='index.html'){
+     if(historyPages[historyPages.length-1]===pageName())historyPages.pop();
+     const previous=historyPages[historyPages.length-1]||'index.html';
+     const b=Array.from(document.querySelectorAll('[data-page]')).find(el=>el.dataset.page===previous);
+     if(b)b.click();else preview.src='index.html';
+     return;
+   }
+   if(!confirm('Vuoi chiudere la vetrina?'))return;
+   window.close();
+   alert('Se la finestra non si chiude automaticamente, utilizza il comando di chiusura del browser o torna alla Home del dispositivo.');
+ }
+ back.addEventListener('click',backAction);
+})();
+</script></body></html>

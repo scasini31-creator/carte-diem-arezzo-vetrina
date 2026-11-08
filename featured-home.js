@@ -60,18 +60,6 @@
         dettagli.appendChild(sigla);
       }
 
-      if (p[3] !== null && p[3] !== undefined && p[3] !== '') {
-        const prezzo = document.createElement('p');
-        prezzo.style.cssText =
-          'color:#f1c777;font-weight:700;margin-top:8px';
-        prezzo.textContent = Number(p[3]).toLocaleString(
-          'it-IT', {
-            style: 'currency',
-            currency: 'EUR'
-          }
-        );
-        dettagli.appendChild(prezzo);
-      }
 
       link.append(img, dettagli);
       track.appendChild(link);

@@ -470,10 +470,17 @@ maintenanceButton.style.cssText='background:#e6b951;color:#121824;font-weight:70
 maintenanceRow.append(maintenanceStatus,maintenanceButton);
 maintenanceSection.appendChild(maintenanceRow);
 let maintenanceActive=false;
+function maintenanceClient(){
+ const w=adminFrame.contentWindow;
+ if(!w||!w.document?.getElementById('adminContent'))throw Error('Pannello amministrativo non ancora caricato. Riprova tra qualche istante.');
+ const client=w.eval('sb');
+ if(!client)throw Error('Connessione al database non pronta.');
+ return client;
+}
 async function refreshMaintenance(){
  maintenanceButton.disabled=true;
  try{
-  const {data,error}=await sb.from('storefront_mode').select('maintenance').eq('id',1).single();
+  const {data,error}=await maintenanceClient().from('storefront_mode').select('maintenance').eq('id',1).single();
   if(error||!data)throw error||Error('Impostazione non disponibile');
   maintenanceActive=data.maintenance===true;
   maintenanceStatus.textContent=maintenanceActive?'Stato attuale: VETRINA IN ALLESTIMENTO':'Stato attuale: VETRINA PUBBLICA';
@@ -483,14 +490,13 @@ async function refreshMaintenance(){
 }
 maintenanceSection.addEventListener('toggle',()=>{if(maintenanceSection.open)refreshMaintenance();});
 maintenanceButton.addEventListener('click',async()=>{
- const {data:{user},error:userError}=await sb.auth.getUser();
- if(userError||!user){maintenanceStatus.textContent='Accedi come amministratore prima di modificare la vetrina.';return;}
- const {data:allowed,error:authError}=await sb.rpc('is_admin');
- if(authError||!allowed){maintenanceStatus.textContent='Account non autorizzato.';return;}
+ let client;
+ try{({sb:client}=await cloudContext());}
+ catch(err){maintenanceStatus.textContent='Accesso richiesto: apri Gestione catalogo ed effettua il login, poi riprova. '+(err?.message||'');return;}
  const next=!maintenanceActive;
  if(!confirm(next?'Attivare la modalità allestimento e nascondere tutti gli articoli al pubblico?':'Disattivare la modalità allestimento e mostrare nuovamente gli articoli?'))return;
  maintenanceButton.disabled=true;maintenanceStatus.textContent='Salvataggio in corso…';
- const {data,error}=await sb.from('storefront_mode').update({maintenance:next,updated_at:new Date().toISOString()}).eq('id',1).select('maintenance').single();
+ const {data,error}=await client.from('storefront_mode').update({maintenance:next,updated_at:new Date().toISOString()}).eq('id',1).select('maintenance').single();
  if(error||!data){maintenanceStatus.textContent='Salvataggio non riuscito: '+(error?.message||'nessuna modifica');maintenanceButton.disabled=false;return;}
  await refreshMaintenance();
 });

@@ -455,6 +455,29 @@ html.cd-installed-app #cd-share-btn{right:62px!important}
 </style>
 
 
+<style id="cd-featured-consistent-cards">
+/* Anteprime in evidenza: immagine sempre uguale, titolo in tre righe, nessun prezzo. */
+#cd-featured-track .cd-featured-card{display:flex;flex-direction:column;align-self:stretch}
+#cd-featured-track .cd-featured-image-box{
+  width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:#fff;
+}
+#cd-featured-track .cd-featured-image-box img{
+  width:100%!important;height:100%!important;max-width:100%;max-height:100%;
+  aspect-ratio:auto!important;object-fit:contain!important;display:block;
+}
+#cd-featured-track .cd-featured-card-body{
+  padding:7px 6px!important;flex:1;min-height:0!important;display:flex;
+  align-items:center;justify-content:center;
+}
+#cd-featured-track .cd-featured-name{
+  display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  line-clamp:3;overflow:hidden;text-overflow:ellipsis;overflow-wrap:anywhere;
+  line-height:1.2;height:3.6em;max-height:3.6em;width:100%;
+  text-align:center;font-size:13px;
+}
+#cd-featured-track .cd-featured-card-body p{display:none!important}
+</style>
 <style id="cd-uniform-spacing">
 /* Ritmo verticale compatto e coerente fra le tre sezioni principali. */
 #categorie,#articoli-evidenza,#cd-mancolista{
@@ -632,7 +655,7 @@ aria-labelledby="cd-mancolista-title">
   });
 })();
 </script>
-<script src="featured-home.js?v=4"></script>
+<script src="featured-home.js?v=5"></script>
 <script src="mancolista-home.js"></script>
 <script src="visual-published.js"></script>
 <script>

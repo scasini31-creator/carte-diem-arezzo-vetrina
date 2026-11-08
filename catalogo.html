@@ -78,7 +78,7 @@
 .catalog-back:hover{text-decoration:underline}
 @media(max-width:650px){.catalog-sections{grid-template-columns:1fr;gap:12px}.catalog-home-card{min-height:98px;padding:20px 18px}}
 #catalogIntro[hidden]{display:none!important}
-<style id="cd-v21-mobile-dock">@media(max-width:800px){.mobile-dock{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}.mobile-dock>a{min-width:0}}</style><link rel="stylesheet" href="shared-mobile-nav.css?v=1"><style id="cd-v24-category-banners">
+<style id="cd-v21-mobile-dock">@media(max-width:800px){.mobile-dock{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}.mobile-dock>a{min-width:0}}</style><link rel="stylesheet" href="shared-mobile-nav.css?v=2"><style id="cd-v24-category-banners">
 /* V27: remove baked-in image frames; use one matching card border and right-aligned crop. */
 .catalog-home-card{position:relative;overflow:hidden;padding:0!important;min-height:0!important;aspect-ratio:1620/222;background-color:#101725;background-repeat:no-repeat;background-position:center;background-size:cover;border-radius:17px;border:1px solid #d4b465!important}
 .catalog-home-card:nth-child(1){background-image:url('banner-pokemon.webp')}
@@ -204,7 +204,7 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
  document.addEventListener('keydown',e=>{if(lb.hidden)return;if(e.key==='Escape'){e.preventDefault();close()}else if(e.key==='ArrowLeft'){e.preventDefault();show(current-1)}else if(e.key==='ArrowRight'){e.preventDefault();show(current+1)}});
  photo.addEventListener('touchstart',e=>{touchStart=e.touches[0]?.clientX??null},{passive:true});photo.addEventListener('touchend',e=>{if(touchStart===null)return;let delta=(e.changedTouches[0]?.clientX??touchStart)-touchStart;if(Math.abs(delta)>45)show(current+(delta<0?1:-1));touchStart=null},{passive:true});
 })();
-</script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a class="active" href="catalogo.html"><span>▦</span>Catalogo</a><a href="richieste.html"><span>♡</span>Lista</a></nav><script src="visual-published.js"></script>
+</script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a class="active" href="catalogo.html"><span>▦</span>Catalogo</a><a href="richieste.html"><span>♡</span>Lista</a><button class="cd-back-button" type="button" aria-label="Indietro"><span>↩</span>Indietro</button></nav><script src="visual-published.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -214,4 +214,4 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-</body></html>
+<script src="shared-mobile-back.js?v=1"></script></body></html>

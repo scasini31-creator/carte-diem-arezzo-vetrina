@@ -199,7 +199,7 @@ loadProducts().then(data=>{
     }
   }
   render();
-}).catch(e=>{document.getElementById('count').textContent='Errore caricamento catalogo. Riprova aggiornando la pagina.';console.error('Errore caricamento catalogo:',e)});
+}).catch(e=>{const message=String(e?.message||e?.details||e?.code||e||'Errore sconosciuto').slice(0,350);document.getElementById('count').textContent='Errore caricamento catalogo: '+message;console.error('Errore caricamento catalogo:',e)});
 </script><script>
 const reqKey='carte-diem-richieste-v1';
 function getRequests(){try{return JSON.parse(localStorage.getItem(reqKey)||'[]')}catch(e){return []}}

@@ -689,21 +689,41 @@ setTimeout(verify,800);
 </script>
 <style id="cd-admin-mobile-back-style">
 @media(max-width:800px){
- #cdAdminBack{position:fixed;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:1100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:76px;min-height:60px;padding:7px 12px;background:#090b14f5;color:#f3f4fa;border:1px solid #b48b50;border-radius:11px;font:400 11px Arial,sans-serif;box-shadow:0 3px 15px #0009;cursor:pointer}
- #cdAdminBack span{font:400 26px/1 Arial,sans-serif}
- #cdAdminBack:focus-visible{outline:2px solid #ffd05e;outline-offset:2px}
+ #cdAdminDock{position:fixed;left:0;right:0;bottom:0;z-index:1100;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;padding:6px 8px max(6px,env(safe-area-inset-bottom,0px));background:#090b14f7;border-top:1px solid #b48b50;box-sizing:border-box}
+ #cdAdminDock>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-sizing:border-box;min-width:0;min-height:49px;width:100%;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;color:#f3f4fa;font:400 10px/1.2 Arial,sans-serif;letter-spacing:normal;text-transform:none;cursor:pointer;appearance:none}
+ #cdAdminDock>button[aria-current="page"]{color:#ffd05e}
+ #cdAdminDock>button span{display:block;font:400 24px/1 Arial,sans-serif}
+ #cdAdminDock>button:focus-visible{outline:2px solid #ffd05e;outline-offset:-2px}
 }
-@media(min-width:801px){#cdAdminBack{display:none}}
+@media(min-width:801px){#cdAdminDock{display:none}}
 </style>
-<button type="button" id="cdAdminBack" aria-label="Indietro"><span aria-hidden="true">↩</span>Indietro</button>
+<nav id="cdAdminDock" aria-label="Navigazione inferiore editor">
+<button type="button" data-admin-dock-page="index.html" aria-current="page"><span aria-hidden="true">⌂</span>HOME</button>
+<button type="button" data-admin-dock-page="catalogo.html"><span aria-hidden="true">▦</span>CATALOGO</button>
+<button type="button" data-admin-dock-page="richieste.html"><span aria-hidden="true">♡</span>LISTA</button>
+<button type="button" id="cdAdminBack" aria-label="Indietro"><span aria-hidden="true">↩</span>INDIETRO</button>
+</nav>
 <script>
 (function(){
  const back=document.getElementById('cdAdminBack');
  const preview=document.getElementById('preview');
  const historyPages=['index.html'];
+ const dockButtons=Array.from(document.querySelectorAll('[data-admin-dock-page]'));
+ function updateDock(page){
+   dockButtons.forEach(b=>{if(b.dataset.adminDockPage===page)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+ }
+ dockButtons.forEach(b=>b.addEventListener('click',()=>{
+   const target=b.dataset.adminDockPage;
+   const pageButton=Array.from(document.querySelectorAll('[data-page]')).find(el=>el.dataset.page===target);
+   if(pageButton)pageButton.click();
+   else preview.src=target;
+   updateDock(target);
+ }));
+
  const pageName=()=>{try{return new URL(preview.getAttribute('src')||'index.html',location.href).pathname.split('/').pop()}catch(_){return 'index.html'}};
  document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{
    const p=b.dataset.page;if(historyPages[historyPages.length-1]!==p)historyPages.push(p);
+   updateDock(p);
  }));
  function backAction(){
    const modal=document.getElementById('editorModal');

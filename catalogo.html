@@ -285,13 +285,13 @@ loadProducts().then(data=>{
       if((currentGroup==='pokemon'||currentGroup==='tcg'||currentGroup==='videogiochi')&&!initialSubcategory){
         const kind=products[index][2];
         if((typeOptions[currentGroup]||[]).some(([key])=>key===kind)){
-          selectedCategories.clear();selectedCategories.add(kind);lockedPokemonType=kind;document.getElementById('typeFilters').hidden=true;
-          document.getElementById('subcatalogSections').hidden=true;
-          for(const el of [document.getElementById('find').parentElement,document.getElementById('filterDrawer'),document.getElementById('count'),document.getElementById('catalogGrid'),document.getElementById('catalogPagination'),document.getElementById('emptyCatalog')])el.hidden=false;
-          document.querySelector('#catalogContent .catalog-back').href='catalogo.html?catalogo='+currentGroup;
-          document.querySelector('#catalogContent .catalog-back').textContent='← '+groupNames[currentGroup];
-          document.getElementById('catalogTitle').textContent=(typeOptions[currentGroup].find(([key])=>key===kind)||[])[1];
-          updateCategoryButtons();
+          // La scheda in evidenza deve aprire anche il catalogo della sottocategoria.
+          // Aggiorna URL e visibilità prima di renderizzare la lista.
+          const targetUrl=new URL(location.href);
+          targetUrl.searchParams.set('catalogo',currentGroup);
+          targetUrl.searchParams.set('sottocategoria',kind);
+          history.replaceState(null,'',targetUrl);
+          showCatalog(currentGroup,kind);
         }
       }
       const allGroupIds=products.map((p,i)=>i).filter(i=>{const p=products[i];return (p.catalog_group||'pokemon')===currentGroup&&p[2]!=='funko'});

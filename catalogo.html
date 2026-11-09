@@ -221,15 +221,15 @@ function updateSubcategories(){
   const options=typeOptions[currentGroup];const filter=document.getElementById('typeFilters');
   filter.innerHTML=options.map(([key,name])=>`<button type="button" class="category-toggle" data-category="${key}" aria-pressed="false">${name}</button>`).join('');
   const tcgGroup=currentGroup==='pokemon'||currentGroup==='tcg';
-  const extra=document.getElementById('extraFilters');extra.hidden=!tcgGroup;
+  const extra=document.getElementById('extraFilters');extra.hidden=!tcgGroup||!['singole','gradate','sealed'].includes(lockedPokemonType);
   const langs=document.getElementById('languageFilters');const conditions=document.getElementById('conditionFilters');const gradeFilter=document.getElementById('gradeFilters');
   langs.innerHTML=tcgGroup?languageOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedLanguages.has(v)}">${v}</button>`).join(''):'';
-  conditions.innerHTML=tcgGroup?conditionOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedConditions.has(v)}">${v}</button>`).join(''):'';
-  gradeFilter.innerHTML=tcgGroup?gradeOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedGrades.has(v)}">${v}</button>`).join(''):'';
+  conditions.innerHTML=tcgGroup&&lockedPokemonType==='singole'?conditionOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedConditions.has(v)}">${v}</button>`).join(''):'';
+  gradeFilter.innerHTML=tcgGroup&&lockedPokemonType==='gradate'?gradeOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedGrades.has(v)}">${v}</button>`).join(''):'';
   gradeFilter.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.value;selectedGrades.has(v)?selectedGrades.delete(v):selectedGrades.add(v);b.setAttribute('aria-pressed',String(selectedGrades.has(v)));currentPage=1;render()});
   langs.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.value;selectedLanguages.has(v)?selectedLanguages.delete(v):selectedLanguages.add(v);b.setAttribute('aria-pressed',String(selectedLanguages.has(v)));currentPage=1;render()});
   conditions.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.value;selectedConditions.has(v)?selectedConditions.delete(v):selectedConditions.add(v);b.setAttribute('aria-pressed',String(selectedConditions.has(v)));currentPage=1;render()});
-  document.getElementById('filterDrawer').hidden=!options.length&&!tcgGroup;
+  document.getElementById('filterDrawer').hidden=!tcgGroup||!lockedPokemonType;
   document.getElementById('filterDrawer').open=false;
   filter.querySelectorAll('button').forEach(b=>b.onclick=()=>setSubcategory(selectedCategories.has(b.dataset.category)?'':b.dataset.category));
 }
@@ -248,6 +248,7 @@ function showCatalog(group,subcategory){
   const options=hasSubcategories?typeOptions[group]:[];
   const active=hasSubcategories&&options.some(([key])=>key===subcategory)?subcategory:null;
   lockedPokemonType=active;
+  updateSubcategories();
   const sub=document.getElementById('subcatalogSections');
   const search=document.getElementById('find').parentElement;
   const drawer=document.getElementById('filterDrawer');
@@ -263,9 +264,9 @@ function showCatalog(group,subcategory){
     back.href=active?'catalogo.html?catalogo='+group:'catalogo.html';
     back.textContent=active?'← '+groupNames[group]:'← Tutti i cataloghi';
     intro.textContent=active?(options.find(([key])=>key===active)||[])[1]:groupNames[group];
-    if(active)selectedCategories.add(active);document.getElementById('typeFilters').hidden=!!active;
+    if(active)selectedCategories.add(active);document.getElementById('typeFilters').hidden=true;
   }else{
-    document.getElementById('typeFilters').hidden=false;
+    document.getElementById('typeFilters').hidden=true;
     back.href='catalogo.html';back.textContent='← Tutti i cataloghi';
   }
   const showProducts=!hasSubcategories||!!active;

@@ -454,53 +454,6 @@ const exportShortLabel=document.getElementById('publishExport');
 if(exportShortLabel){exportShortLabel.textContent='Prepara file';exportShortLabel.title='Prepara file di pubblicazione';exportShortLabel.setAttribute('aria-label','Prepara file di pubblicazione');}
 
 publicationSection.appendChild(publishRow);
-const maintenanceSection=makeSubmenu('Allestimento');
-const maintenanceRow=document.createElement('div');
-maintenanceRow.id='maintenanceToolbar';
-maintenanceRow.style.cssText='padding:12px 18px;background:#172234;display:flex;flex-direction:column;gap:10px;align-items:stretch;border-top:1px solid #ad8948;border-bottom:1px solid #ad8948';
-const maintenanceStatus=document.createElement('p');
-maintenanceStatus.id='maintenanceStatus';
-maintenanceStatus.style.cssText='margin:0;color:#f3ca67;text-align:center;font-size:14px';
-maintenanceStatus.setAttribute('role','status');
-maintenanceStatus.textContent='Verifica stato vetrina…';
-const maintenanceButton=document.createElement('button');
-maintenanceButton.type='button';
-maintenanceButton.id='maintenanceButton';
-maintenanceButton.disabled=true;
-maintenanceButton.textContent='Caricamento…';
-maintenanceButton.style.cssText='background:#e6b951;color:#121824;font-weight:700;border-radius:10px;padding:12px 15px;min-height:48px;width:100%';
-maintenanceRow.append(maintenanceStatus,maintenanceButton);
-maintenanceSection.appendChild(maintenanceRow);
-let maintenanceActive=false;
-function maintenanceClient(){
- if(typeof sb==='undefined')throw Error('Connessione Supabase non disponibile. Aggiorna la pagina.');
- return sb;
-}
-async function refreshMaintenance(){
- maintenanceButton.disabled=true;
- try{
-  const {data,error}=await maintenanceClient().from('storefront_mode').select('maintenance').eq('id',1).single();
-  if(error||!data)throw error||Error('Impostazione non disponibile');
-  maintenanceActive=data.maintenance===true;
-  maintenanceStatus.textContent=maintenanceActive?'Stato attuale: VETRINA IN ALLESTIMENTO':'Stato attuale: VETRINA PUBBLICA';
-  maintenanceButton.textContent=maintenanceActive?'Disattiva modalità allestimento':'Attiva modalità allestimento';
- }catch(err){maintenanceStatus.textContent='Errore lettura: '+(err?.message||String(err));maintenanceButton.textContent='Riprova';}
- finally{maintenanceButton.disabled=false;}
-}
-maintenanceSection.addEventListener('toggle',()=>{if(maintenanceSection.open)refreshMaintenance();});
-maintenanceButton.addEventListener('click',async()=>{
- const client=maintenanceClient();
- const {data:{user},error:userError}=await client.auth.getUser();
- if(userError||!user){maintenanceStatus.textContent='Accedi come amministratore tramite Gestione catalogo, poi riprova.';return;}
- const {data:allowed,error:authError}=await client.rpc('is_admin');
- if(authError||!allowed){maintenanceStatus.textContent='Account non autorizzato.';return;}
- const next=!maintenanceActive;
- if(!confirm(next?'Attivare la modalità allestimento e nascondere tutti gli articoli al pubblico?':'Disattivare la modalità allestimento e mostrare nuovamente gli articoli?'))return;
- maintenanceButton.disabled=true;maintenanceStatus.textContent='Salvataggio in corso…';
- const {data,error}=await client.from('storefront_mode').update({maintenance:next,updated_at:new Date().toISOString()}).eq('id',1).select('maintenance').single();
- if(error||!data){maintenanceStatus.textContent='Salvataggio non riuscito: '+(error?.message||'nessuna modifica');maintenanceButton.disabled=false;return;}
- await refreshMaintenance();
-});
 const contentSection=makeSubmenu('Inserimento');
 contentSection.appendChild(ueToolbar);
 document.querySelector('header').after(editorMenu);

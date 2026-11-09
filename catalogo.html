@@ -214,18 +214,21 @@
  font:800 clamp(17px,2.2vw,29px)/1.15 Arial,Helvetica,sans-serif;
  color:#fff0ff;text-shadow:0 2px 8px #000,0 0 14px #000b
 }
-#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>.catalog-home-icon,
-#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>.catalog-home-arrow{display:none!important}
+#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>.catalog-home-icon{display:none!important}
+#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>.catalog-home-arrow{
+ display:block!important;position:absolute;right:15px;top:50%;transform:translateY(-50%);
+ z-index:2;color:#fff2ff;font-size:clamp(28px,5vw,46px);line-height:1;
+ text-shadow:0 0 8px #b44bff,0 0 18px #9b27ef;pointer-events:none
+}
 @media(max-width:650px){
  #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card{
-  aspect-ratio:3.55/1;background-position:right center;background-size:auto 114%;border-radius:14px
- }
- /* The third artwork has a deeper built-in inner stroke: crop it separately. */
- #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card:nth-child(3){
-  background-size:auto 137%;background-position:right center
+  aspect-ratio:3.55/1;background-size:auto 114%;background-position:calc(100% + 100px) center;border-radius:14px
  }
  #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>strong{
   font-size:clamp(17px,4.5vw,23px);max-width:47%;margin-left:14px
+ }
+ #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>.catalog-home-arrow{
+  right:15px;font-size:34px
  }
 }
 </style></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="index.html#chi-siamo">Chi siamo</a><a href="index.html#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header><main><section class="container" id="catalogIntro" style="padding-bottom:0"><div class="eyebrow">CARTE DIEM AREZZO</div><h1 class="section-title">Il nostro catalogo</h1><p class="sub">Esplora gli articoli disponibili. Il sito è una vetrina: nessun acquisto o pagamento online.</p></section><section class="container" id="catalogo"><div id="catalogSections" class="catalog-sections"></div><div id="catalogContent" hidden><a class="catalog-back" href="catalogo.html">← Tutti i cataloghi</a><h2 class="section-title" id="catalogTitle">Scegli un catalogo</h2><div id="subcatalogSections" class="subcatalog-sections" aria-label="Sottocategorie"></div><div class="filter"><input aria-label="Cerca" id="find" placeholder="Cerca nome o sigla…" type="search"/></div><details class="filter-drawer" id="filterDrawer"><summary>☷ Filtri <span aria-hidden="true">▾</span></summary><div aria-label="Filtra per tipologia" class="category-filters" id="typeFilters" role="group"></div><div id="extraFilters" class="catalog-extra-filters" hidden><div class="filter-heading">Lingua</div><div class="category-filters" id="languageFilters" role="group" aria-label="Filtra per lingua"></div><div class="filter-heading" id="conditionFilterHeading">Condizioni (carte raw)</div><div class="category-filters" id="conditionFilters" role="group" aria-label="Filtra per condizioni"></div><div class="filter-heading">Voto (carte gradate)</div><div class="category-filters" id="gradeFilters" role="group" aria-label="Filtra per voto delle carte gradate"></div></div></details><div class="filter" style="margin-top:8px"></div><p class="sub" id="count"></p><div class="products" id="catalogGrid"></div><nav id="catalogPagination" class="catalog-pagination" aria-label="Pagine del catalogo" hidden></nav><p class="sub hidden" id="emptyCatalog">Nessun risultato.</p></div></section><div class="hidden" id="overlay" role="presentation"><div aria-label="Scheda prodotto" aria-modal="true" id="detail" role="dialog"><button aria-label="Chiudi" id="close">×</button><div class="photo" id="detailPhoto"><div class="mock-card" id="detailSymbol"></div></div><div id="detailText"><div class="eyebrow" id="detailCategory"></div><h2 id="detailName"></h2><p class="sub" id="detailCondition"></p><p id="detailDescription" class="detail-description" hidden></p><h3 class="gold" id="detailPrice"></h3><div class="detail-action-row"><button class="button secondary" id="detailAdd" type="button">Aggiungi alla lista</button> <a class="button secondary" href="richieste.html">Apri lista</a> <button class="button secondary" id="detailShare" type="button" aria-label="Condividi scheda prodotto" title="Condividi scheda prodotto" style="display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;min-width:48px;padding:10px 12px"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 13.5 6.6 4m0-11-6.6 4"/></svg></button></div><div class="detail-product-nav" aria-label="Navigazione tra prodotti"><button type="button" id="detailPrev" aria-label="Prodotto precedente">‹ Precedente</button><span id="detailPosition" aria-live="polite"></span><button type="button" id="detailNext" aria-label="Prodotto successivo">Successivo ›</button></div></div></div></div>

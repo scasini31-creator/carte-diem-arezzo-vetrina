@@ -243,9 +243,9 @@ function showCatalog(group,subcategory){
   document.getElementById('catalogTitle').textContent=groupNames[group];
   document.title=groupNames[group]+' | CARTE DIEM AREZZO';
   updateSubcategories();
-  const isPokemon=group==='pokemon';
+  const isTcgCatalog=group==='pokemon'||group==='tcg';
   const allowed=['singole','gradate','sealed'];
-  const active=isPokemon&&allowed.includes(subcategory)?subcategory:null;lockedPokemonType=active;
+  const active=isTcgCatalog&&allowed.includes(subcategory)?subcategory:null;lockedPokemonType=active;
   const sub=document.getElementById('subcatalogSections');
   const search=document.getElementById('find').parentElement;
   const drawer=document.getElementById('filterDrawer');
@@ -255,19 +255,19 @@ function showCatalog(group,subcategory){
   const empty=document.getElementById('emptyCatalog');
   const back=document.querySelector('#catalogContent .catalog-back');
   const intro=document.getElementById('catalogTitle');
-  if(isPokemon){
+  if(isTcgCatalog){
     sub.hidden=!!active;
     sub.innerHTML=allowed.map((key,i)=>'<a class="catalog-home-card" href="catalogo.html?catalogo=pokemon&sottocategoria='+key+'"><span class="catalog-home-icon" aria-hidden="true">'+['✦','◇','▣'][i]+'</span><strong>'+['Carte raw','Carte gradate','Prodotti sigillati'][i]+'</strong><span class="catalog-home-arrow" aria-hidden="true">→</span></a>').join('');
-    back.href=active?'catalogo.html?catalogo=pokemon':'catalogo.html';
-    back.textContent=active?'← TCG Pokémon':'← Tutti i cataloghi';
-    intro.textContent=active?({singole:'Carte raw',gradate:'Carte gradate',sealed:'Prodotti sigillati'})[active]:'TCG Pokémon';
+    back.href=active?'catalogo.html?catalogo='+group:'catalogo.html';
+    back.textContent=active?'← '+groupNames[group]:'← Tutti i cataloghi';
+    intro.textContent=active?({singole:'Carte raw',gradate:'Carte gradate',sealed:'Prodotti sigillati'})[active]:groupNames[group];
     if(active)selectedCategories.add(active);document.getElementById('typeFilters').hidden=!!active;
   }else{
     document.getElementById('typeFilters').hidden=false;
     back.href='catalogo.html';back.textContent='← Tutti i cataloghi';
   }
-  const showProducts=!isPokemon||!!active;
-  document.getElementById('catalogContent').classList.toggle('pokemon-subcategory-landing',isPokemon&&!active);
+  const showProducts=!isTcgCatalog||!!active;
+  document.getElementById('catalogContent').classList.toggle('pokemon-subcategory-landing',isTcgCatalog&&!active);
   for(const el of [search,drawer,count,grid,pagination,empty])el.hidden=!showProducts;
   if(showProducts){updateCategoryButtons();render();}
 }
@@ -279,14 +279,14 @@ loadProducts().then(data=>{
   if(requestedId){
     const index=products.findIndex(p=>String(p.id)===requestedId && (p.catalog_group||'pokemon')===currentGroup);
     if(index!==-1){
-      if(currentGroup==='pokemon'&&!initialSubcategory){
+      if((currentGroup==='pokemon'||currentGroup==='tcg')&&!initialSubcategory){
         const kind=products[index][2];
         if(['singole','gradate','sealed'].includes(kind)){
           selectedCategories.clear();selectedCategories.add(kind);lockedPokemonType=kind;document.getElementById('typeFilters').hidden=true;
           document.getElementById('subcatalogSections').hidden=true;
           for(const el of [document.getElementById('find').parentElement,document.getElementById('filterDrawer'),document.getElementById('count'),document.getElementById('catalogGrid'),document.getElementById('catalogPagination'),document.getElementById('emptyCatalog')])el.hidden=false;
-          document.querySelector('#catalogContent .catalog-back').href='catalogo.html?catalogo=pokemon';
-          document.querySelector('#catalogContent .catalog-back').textContent='← TCG Pokémon';
+          document.querySelector('#catalogContent .catalog-back').href='catalogo.html?catalogo='+currentGroup;
+          document.querySelector('#catalogContent .catalog-back').textContent='← '+groupNames[currentGroup];
           document.getElementById('catalogTitle').textContent=({singole:'Carte raw',gradate:'Carte gradate',sealed:'Prodotti sigillati'})[kind];
           updateCategoryButtons();
         }

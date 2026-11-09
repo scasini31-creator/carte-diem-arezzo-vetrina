@@ -753,7 +753,7 @@ aria-labelledby="cd-mancolista-title">
   });
 })();
 </script>
-<script src="featured-home.js?v=7"></script>
+<script src="featured-home.js?v=8"></script>
 <script src="mancolista-home.js?v=3"></script>
 <script src="visual-published.js"></script>
 <script>
@@ -773,4 +773,14 @@ if ('serviceWorker' in navigator) {
   body nav.mobile-dock>a.active{color:#ffd05e!important}
   body nav.mobile-dock>a span{display:block!important;font:400 24px/1 Arial,sans-serif!important;color:inherit!important}
 }
-</style><script src="shared-mobile-dock.js?v=1"></script></body></html>
+</style><script src="shared-mobile-dock.js?v=1"></script><style id="cd-featured-card-final-sync">
+/* Allinea il componente in evidenza alla Mancolista, senza le vecchie regole per il titolo. */
+#cd-featured-track .cd-featured-card,
+#cd-mancolista-track .cd-featured-card{flex:0 0 min(36vw,130px)!important;width:min(36vw,130px)!important;display:flex!important;flex-direction:column!important;align-self:stretch!important}
+#cd-featured-track .cd-mancolista-image-box,
+#cd-mancolista-track .cd-mancolista-image-box{height:auto!important;width:100%!important;aspect-ratio:1!important;flex:none!important;background:#000!important;overflow:hidden!important;padding:0!important}
+#cd-featured-track .cd-mancolista-details,
+#cd-mancolista-track .cd-mancolista-details{flex:1!important;min-height:calc(3.6em + 14px)!important;padding:7px 6px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;box-sizing:border-box!important}
+#cd-featured-track .cd-mancolista-name,
+#cd-mancolista-track .cd-mancolista-name{height:3.6em!important;max-height:3.6em!important;min-height:3.6em!important;line-height:1.2!important;display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical!important;overflow:hidden!important;text-align:center!important}
+</style></body></html>

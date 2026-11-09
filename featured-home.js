@@ -40,7 +40,7 @@
         encodeURIComponent(gruppo) + '&prodotto=' + encodeURIComponent(String(p.id));
 
       const imageBox = document.createElement('div');
-      imageBox.className = 'cd-featured-image-box';
+      imageBox.className = 'cd-mancolista-image-box';
       const img = document.createElement('img');
       img.loading = 'lazy';
       img.alt = p[0] || 'Articolo Carte Diem';
@@ -48,12 +48,12 @@
       imageBox.appendChild(img);
 
       const nome = document.createElement('strong');
-      nome.className = 'cd-featured-name';
+      nome.className = 'cd-mancolista-name';
       nome.textContent = p[0] || 'Articolo';
       nome.title = nome.textContent;
 
       const dettagli = document.createElement('div');
-      dettagli.className = 'cd-featured-card-body';
+      dettagli.className = 'cd-mancolista-details';
       dettagli.appendChild(nome);
 
       link.append(imageBox, dettagli);

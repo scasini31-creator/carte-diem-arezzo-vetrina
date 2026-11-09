@@ -3,7 +3,6 @@
   if(!track)return;
   function showMessage(text){const p=document.createElement('p');p.className='cd-featured-empty';p.textContent=text;track.replaceChildren(p);}
   try{
-    if(await window.cdStorefrontReady){return;}
     const {data,error}=await sb.from('mancolista').select('id,nome,espansione,immagine_url,posizione').order('posizione',{ascending:true}).order('created_at',{ascending:true});
     if(error)throw error;
     if(!data?.length){showMessage('Presto troverai qui le carte che stiamo cercando!');return;}

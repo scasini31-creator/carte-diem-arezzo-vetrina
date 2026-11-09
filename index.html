@@ -533,7 +533,47 @@ header{
 }
 </style>
 
-<link rel="stylesheet" href="shared-sticky-header.css?v=1"></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="#chi-siamo">Chi siamo</a><a href="#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav><button id="cd-install-btn" type="button"
+<link rel="stylesheet" href="shared-sticky-header.css?v=1"><style id="cd-featured-match-mancolista">
+/* Le anteprime in evidenza adottano esattamente la geometria della Mancolista. */
+#cd-featured-track .cd-featured-card,
+#cd-mancolista-track .cd-featured-card{
+  flex:0 0 min(36vw,130px)!important;
+  width:min(36vw,130px)!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-self:stretch!important;
+}
+#cd-featured-track .cd-featured-image-box,
+#cd-mancolista-track .cd-mancolista-image-box{
+  flex:0 0 auto!important;
+  width:100%!important;
+  aspect-ratio:1/1!important;
+  height:auto!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+#cd-featured-track .cd-featured-card-body,
+#cd-mancolista-track .cd-mancolista-details{
+  flex:1 1 auto!important;
+  min-height:calc(3.6em + 14px)!important;
+  height:auto!important;
+  padding:7px 6px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+}
+#cd-featured-track .cd-featured-name,
+#cd-mancolista-track .cd-mancolista-name{
+  margin:0!important;
+  font:normal clamp(13px,1.5vw,17px)/1.2 Georgia,serif!important;
+  color:#fff!important;
+  text-align:center!important;
+}
+</style></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="#chi-siamo">Chi siamo</a><a href="#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav><button id="cd-install-btn" type="button"
 aria-label="Installa CARTE DIEM"
 title="Installa CARTE DIEM"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></button><button id="cd-share-btn" type="button" aria-label="Condividi CARTE DIEM AREZZO" title="Condividi il sito"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.9 7.6-4.8M8.2 13.1l7.6 4.8"/></svg></button></header>
 

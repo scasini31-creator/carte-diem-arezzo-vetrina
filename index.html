@@ -705,4 +705,44 @@ if ('serviceWorker' in navigator) {
   body nav.mobile-dock>a.active{color:#ffd05e!important}
   body nav.mobile-dock>a span{display:block!important;font:400 24px/1 Arial,sans-serif!important;color:inherit!important}
 }
-</style><script src="shared-mobile-dock.js?v=1"></script></body></html>
+</style><script src="shared-mobile-dock.js?v=1"></script><style id="cd-uniform-home-preview-images">
+/* Tutte le anteprime Home prendono l'altezza dell'immagine del primo articolo in evidenza. */
+#cd-featured-track .cd-mancolista-image-box,
+#cd-mancolista-track .cd-mancolista-image-box{
+  height:var(--cd-preview-image-height,auto)!important;
+  min-height:var(--cd-preview-image-height,0px)!important;
+  max-height:var(--cd-preview-image-height,none)!important;
+  aspect-ratio:auto!important;
+  flex:0 0 auto!important;
+  overflow:hidden!important;
+  background:#000!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+}
+#cd-featured-track .cd-mancolista-image-box img,
+#cd-mancolista-track .cd-mancolista-image-box img{
+  width:100%!important;height:100%!important;object-fit:contain!important;
+}
+</style>
+<script id="cd-preview-image-size-sync">
+(function(){
+  const featured=document.getElementById('cd-featured-track');
+  const missing=document.getElementById('cd-mancolista-track');
+  if(!featured||!missing)return;
+  function sync(){
+    const first=featured.querySelector('.cd-featured-card .cd-mancolista-image-box img');
+    if(!first||!first.complete||!first.naturalWidth||!first.naturalHeight)return;
+    const box=first.closest('.cd-mancolista-image-box');
+    const width=box.getBoundingClientRect().width;
+    if(!width)return;
+    const height=Math.round(width*first.naturalHeight/first.naturalWidth);
+    if(height>0)document.documentElement.style.setProperty('--cd-preview-image-height',height+'px');
+  }
+  const observer=new MutationObserver(sync);
+  observer.observe(featured,{childList:true,subtree:true});
+  window.addEventListener('load',sync);
+  window.addEventListener('resize',sync);
+  featured.addEventListener('load',sync,true);
+  missing.addEventListener('load',sync,true);
+  sync();
+})();
+</script></body></html>

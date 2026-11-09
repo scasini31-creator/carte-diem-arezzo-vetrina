@@ -224,6 +224,10 @@
  #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card{
   aspect-ratio:3.55/1;background-size:auto 114%;background-position:calc(100% + 100px) center;border-radius:14px
  }
+ /* Solo Prodotti sigillati: ritaglio maggiore per eliminare il bordo interno. */
+ #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card:nth-child(3){
+  background-size:auto 135%;background-position:calc(100% + 155px) center
+ }
  #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>strong{
   font-size:clamp(17px,4.5vw,23px);max-width:47%;margin-left:14px
  }

@@ -50,7 +50,7 @@
     important(nav,'z-index','90');
     important(nav,'background','#090b14f7');
     important(nav,'border-top','1px solid #b48b50');
-    important(nav,'padding','6px 8px max(6px,env(safe-area-inset-bottom))');
+    important(nav,'padding','6px 8px calc(6px + env(safe-area-inset-bottom, 0px))');
     important(nav,'box-sizing','border-box');
     nav.querySelectorAll('a,button.cd-back-button').forEach(el=>{
       important(el,'display','flex');
@@ -74,7 +74,7 @@
         important(icon,'font','400 24px/1 Arial,sans-serif');
       });
     });
-    important(document.body,'padding-bottom','calc(65px + env(safe-area-inset-bottom))');
+    important(document.body,'padding-bottom','calc(72px + env(safe-area-inset-bottom, 0px))');
   }
   ensureMobileDock();
   window.addEventListener('resize',ensureMobileDock);

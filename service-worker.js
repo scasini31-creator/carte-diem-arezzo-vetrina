@@ -1,5 +1,5 @@
 /* CARTE DIEM AREZZO: cache selettiva delle sole risorse pubbliche statiche. */
-const CACHE = 'carte-diem-static-v4';
+const CACHE = 'carte-diem-static-v5';
 const STATIC = [
   './shared-base.css?v=1',
   './shared-catalog-layout.css?v=1',

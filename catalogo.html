@@ -323,38 +323,7 @@
 }
 </style>
 
-<style id="cd-clear-all-style">
-.cd-clear-all-wrap {
-  display: flex;
-  justify-content: flex-end;
-  margin: 14px 0;
-}
 
-#clearAllCatalogFilters {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 9px 13px;
-  background: #171719;
-  color: #d5b36a;
-  border: 1px solid #8b7448;
-  border-radius: 7px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-#clearAllCatalogFilters:active {
-  background: #34291b;
-}
-
-#clearAllCatalogFilters:focus-visible {
-  outline: 2px solid #d5b36a;
-  outline-offset: 3px;
-}
-</style>
 
 <style id="cd-dynamic-filters-style">
 .category-filters button[hidden] {
@@ -440,8 +409,6 @@ body > header .brand .gold {
 #filterDrawer #cd-panel-sort{width:100%;display:flex;flex-direction:column;gap:9px;margin:13px 0 19px}
 #filterDrawer #cd-panel-sort label{display:block;color:#d5b36a;font-size:14px;font-weight:700}
 #filterDrawer #catalogSort{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;font-size:16px!important}
-#filterDrawer .cd-filter-reset-last{display:block;width:100%;margin:20px 0 17px!important}
-#filterDrawer .cd-filter-reset-last #clearAllCatalogFilters{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:45px;box-sizing:border-box!important;margin:0!important;font-size:14px!important}
 #filterDrawer .price-filter-section{margin:0 0 16px!important;padding:0!important}
 #filterDrawer .price-filter-section>.filter-heading{font-size:14px;font-weight:700;margin:0 0 9px!important}
 #filterDrawer .price-filter-section>div:has(#filterMinPrice){margin:0!important}
@@ -480,18 +447,7 @@ border-radius:7px;padding:10px;width:100%">
 </div><div class="cd-filter-section" hidden="" id="gradingCompanySection">
 <div class="filter-heading">Casa di gradazione</div>
 <div aria-label="Filtra per casa di gradazione" class="category-filters" id="gradingCompanyFilters" role="group"></div>
-</div><section class="cd-filter-section" id="cd-grade-section"><div class="filter-heading">Voto</div><div aria-label="Filtra per voto delle carte gradate" class="category-filters" id="gradeFilters" role="group"></div></section></div><div class="cd-clear-all-wrap cd-filter-reset-last">
-<button aria-label="Cancella tutti i filtri" id="clearAllCatalogFilters" onclick="window.location.reload()" type="button">
-<svg aria-hidden="true" fill="none" height="17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="17">
-<path d="M3 6h18"></path>
-<path d="M8 6V4h8v2"></path>
-<path d="M19 6l-1 14H6L5 6"></path>
-<path d="M10 10v7"></path>
-<path d="M14 10v7"></path>
-</svg>
-<span>Cancella tutti i filtri</span>
-</button>
-</div><div class="price-filter-section">
+</div><section class="cd-filter-section" id="cd-grade-section"><div class="filter-heading">Voto</div><div aria-label="Filtra per voto delle carte gradate" class="category-filters" id="gradeFilters" role="group"></div></section></div><div class="price-filter-section">
 <div class="filter-heading">Fascia di prezzo</div>
 <div style="display:flex;gap:10px;margin:10px 0">
 <label style="flex:1;min-width:0">
@@ -1344,7 +1300,6 @@ if ('serviceWorker' in navigator) {
 <script id="cd-filter-memory">
 (function(){
   const prefix='cd-local-filter-state-v1:';
-  let clearing=false;
 
   function key(){
     const q=new URLSearchParams(location.search);
@@ -1368,7 +1323,6 @@ if ('serviceWorker' in navigator) {
   }
 
   function save(){
-    if(clearing)return;
     const k=key();
     if(!k)return;
 
@@ -1458,15 +1412,6 @@ if ('serviceWorker' in navigator) {
       },{once:true});
     }
   }
-
-  document.addEventListener('click',e=>{
-    const reset=e.target.closest('#clearAllCatalogFilters');
-    if(!reset)return;
-
-    clearing=true;
-    const k=key();
-    if(k)sessionStorage.removeItem(k);
-  },true);
 
   window.addEventListener('pagehide',save);
   restore();

@@ -178,7 +178,7 @@ function catalogTools(doc){
   wireSort(doc,btn,subGrid,'a.catalog-home-card',subCardId,ids=>saveOrder('sub:'+group,ids));
  }
  const productGrid=doc.getElementById('catalogGrid');
- if(!group||!sub||!productGrid||doc.getElementById('catalogContent')?.hidden)return;
+ if(!group||(!sub&&['pokemon','tcg','videogiochi'].includes(group))||!productGrid||doc.getElementById('catalogContent')?.hidden)return;
  const existing=productGrid.querySelectorAll('article.product:not(.cd-admin-new)');
  for(const card of existing){
   const index=Number(card.dataset.id);
@@ -213,8 +213,8 @@ function catalogTools(doc){
   const card=doc.createElement('article');card.className='product cd-admin-new';card.tabIndex=0;card.setAttribute('role','button');
   card.setAttribute('aria-label','Nuovo articolo');
   card.innerHTML='<div class="photo"><span aria-hidden="true">+</span></div><div class="product-info"><h3>Nuovo articolo</h3><div class="price">&nbsp;</div><button class="quick-add" type="button" aria-label="Nuovo articolo">+</button></div>';
-  card.onclick=e=>{e.preventDefault();e.stopPropagation();openProduct(null,group,sub);};
-  card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();openProduct(null,group,sub);}};
+  card.onclick=e=>{e.preventDefault();e.stopPropagation();openProduct(null,group,sub||(choices[group]||[])[0]?.[0]);};
+  card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();openProduct(null,group,sub||(choices[group]||[])[0]?.[0]);}};
   productGrid.prepend(card);
  }
 }

@@ -796,7 +796,7 @@ function updatePlatformUI(){
 
  container.innerHTML=Object.entries(platformGroups).map(
   ([group,values])=>`
-    <div style="width:100%;color:#d5b36a;margin:12px 0 5px">
+    <div data-platform-group="${group}" style="width:100%;color:#d5b36a;margin:12px 0 5px">
       ${group}
     </div>
     ${values.map(v=>`
@@ -1070,6 +1070,18 @@ function updateDynamicFilters(){
        button.getAttribute('aria-pressed')==='true';
 
      button.hidden=!available.has(value)&&!selected;
+   });
+ }
+ // I titoli Nintendo, PlayStation, Xbox, Sega e Altre
+ // sono visibili soltanto se il gruppo ha opzioni disponibili.
+ const platformBox=document.getElementById('platformFilters');
+ if(platformBox){
+   const buttons=Array.from(platformBox.querySelectorAll('button[data-platform]'));
+   platformBox.querySelectorAll('[data-platform-group]').forEach(heading=>{
+     const values=platformGroups[heading.dataset.platformGroup]||[];
+     heading.hidden=!buttons.some(button=>
+       values.includes(button.dataset.platform)&&!button.hidden
+     );
    });
  }
   cdRefreshFilterSections();

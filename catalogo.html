@@ -577,6 +577,8 @@ const gradingCompanies=[
 
 function productGrader(p){
  if(p[2]!=='gradate')return '';
+ const saved=String(p.details?.grader||'');
+ if(saved)return saved;
  const raw=String(p[5]||'').trim().toUpperCase();
  const match=raw.match(/^(PSA|BGS|CGC|GRAAD)(?=\s|[-:]|[0-9]|$)/);
  if(match)return match[1];
@@ -625,6 +627,7 @@ const sealedTypes=[
 ];
 
 function productSealedType(p){
+ if(p.details?.sealedType)return p.details.sealedType;
  if(p.testMeta?.sealedType)return p.testMeta.sealedType;
  const name=String(p[0]||'').toLowerCase();
 
@@ -680,6 +683,7 @@ const platformGroups = {
 };
 
 function productPlatform(p){
+ if(p.details?.platform)return p.details.platform;
  if(p.testMeta?.platform)return p.testMeta.platform;
  const name = String(p[0]||'').toLowerCase();
 
@@ -728,6 +732,7 @@ const selectedGameConditions = new Set();
 const gameConditions = ['CIB','Boxed','Loose'];
 
 function productGameCondition(p){
+ if(p.details?.gameCondition)return p.details.gameCondition;
  if(p.testMeta?.gameCondition)return p.testMeta.gameCondition;
  const value = String(
    (p[0]||'')+' '+(p[9]||'')
@@ -839,6 +844,7 @@ const accessoryTypes = [
 ];
 
 function productAccessoryType(p){
+ if(p.details?.accessoryType)return p.details.accessoryType;
  if(p.testMeta?.accessoryType)return p.testMeta.accessoryType;
  const name = String(p[0]||'').toLowerCase();
 
@@ -913,6 +919,7 @@ const collectibleTypes = [
 ];
 
 function productCollectibleType(p){
+ if(p.details?.collectibleType)return p.details.collectibleType;
  if(p.testMeta?.collectibleType)return p.testMeta.collectibleType;
  const name=String(p[0]||'').toLowerCase();
 
@@ -1106,7 +1113,7 @@ function cdRefreshFilterSections(){
     section.hidden=!(applies&&buttons.some(button=>!button.hidden));
   }
 }
-function render(){let q=document.getElementById('find').value.toLowerCase();let ids=products.map((p,i)=>i).filter(i=>{let p=products[i];return(p.catalog_group||'pokemon')===currentGroup&&(!lockedPokemonType||p[2]===lockedPokemonType)&&p[2]!=='funko'&&(selectedCategories.size===0||selectedCategories.has(p[2]))&&(selectedLanguages.size===0||selectedLanguages.has((p[10]||'ITA').toUpperCase()))&&(selectedConditions.size===0||p[2]!=='singole'||selectedConditions.has(p[5]))&&graderMatches(p)&&gradeMatches(p)&&sealedTypeMatches(p)&&platformMatches(p)&&gameConditionMatches(p)&&accessoryTypeMatches(p)&&collectibleTypeMatches(p)&&label(p).toLowerCase().includes(q)});ids=ids.filter(i=>priceFilterMatches(products[i]));ids=sortProductIds(ids);visibleProductIds=ids;const totalPages=Math.max(1,Math.ceil(ids.length/PAGE_SIZE));currentPage=Math.min(Math.max(1,currentPage),totalPages);const pageIds=ids.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);document.getElementById('count').textContent=ids.length+' prodotti'+(ids.length?' · Pagina '+currentPage+' di '+totalPages:'');document.getElementById('emptyCatalog').classList.toggle('hidden',ids.length!==0);document.getElementById('catalogGrid').innerHTML=pageIds.map(i=>{let p=products[i];return `<article class="product" role="button" tabindex="0" aria-label="Visualizza dettagli di ${escapeHtml(p[0]||'prodotto')}" data-id="${i}"><div class="photo">${p[7]&&p[7].length?`<div class="preview-pair ${p[7].length===1?'one':''}">${p[7].slice(0,1).map((src,n)=>`<img src="${escapeHtml(safeImageUrl(src))}" alt="Foto ${n+1} del prodotto" loading="lazy" decoding="async">`).join('')}</div>`:`<div class="mock-card">${escapeHtml(p[6]||'')}</div>`}</div><div class="product-info ${(['singole','gradate'].includes(p[2])&&p[1])?'has-code':'no-code'}"><h3 class="preview-product-name" title="${escapeHtml(p[0]||'')}">${escapeHtml(p[0]||'')}</h3><div class="preview-product-code" title="${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')}">${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')||'&nbsp;'}</div><div class="price">${escapeHtml(price(p))}</div><div class="card-actions"><button type="button" class="quick-add" data-quick-add="${i}" aria-label="Aggiungi ${escapeHtml(label(p))} alla lista richieste">Aggiungi alla lista</button></div></div></article>`}).join('');document.querySelectorAll('[data-id]').forEach(e=>{e.onclick=event=>{if(event.target.closest('.quick-add'))return;openDetail(+e.dataset.id)};e.onkeydown=x=>{if((x.key==='Enter'||x.key===' ')&&!x.target.closest('.quick-add')){x.preventDefault();openDetail(+e.dataset.id)}}});document.querySelectorAll('.quick-add').forEach(b=>{const i=Number(b.dataset.quickAdd);const selected=getRequests().includes(products[i].id);b.textContent=selected?'✓ Nella lista':'Aggiungi alla lista';b.classList.toggle('is-added',selected);b.setAttribute('aria-pressed',String(selected));b.onclick=event=>{event.stopPropagation();toggleRequest(products[i].id);updateQuickButtons()}});renderPagination(totalPages,ids.length);updateDynamicFilters()}
+function render(){let q=document.getElementById('find').value.toLowerCase();let ids=products.map((p,i)=>i).filter(i=>{let p=products[i];return(p.catalog_group||'pokemon')===currentGroup&&(!lockedPokemonType||p[2]===lockedPokemonType)&&p[2]!=='funko'&&(selectedCategories.size===0||selectedCategories.has(p[2]))&&(selectedLanguages.size===0||selectedLanguages.has((p[10]||'ITA').toUpperCase()))&&(selectedConditions.size===0||p[2]!=='singole'||selectedConditions.has(p[5]))&&graderMatches(p)&&gradeMatches(p)&&sealedTypeMatches(p)&&platformMatches(p)&&gameConditionMatches(p)&&accessoryTypeMatches(p)&&collectibleTypeMatches(p)&&label(p).toLowerCase().includes(q)});ids=ids.filter(i=>priceFilterMatches(products[i]));ids=sortProductIds(ids);visibleProductIds=ids;const totalPages=Math.max(1,Math.ceil(ids.length/PAGE_SIZE));currentPage=Math.min(Math.max(1,currentPage),totalPages);const pageIds=ids.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);document.getElementById('count').textContent=ids.length+' prodotti'+(ids.length?' · Pagina '+currentPage+' di '+totalPages:'');document.getElementById('emptyCatalog').classList.toggle('hidden',ids.length!==0);document.getElementById('catalogGrid').innerHTML=pageIds.map(i=>{let p=products[i];return `<article class="product" role="button" tabindex="0" aria-label="Visualizza dettagli di ${escapeHtml(p[0]||'prodotto')}" data-id="${i}" data-product-id="${escapeHtml(p.id||'')}"><div class="photo">${p[7]&&p[7].length?`<div class="preview-pair ${p[7].length===1?'one':''}">${p[7].slice(0,1).map((src,n)=>`<img src="${escapeHtml(safeImageUrl(src))}" alt="Foto ${n+1} del prodotto" loading="lazy" decoding="async">`).join('')}</div>`:`<div class="mock-card">${escapeHtml(p[6]||'')}</div>`}</div><div class="product-info ${(['singole','gradate'].includes(p[2])&&p[1])?'has-code':'no-code'}"><h3 class="preview-product-name" title="${escapeHtml(p[0]||'')}">${escapeHtml(p[0]||'')}</h3><div class="preview-product-code" title="${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')}">${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')||'&nbsp;'}</div><div class="price">${escapeHtml(price(p))}</div><div class="card-actions"><button type="button" class="quick-add" data-quick-add="${i}" aria-label="Aggiungi ${escapeHtml(label(p))} alla lista richieste">Aggiungi alla lista</button></div></div></article>`}).join('');document.querySelectorAll('[data-id]').forEach(e=>{e.onclick=event=>{if(event.target.closest('.quick-add'))return;openDetail(+e.dataset.id)};e.onkeydown=x=>{if((x.key==='Enter'||x.key===' ')&&!x.target.closest('.quick-add')){x.preventDefault();openDetail(+e.dataset.id)}}});document.querySelectorAll('.quick-add').forEach(b=>{const i=Number(b.dataset.quickAdd);const selected=getRequests().includes(products[i].id);b.textContent=selected?'✓ Nella lista':'Aggiungi alla lista';b.classList.toggle('is-added',selected);b.setAttribute('aria-pressed',String(selected));b.onclick=event=>{event.stopPropagation();toggleRequest(products[i].id);updateQuickButtons()}});renderPagination(totalPages,ids.length);updateDynamicFilters()}
 function renderPagination(totalPages,totalCount){
  const nav=document.getElementById('catalogPagination');
  nav.hidden=totalCount<=PAGE_SIZE;

@@ -236,12 +236,874 @@
  }
 
 }
-</style></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="index.html#chi-siamo">Chi siamo</a><a href="index.html#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header><main><section class="container" id="catalogIntro" style="padding-bottom:0"><div class="eyebrow">CARTE DIEM AREZZO</div><h1 class="section-title">Il nostro catalogo</h1><p class="sub">Esplora gli articoli disponibili. Il sito è una vetrina: nessun acquisto o pagamento online.</p></section><section class="container" id="catalogo"><div id="catalogSections" class="catalog-sections"></div><div id="catalogContent" hidden><a class="catalog-back" href="catalogo.html">← Tutti i cataloghi</a><h2 class="section-title" id="catalogTitle">Scegli un catalogo</h2><div id="subcatalogSections" class="subcatalog-sections" aria-label="Sottocategorie"></div><div class="filter"><input aria-label="Cerca" id="find" placeholder="Cerca nome o sigla…" type="search"/></div><details class="filter-drawer" id="filterDrawer"><summary>☷ Filtri <span aria-hidden="true">▾</span></summary><div aria-label="Filtra per tipologia" class="category-filters" id="typeFilters" role="group"></div><div id="extraFilters" class="catalog-extra-filters" hidden><div class="filter-heading">Lingua</div><div class="category-filters" id="languageFilters" role="group" aria-label="Filtra per lingua"></div><div class="filter-heading" id="conditionFilterHeading">Condizioni (carte raw)</div><div class="category-filters" id="conditionFilters" role="group" aria-label="Filtra per condizioni"></div><div class="filter-heading">Voto (carte gradate)</div><div class="category-filters" id="gradeFilters" role="group" aria-label="Filtra per voto delle carte gradate"></div></div></details><div class="filter" style="margin-top:8px"></div><p class="sub" id="count"></p><div class="products" id="catalogGrid"></div><nav id="catalogPagination" class="catalog-pagination" aria-label="Pagine del catalogo" hidden></nav><p class="sub hidden" id="emptyCatalog">Nessun risultato.</p></div></section><div class="hidden" id="overlay" role="presentation"><div aria-label="Scheda prodotto" aria-modal="true" id="detail" role="dialog"><button aria-label="Chiudi" id="close">×</button><div class="photo" id="detailPhoto"><div class="mock-card" id="detailSymbol"></div></div><div id="detailText"><div class="eyebrow" id="detailCategory"></div><h2 id="detailName"></h2><p class="sub" id="detailCondition"></p><p id="detailDescription" class="detail-description" hidden></p><h3 class="gold" id="detailPrice"></h3><div class="detail-action-row"><button class="button secondary" id="detailAdd" type="button">Aggiungi alla lista</button> <a class="button secondary" href="richieste.html">Apri lista</a> <button class="button secondary" id="detailShare" type="button" aria-label="Condividi scheda prodotto" title="Condividi scheda prodotto" style="display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;min-width:48px;padding:10px 12px"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 13.5 6.6 4m0-11-6.6 4"/></svg></button></div><div class="detail-product-nav" aria-label="Navigazione tra prodotti"><button type="button" id="detailPrev" aria-label="Prodotto precedente">‹ Precedente</button><span id="detailPosition" aria-live="polite"></span><button type="button" id="detailNext" aria-label="Prodotto successivo">Successivo ›</button></div></div></div></div>
+</style>
+<style id="cd-price-filter-style">
+.price-filter-section {
+  margin-top: 14px;
+}
+.price-filter-section label {
+  display: block;
+}
+.price-filter-section input {
+  font: inherit;
+  border-radius: 8px !important;
+}
+#clearPriceFilter {
+  display: block;
+  margin-top: 14px;
+  padding: 11px 18px;
+  background: #171719;
+  color: #d5b36a;
+  border: 1px solid #8b7448;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+#clearPriceFilter:active {
+  background: #34291b;
+}
+#clearPriceFilter:focus-visible {
+  outline: 2px solid #d5b36a;
+  outline-offset: 3px;
+}
+</style>
+
+<style id="cd-price-button-small">
+#clearPriceFilter {
+  width: 50% !important;
+  height: 20px !important;
+  min-height: 0 !important;
+  padding: 0 4px !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  border-radius: 5px !important;
+  box-sizing: border-box !important;
+}
+</style>
+
+<style id="cd-price-trash-style">
+.price-filter-section > div:has(#filterMinPrice) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+}
+
+.price-filter-section label {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
+
+#clearPriceFilter {
+  flex: 0 0 38px !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #171719 !important;
+  color: #d5b36a !important;
+  border: 1px solid #8b7448 !important;
+  border-radius: 7px !important;
+  cursor: pointer;
+}
+
+#clearPriceFilter svg {
+  display: block;
+}
+
+#clearPriceFilter:active {
+  background: #34291b !important;
+}
+</style>
+
+<style id="cd-clear-all-style">
+.cd-clear-all-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin: 14px 0;
+}
+
+#clearAllCatalogFilters {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 13px;
+  background: #171719;
+  color: #d5b36a;
+  border: 1px solid #8b7448;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#clearAllCatalogFilters:active {
+  background: #34291b;
+}
+
+#clearAllCatalogFilters:focus-visible {
+  outline: 2px solid #d5b36a;
+  outline-offset: 3px;
+}
+</style>
+
+<style id="cd-dynamic-filters-style">
+.category-filters button[hidden] {
+  display:none !important;
+}
+</style>
+
+<style id="cd-header-uniforme-home">
+/* Intestazione coerente con la Home */
+body > header {
+  min-height: 70px !important;
+  padding: 8px max(4%, calc((100% - 1150px)/2)) !important;
+  background: #080a11f7 !important;
+  border-bottom: 1px solid #b9904c70 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+}
+
+body > header .brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-family: Georgia, serif !important;
+  font-size: 19px !important;
+  font-weight: normal !important;
+  letter-spacing: 1.2px !important;
+}
+
+body > header .brand img {
+  width: 51px !important;
+  height: 51px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 0 5px #e8ba5a40) !important;
+}
+
+/* Nessuna icona Download o Condividi */
+body > header #cd-install-btn,
+body > header #cd-share-btn {
+  display: none !important;
+}
+
+@media (max-width: 800px) {
+  body > header {
+    min-height: 62px !important;
+    padding: 6px 15px !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+  }
+
+  body > header .brand {
+    font-size: 14px !important;
+    gap: 6px !important;
+  }
+
+  body > header .brand img {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  body > header nav {
+    display: none !important;
+  }
+}
+</style>
+
+<style id="cd-header-bold-uniform">
+body > header .brand,
+body > header .brand span,
+body > header .brand .gold {
+  font-weight: 700 !important;
+}
+</style>
+<style id="cd-catalog-filter-layout-clean">
+#filterDrawer #typeFilters{display:none!important}
+#filterDrawer #extraFilters{border:0!important;padding:0!important;margin:0!important;display:flex;flex-direction:column;gap:19px}
+#filterDrawer #extraFilters[hidden]{display:none!important}
+#filterDrawer .cd-filter-section[hidden],#filterDrawer [hidden]{display:none!important}
+#filterDrawer .cd-filter-section{margin:0!important;padding:0!important;border:0!important}
+#filterDrawer .cd-filter-section .filter-heading{font-size:14px;font-weight:700;color:#d5b36a;margin:0 0 9px!important}
+#filterDrawer .cd-filter-section .category-filters{margin:0!important;padding:0!important;border:0!important;display:flex;gap:9px;flex-wrap:wrap}
+#filterDrawer #cd-panel-sort{width:100%;display:flex;flex-direction:column;gap:9px;margin:13px 0 19px}
+#filterDrawer #cd-panel-sort label{display:block;color:#d5b36a;font-size:14px;font-weight:700}
+#filterDrawer #catalogSort{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;font-size:16px!important}
+#filterDrawer .cd-filter-reset-last{display:block;width:100%;margin:20px 0 17px!important}
+#filterDrawer .cd-filter-reset-last #clearAllCatalogFilters{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:45px;box-sizing:border-box!important;margin:0!important;font-size:14px!important}
+#filterDrawer .price-filter-section{margin:0 0 16px!important;padding:0!important}
+#filterDrawer .price-filter-section>.filter-heading{font-size:14px;font-weight:700;margin:0 0 9px!important}
+#filterDrawer .price-filter-section>div:has(#filterMinPrice){margin:0!important}
+#filterDrawer .price-filter-section label{min-width:0!important}
+#filterDrawer .price-filter-section input{width:100%!important;min-width:0!important;box-sizing:border-box!important}
+</style></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="index.html#chi-siamo">Chi siamo</a><a href="index.html#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header><main><section class="container" id="catalogIntro" style="padding-bottom:0"><div class="eyebrow">CARTE DIEM AREZZO</div><h1 class="section-title">Il nostro catalogo</h1><p class="sub">Esplora gli articoli disponibili. Il sito è una vetrina: nessun acquisto o pagamento online.</p></section><section class="container" id="catalogo"><div id="catalogSections" class="catalog-sections"></div><div id="catalogContent" hidden><a class="catalog-back" href="catalogo.html">← Tutti i cataloghi</a><h2 class="section-title" id="catalogTitle">Scegli un catalogo</h2><div id="subcatalogSections" class="subcatalog-sections" aria-label="Sottocategorie"></div><div class="filter"><input aria-label="Cerca" id="find" placeholder="Cerca nome o sigla…" type="search"/></div><details class="filter-drawer" id="filterDrawer"><summary>☷ Filtri <span aria-hidden="true">▾</span></summary>
+
+<div aria-label="Filtra per tipologia" class="category-filters" id="typeFilters" role="group"></div><div id="cd-panel-sort"><label for="catalogSort">Ordina per</label><select id="catalogSort" style="background:#171719;color:white;
+border:1px solid #d5b36a;
+border-radius:7px;padding:10px;width:100%">
+<option value="recent">Più recenti</option>
+<option value="old">Meno recenti</option>
+<option value="low">Prezzo crescente</option>
+<option value="high">Prezzo decrescente</option>
+<option value="az">Nome A–Z</option>
+<option value="za">Nome Z–A</option>
+</select></div><div class="catalog-extra-filters" hidden="" id="extraFilters"><section class="cd-filter-section" id="cd-language-section"><div class="filter-heading">Lingua</div><div aria-label="Filtra per lingua" class="category-filters" id="languageFilters" role="group"></div></section><div class="cd-filter-section" hidden="" id="sealedTypeSection">
+<div class="filter-heading">Tipologia</div>
+<div aria-label="Filtra per tipologia sealed" class="category-filters" id="sealedTypeFilters" role="group"></div>
+</div><div class="cd-filter-section" hidden="" id="accessoryTypeSection">
+<div class="filter-heading">Tipologia</div>
+<div aria-label="Filtra per tipologia accessori" class="category-filters" id="accessoryTypeFilters" role="group">
+</div>
+</div><div class="cd-filter-section" hidden="" id="collectibleTypeSection">
+<div class="filter-heading">Tipologia</div>
+<div aria-label="Filtra per tipologia oggetti da collezione" class="category-filters" id="collectibleTypeFilters" role="group">
+</div>
+</div><section class="cd-filter-section" id="cd-condition-section"><div class="filter-heading">Condizione</div><div aria-label="Filtra per condizioni" class="category-filters" id="conditionFilters" role="group"></div></section><div class="cd-filter-section" hidden="" id="gameConditionSection">
+<div class="filter-heading">Condizione</div>
+<div aria-label="Filtra per condizione" class="category-filters" id="gameConditionFilters" role="group">
+</div>
+</div><div class="cd-filter-section" hidden="" id="platformSection">
+<div class="filter-heading">Piattaforma</div>
+<div aria-label="Filtra per piattaforma" class="category-filters" id="platformFilters" role="group">
+</div>
+</div><div class="cd-filter-section" hidden="" id="gradingCompanySection">
+<div class="filter-heading">Casa di gradazione</div>
+<div aria-label="Filtra per casa di gradazione" class="category-filters" id="gradingCompanyFilters" role="group"></div>
+</div><section class="cd-filter-section" id="cd-grade-section"><div class="filter-heading">Voto</div><div aria-label="Filtra per voto delle carte gradate" class="category-filters" id="gradeFilters" role="group"></div></section></div><div class="cd-clear-all-wrap cd-filter-reset-last">
+<button aria-label="Cancella tutti i filtri" id="clearAllCatalogFilters" onclick="window.location.reload()" type="button">
+<svg aria-hidden="true" fill="none" height="17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="17">
+<path d="M3 6h18"></path>
+<path d="M8 6V4h8v2"></path>
+<path d="M19 6l-1 14H6L5 6"></path>
+<path d="M10 10v7"></path>
+<path d="M14 10v7"></path>
+</svg>
+<span>Cancella tutti i filtri</span>
+</button>
+</div><div class="price-filter-section">
+<div class="filter-heading">Fascia di prezzo</div>
+<div style="display:flex;gap:10px;margin:10px 0">
+<label style="flex:1;min-width:0">
+<input id="filterMinPrice" min="0" placeholder="Minimo" step="0.01" style="width:100%;padding:10px;background:#171719;
+        color:white;border:1px solid #8b7448;border-radius:6px" type="number"/>
+</label>
+<label style="flex:1;min-width:0">
+<input id="filterMaxPrice" min="0" placeholder="Massimo" step="0.01" style="width:100%;padding:10px;background:#171719;
+        color:white;border:1px solid #8b7448;border-radius:6px" type="number"/>
+</label>
+<button aria-label="Cancella filtro prezzo" id="clearPriceFilter" title="Cancella filtro prezzo" type="button">
+<svg aria-hidden="true" fill="none" height="19" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="19">
+<path d="M3 6h18"></path>
+<path d="M8 6V4h8v2"></path>
+<path d="M19 6l-1 14H6L5 6"></path>
+<path d="M10 10v7"></path>
+<path d="M14 10v7"></path>
+</svg>
+</button>
+</div>
+</div>
+
+
+
+
+
+</details>
+<div class="filter" style="margin-top:8px"></div><p class="sub" id="count"></p><div class="products" id="catalogGrid"></div><nav id="catalogPagination" class="catalog-pagination" aria-label="Pagine del catalogo" hidden></nav><p class="sub hidden" id="emptyCatalog">Nessun risultato.</p></div></section><div class="hidden" id="overlay" role="presentation"><div aria-label="Scheda prodotto" aria-modal="true" id="detail" role="dialog"><button aria-label="Chiudi" id="close">×</button><div class="photo" id="detailPhoto"><div class="mock-card" id="detailSymbol"></div></div><div id="detailText"><div class="eyebrow" id="detailCategory"></div><h2 id="detailName"></h2><p class="sub" id="detailCondition"></p><p id="detailDescription" class="detail-description" hidden></p><h3 class="gold" id="detailPrice"></h3><div class="detail-action-row"><button class="button secondary" id="detailAdd" type="button">Aggiungi alla lista</button> <a class="button secondary" href="richieste.html">Apri lista</a> <button class="button secondary" id="detailShare" type="button" aria-label="Condividi scheda prodotto" title="Condividi scheda prodotto" style="display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;min-width:48px;padding:10px 12px"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 13.5 6.6 4m0-11-6.6 4"/></svg></button></div><div class="detail-product-nav" aria-label="Navigazione tra prodotti"><button type="button" id="detailPrev" aria-label="Prodotto precedente">‹ Precedente</button><span id="detailPosition" aria-live="polite"></span><button type="button" id="detailNext" aria-label="Prodotto successivo">Successivo ›</button></div></div></div></div>
 </main><footer>© 2026 CARTE DIEM AREZZO</footer><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="supabase-config.js"></script><script>
 const defaultProducts=[["Charizard ex", "199/165", "singole", null, "Disponibile", "Near Mint", "✦"], ["Pikachu", "025", "gradate", 149, "Disponibile", "PSA 10", "◈"], ["Box Pokémon sigillato", "", "sealed", 89, "Disponibile", "Sigillato", "▣"], ["Mew ex", "205/165", "singole", 55, "Disponibile", "Near Mint", "✦"], ["Set protezioni carte", "", "accessori", 12, "Venduto", "Nuovo", "◇"]];let products=[];let currentGroup='pokemon';let lockedPokemonType=null;const groupNames={pokemon:'TCG Pokémon',tcg:'Altri TCG',collezione:'Oggetti da collezione',videogiochi:'Consoles e Videogames',accessori:'Accessori'};const categoryNames={singole:'Carte raw',gradate:'Carte gradate',sealed:'Prodotti sealed',accessori:'Accessori',collezione:'Oggetti da collezione'};
 const label=p=>p[0]+((['singole','gradate'].includes(p[2])&&p[1])?' - '+p[1]:'');
 const escapeHtml=v=>String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]||c)); const safeImageUrl=v=>{try{const u=new URL(String(v),location.href);return u.protocol==='https:'||u.protocol==='http:'&&u.origin===location.origin?u.href:''}catch{return ''}}; const price=p=>p[3]===null?'Prezzo su richiesta':new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(p[3]);
-const selectedCategories=new Set();const selectedLanguages=new Set();const selectedConditions=new Set();const selectedGrades=new Set();let visibleProductIds=[];const PAGE_SIZE=20;let currentPage=1;function render(){let q=document.getElementById('find').value.toLowerCase();let ids=products.map((p,i)=>i).filter(i=>{let p=products[i];return(p.catalog_group||'pokemon')===currentGroup&&(!lockedPokemonType||p[2]===lockedPokemonType)&&p[2]!=='funko'&&(selectedCategories.size===0||selectedCategories.has(p[2]))&&(selectedLanguages.size===0||selectedLanguages.has((p[10]||'ITA').toUpperCase()))&&(selectedConditions.size===0||p[2]!=='singole'||selectedConditions.has(p[5]))&&(selectedGrades.size===0||p[2]!=='gradate'||selectedGrades.has(String(p[5]||'').replace(/^(PSA|BGS|CGC|GRAAD)\s+/i,'').trim()))&&label(p).toLowerCase().includes(q)});visibleProductIds=ids;const totalPages=Math.max(1,Math.ceil(ids.length/PAGE_SIZE));currentPage=Math.min(Math.max(1,currentPage),totalPages);const pageIds=ids.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);document.getElementById('count').textContent=ids.length+' prodotti'+(ids.length?' · Pagina '+currentPage+' di '+totalPages:'');document.getElementById('emptyCatalog').classList.toggle('hidden',ids.length!==0);document.getElementById('catalogGrid').innerHTML=pageIds.map(i=>{let p=products[i];return `<article class="product" role="button" tabindex="0" aria-label="Visualizza dettagli di ${escapeHtml(p[0]||'prodotto')}" data-id="${i}"><div class="photo">${p[7]&&p[7].length?`<div class="preview-pair ${p[7].length===1?'one':''}">${p[7].slice(0,1).map((src,n)=>`<img src="${escapeHtml(safeImageUrl(src))}" alt="Foto ${n+1} del prodotto" loading="lazy" decoding="async">`).join('')}</div>`:`<div class="mock-card">${escapeHtml(p[6]||'')}</div>`}</div><div class="product-info ${(['singole','gradate'].includes(p[2])&&p[1])?'has-code':'no-code'}"><h3 class="preview-product-name" title="${escapeHtml(p[0]||'')}">${escapeHtml(p[0]||'')}</h3><div class="preview-product-code" title="${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')}">${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')||'&nbsp;'}</div><div class="price">${escapeHtml(price(p))}</div><div class="card-actions"><button type="button" class="quick-add" data-quick-add="${i}" aria-label="Aggiungi ${escapeHtml(label(p))} alla lista richieste">Aggiungi alla lista</button></div></div></article>`}).join('');document.querySelectorAll('[data-id]').forEach(e=>{e.onclick=event=>{if(event.target.closest('.quick-add'))return;openDetail(+e.dataset.id)};e.onkeydown=x=>{if((x.key==='Enter'||x.key===' ')&&!x.target.closest('.quick-add')){x.preventDefault();openDetail(+e.dataset.id)}}});document.querySelectorAll('.quick-add').forEach(b=>{const i=Number(b.dataset.quickAdd);const selected=getRequests().includes(products[i].id);b.textContent=selected?'✓ Nella lista':'Aggiungi alla lista';b.classList.toggle('is-added',selected);b.setAttribute('aria-pressed',String(selected));b.onclick=event=>{event.stopPropagation();toggleRequest(products[i].id);updateQuickButtons()}});renderPagination(totalPages,ids.length)}
+const selectedCategories=new Set();const selectedLanguages=new Set();const selectedSealedTypes=new Set();const selectedConditions=new Set();const selectedGrades=new Set();const selectedGraders=new Set();let visibleProductIds=[];const PAGE_SIZE=20;let currentPage=1;
+function sortProductIds(ids){
+ const mode=document.getElementById('catalogSort').value;
+ const result=[...ids];
+ const names=(a,b)=>products[a][0].localeCompare(
+   products[b][0],'it',{sensitivity:'base',numeric:true}
+ );
+ const priced=(a,b,descending=false)=>{
+   const x=products[a][3],y=products[b][3];
+   if(x===null&&y===null)return 0;
+   if(x===null)return 1;
+   if(y===null)return -1;
+   return descending?y-x:x-y;
+ };
+ if(mode==='old')result.reverse();
+ if(mode==='low')result.sort((a,b)=>priced(a,b));
+ if(mode==='high')result.sort((a,b)=>priced(a,b,true));
+ if(mode==='az')result.sort(names);
+ if(mode==='za')result.sort((a,b)=>names(b,a));
+ return result;
+}
+document.getElementById('catalogSort').addEventListener(
+ 'change',()=>{currentPage=1;render()}
+);
+
+function priceFilterMatches(p){
+ const min=document.getElementById('filterMinPrice').value;
+ const max=document.getElementById('filterMaxPrice').value;
+
+ if(min===''&&max==='')return true;
+
+ if(p[3]===null||p[3]===undefined)return false;
+
+ const price=Number(p[3]);
+
+ if(!Number.isFinite(price))return false;
+ if(min!==''&&price<Number(min))return false;
+ if(max!==''&&price>Number(max))return false;
+
+ return true;
+}
+
+['filterMinPrice','filterMaxPrice'].forEach(id=>{
+ document.getElementById(id).addEventListener('input',()=>{
+   currentPage=1;
+   render();
+ });
+});
+
+document.getElementById('clearPriceFilter').onclick=()=>{
+ document.getElementById('filterMinPrice').value='';
+ document.getElementById('filterMaxPrice').value='';
+ currentPage=1;
+ render();
+};
+
+const gradingCompanies=[
+ 'PSA','BGS','CGC','GRAAD','Altre','Non specificata'
+];
+
+function productGrader(p){
+ if(p[2]!=='gradate')return '';
+ const raw=String(p[5]||'').trim().toUpperCase();
+ const match=raw.match(/^(PSA|BGS|CGC|GRAAD)(?=\s|[-:]|[0-9]|$)/);
+ if(match)return match[1];
+ if(!raw||/^(?:[0-9]+(?:[.,][0-9]+)?|BLACK LABEL)$/.test(raw))
+   return 'Non specificata';
+ return 'Altre';
+}
+
+function graderMatches(p){
+ return selectedGraders.size===0 ||
+        p[2]!=='gradate' ||
+        selectedGraders.has(productGrader(p));
+}
+
+function gradeMatches(p){
+ if(selectedGrades.size===0 || p[2]!=='gradate')
+   return true;
+
+ const raw=String(p[5]||'').trim().toUpperCase();
+
+ if(raw.includes('BLACK LABEL'))
+   return selectedGrades.has('Black Label');
+
+ const match=raw.match(
+   /(?:^|\\s)(10|[1-9](?:[.,]5)?)(?=\\s|$)/
+ );
+
+ if(!match)return false;
+
+ const vote=Number(match[1].replace(',','.'));
+
+ let group='';
+
+ if(vote===10)group='10';
+ else if(vote>=9)group='9–9.5';
+ else if(vote>=8)group='8–8.5';
+ else if(vote>=7)group='7–7.5';
+ else if(vote>=1)group='1–6.5';
+
+ return selectedGrades.has(group);
+}
+
+const sealedTypes=[
+ 'Box','ETB','Bundle','Tin',
+ 'Collezioni','Bustine','UPC','Altro'
+];
+
+function productSealedType(p){
+ if(p.testMeta?.sealedType)return p.testMeta.sealedType;
+ const name=String(p[0]||'').toLowerCase();
+
+ if(/\b(?:upc|ultra[\s-]*premium)\b/i.test(name))
+   return 'UPC';
+
+ if(/\b(?:etb|elite trainer box)\b/i.test(name))
+   return 'ETB';
+
+ if(/\b(?:bundle|booster bundle)\b/i.test(name))
+   return 'Bundle';
+
+ if(/\b(?:mini[\s-]*tin|tin|scatola metallica)\b/i.test(name))
+   return 'Tin';
+
+ if(/\b(?:box|display|booster box)\b/i.test(name))
+   return 'Box';
+
+ if(/\b(?:bustina|bustine|booster pack|pack singolo)\b/i.test(name))
+   return 'Bustine';
+
+ if(/\b(?:collezione|collection|cofanetto)\b/i.test(name))
+   return 'Collezioni';
+
+ return 'Altro';
+}
+
+function sealedTypeMatches(p){
+ if(selectedSealedTypes.size===0||p[2]!=='sealed')
+   return true;
+
+ return selectedSealedTypes.has(productSealedType(p));
+}
+
+const selectedPlatforms = new Set();
+
+const platformGroups = {
+ Nintendo: [
+  'Game Boy','Game Boy Color','Game Boy Advance',
+  'Nintendo DS','Nintendo 3DS','Wii','Wii U',
+  'Switch','Switch 2'
+ ],
+ PlayStation: [
+  'PS1','PS2','PS3','PS4','PS5','PSP','PS Vita'
+ ],
+ Xbox: [
+  'Xbox','Xbox 360','Xbox One','Xbox Series X/S'
+ ],
+ Sega: [
+  'Mega Drive','Saturn','Dreamcast'
+ ],
+ Altre: ['Altro','Non specificata']
+};
+
+function productPlatform(p){
+ if(p.testMeta?.platform)return p.testMeta.platform;
+ const name = String(p[0]||'').toLowerCase();
+
+ const rules = [
+  ['Switch 2', /\b(?:switch\s*2)\b/],
+  ['Switch', /\bswitch\b/],
+  ['Game Boy Advance', /\b(?:game\s*boy\s*advance|gba)\b/],
+  ['Game Boy Color', /\b(?:game\s*boy\s*color|gbc)\b/],
+  ['Game Boy', /\b(?:game\s*boy|dmg)\b/],
+  ['Nintendo 3DS', /\b(?:3ds|2ds)\b/],
+  ['Nintendo DS', /\b(?:nintendo\s*ds|nds|ds\s*lite|dsi)\b/],
+  ['Wii U', /\bwii\s*u\b/],
+  ['Wii', /\bwii\b/],
+  ['PS Vita', /\b(?:ps\s*vita|playstation\s*vita|psvita)\b/],
+  ['PSP', /\b(?:psp|playstation\s*portable)\b/],
+  ['PS5', /\b(?:ps5|playstation\s*5)\b/],
+  ['PS4', /\b(?:ps4|playstation\s*4)\b/],
+  ['PS3', /\b(?:ps3|playstation\s*3)\b/],
+  ['PS2', /\b(?:ps2|playstation\s*2)\b/],
+  ['PS1', /\b(?:ps1|psx|playstation\s*1|playstation\s*one)\b/],
+  ['Xbox Series X/S', /\bxbox\s*series\s*[xs]\b/],
+  ['Xbox 360', /\bxbox\s*360\b/],
+  ['Xbox One', /\bxbox\s*one\b/],
+  ['Xbox', /\bxbox\b/],
+  ['Mega Drive', /\b(?:mega\s*drive|genesis)\b/],
+  ['Saturn', /\b(?:sega\s*saturn|saturn)\b/],
+  ['Dreamcast', /\bdreamcast\b/]
+ ];
+
+ for(const [platform,regex] of rules){
+  if(regex.test(name))return platform;
+ }
+
+ return 'Non specificata';
+}
+
+function platformMatches(p){
+ if(currentGroup!=='videogiochi'||selectedPlatforms.size===0)
+   return true;
+
+ return selectedPlatforms.has(productPlatform(p));
+}
+
+
+const selectedGameConditions = new Set();
+const gameConditions = ['CIB','Boxed','Loose'];
+
+function productGameCondition(p){
+ if(p.testMeta?.gameCondition)return p.testMeta.gameCondition;
+ const value = String(
+   (p[0]||'')+' '+(p[9]||'')
+ ).toLowerCase();
+
+ if(/\b(?:cib|complete in box|completo di scatola e manuale)\b/i.test(value))
+   return 'CIB';
+
+ if(/\b(?:boxed|con scatola)\b/i.test(value))
+   return 'Boxed';
+
+ if(/\b(?:loose|senza scatola|solo cartuccia|solo console)\b/i.test(value))
+   return 'Loose';
+
+ return '';
+}
+
+function gameConditionMatches(p){
+ if(currentGroup!=='videogiochi' ||
+    selectedGameConditions.size===0)
+   return true;
+
+ return selectedGameConditions.has(productGameCondition(p));
+}
+
+function updateGameConditionUI(){
+ const section=document.getElementById('gameConditionSection');
+ const box=document.getElementById('gameConditionFilters');
+
+ section.hidden=currentGroup!=='videogiochi';
+ if(section.hidden)return;
+
+ box.innerHTML=gameConditions.map(v=>
+   `<button type="button"
+      class="category-toggle"
+      data-condition="${v}"
+      aria-pressed="${selectedGameConditions.has(v)}"
+    >${v}</button>`
+ ).join('');
+
+ box.querySelectorAll('button').forEach(b=>{
+   b.onclick=()=>{
+     const v=b.dataset.condition;
+
+     if(selectedGameConditions.has(v))
+       selectedGameConditions.delete(v);
+     else
+       selectedGameConditions.add(v);
+
+     b.setAttribute(
+       'aria-pressed',
+       String(selectedGameConditions.has(v))
+     );
+
+     currentPage=1;
+     render();
+   };
+ });
+}
+function updatePlatformUI(){
+ const section=document.getElementById('platformSection');
+ const container=document.getElementById('platformFilters');
+
+ section.hidden=currentGroup!=='videogiochi';
+ if(section.hidden)return;
+
+ container.innerHTML=Object.entries(platformGroups).map(
+  ([group,values])=>`
+    <div style="width:100%;color:#d5b36a;margin:12px 0 5px">
+      ${group}
+    </div>
+    ${values.map(v=>`
+      <button type="button"
+        class="category-toggle"
+        data-platform="${v}"
+        aria-pressed="${selectedPlatforms.has(v)}">
+        ${v}
+      </button>
+    `).join('')}
+  `
+ ).join('');
+
+ container.querySelectorAll('[data-platform]').forEach(b=>{
+  b.onclick=()=>{
+   const v=b.dataset.platform;
+   if(selectedPlatforms.has(v))selectedPlatforms.delete(v);
+   else selectedPlatforms.add(v);
+
+   b.setAttribute(
+    'aria-pressed',
+    String(selectedPlatforms.has(v))
+   );
+
+   currentPage=1;
+   render();
+  };
+ });
+}
+
+const selectedAccessoryTypes = new Set();
+
+const accessoryTypes = [
+ 'Binder',
+ 'Sleeve e bustine protettive',
+ 'Toploader e protezioni rigide',
+ 'Espositori',
+ 'Box portacarte',
+ 'Altro'
+];
+
+function productAccessoryType(p){
+ if(p.testMeta?.accessoryType)return p.testMeta.accessoryType;
+ const name = String(p[0]||'').toLowerCase();
+
+ if(/\b(?:binder|album|raccoglitore|portfolio)\b/i.test(name))
+   return 'Binder';
+
+ if(/\b(?:toploader|top loader|semi.rigid|card saver|magnetic holder|one touch)\b/i.test(name))
+   return 'Toploader e protezioni rigide';
+
+ if(/\b(?:sleeve|bustine|bustina protettiva|perfect fit|protezioni morbide)\b/i.test(name))
+   return 'Sleeve e bustine protettive';
+
+ if(/\b(?:espositore|display stand|supporto|stand|cornice|teca)\b/i.test(name))
+   return 'Espositori';
+
+ if(/\b(?:deck box|storage box|portacarte|porta carte|scatola carte)\b/i.test(name))
+   return 'Box portacarte';
+
+ return 'Altro';
+}
+
+function accessoryTypeMatches(p){
+ if(currentGroup!=='accessori' ||
+    selectedAccessoryTypes.size===0)
+   return true;
+
+ return selectedAccessoryTypes.has(productAccessoryType(p));
+}
+
+function updateAccessoryTypeUI(){
+ const section=document.getElementById('accessoryTypeSection');
+ const box=document.getElementById('accessoryTypeFilters');
+
+ section.hidden=currentGroup!=='accessori';
+ if(section.hidden)return;
+
+ box.innerHTML=accessoryTypes.map(v=>
+   `<button type="button"
+     class="category-toggle"
+     data-accessory="${v}"
+     aria-pressed="${selectedAccessoryTypes.has(v)}"
+   >${v}</button>`
+ ).join('');
+
+ box.querySelectorAll('button').forEach(b=>{
+   b.onclick=()=>{
+     const v=b.dataset.accessory;
+
+     if(selectedAccessoryTypes.has(v))
+       selectedAccessoryTypes.delete(v);
+     else
+       selectedAccessoryTypes.add(v);
+
+     b.setAttribute(
+       'aria-pressed',
+       String(selectedAccessoryTypes.has(v))
+     );
+
+     currentPage=1;
+     render();
+   };
+ });
+}
+
+const selectedCollectibleTypes = new Set();
+
+const collectibleTypes = [
+ 'Funko Pop',
+ 'Figure e Statue',
+ 'Gadget',
+ 'Altro'
+];
+
+function productCollectibleType(p){
+ if(p.testMeta?.collectibleType)return p.testMeta.collectibleType;
+ const name=String(p[0]||'').toLowerCase();
+
+ if(/\b(?:funko|pop vinyl|pop!)\b/i.test(name))
+   return 'Funko Pop';
+
+ if(/\b(?:figure|figurine|statua|statue|action figure|nendoroid|figma)\b/i.test(name))
+   return 'Figure e Statue';
+
+ if(/\b(?:gadget|portachiavi|keychain|peluche|plush|tazza|mug|poster|spilla)\b/i.test(name))
+   return 'Gadget';
+
+ return 'Altro';
+}
+
+function collectibleTypeMatches(p){
+ if(currentGroup!=='collezione' ||
+    selectedCollectibleTypes.size===0)
+   return true;
+
+ return selectedCollectibleTypes.has(productCollectibleType(p));
+}
+
+function updateCollectibleTypeUI(){
+ const section=document.getElementById('collectibleTypeSection');
+ const box=document.getElementById('collectibleTypeFilters');
+
+ section.hidden=currentGroup!=='collezione';
+ if(section.hidden)return;
+
+ box.innerHTML=collectibleTypes.map(v=>
+   `<button type="button"
+      class="category-toggle"
+      data-collectible="${v}"
+      aria-pressed="${selectedCollectibleTypes.has(v)}"
+   >${v}</button>`
+ ).join('');
+
+ box.querySelectorAll('button').forEach(b=>{
+   b.onclick=()=>{
+     const v=b.dataset.collectible;
+
+     if(selectedCollectibleTypes.has(v))
+       selectedCollectibleTypes.delete(v);
+     else
+       selectedCollectibleTypes.add(v);
+
+     b.setAttribute('aria-pressed',
+       String(selectedCollectibleTypes.has(v)));
+
+     currentPage=1;
+     render();
+   };
+ });
+}
+
+function updateDynamicFilters(){
+
+ const baseProducts=products.filter(p=>{
+   if((p.catalog_group||'pokemon')!==currentGroup)
+     return false;
+
+   if(lockedPokemonType&&p[2]!==lockedPokemonType)
+     return false;
+
+   return p[2]!=='funko';
+ });
+
+ function gradeGroup(p){
+   const raw=String(p[5]||'').toUpperCase();
+
+   if(raw.includes('BLACK LABEL'))
+     return 'Black Label';
+
+   const match=raw.match(
+     /(?:^|\s)(10|[1-9](?:[.,]5)?)(?=\s|$)/
+   );
+
+   if(!match)return '';
+
+   const n=Number(match[1].replace(',','.'));
+
+   if(n===10)return '10';
+   if(n>=9)return '9–9.5';
+   if(n>=8)return '8–8.5';
+   if(n>=7)return '7–7.5';
+   if(n>=1)return '1–6.5';
+
+   return '';
+ }
+
+ const configs=[
+   [
+     'languageFilters',
+     p=>(p[10]||'ITA').toUpperCase()
+   ],
+   [
+     'conditionFilters',
+     p=>p[2]==='singole'?p[5]:''
+   ],
+   [
+     'gradingCompanyFilters',
+     p=>p[2]==='gradate'?productGrader(p):''
+   ],
+   [
+     'gradeFilters',
+     p=>p[2]==='gradate'?gradeGroup(p):''
+   ],
+   [
+     'sealedTypeFilters',
+     p=>p[2]==='sealed'?productSealedType(p):''
+   ],
+   [
+     'platformFilters',
+     p=>currentGroup==='videogiochi'
+       ?productPlatform(p):''
+   ],
+   [
+     'gameConditionFilters',
+     p=>currentGroup==='videogiochi'
+       ?productGameCondition(p):''
+   ],
+   [
+     'accessoryTypeFilters',
+     p=>currentGroup==='accessori'
+       ?productAccessoryType(p):''
+   ],
+   [
+     'collectibleTypeFilters',
+     p=>currentGroup==='collezione'
+       ?productCollectibleType(p):''
+   ]
+ ];
+
+ for(const [id,getValue] of configs){
+
+   const container=document.getElementById(id);
+   if(!container)continue;
+
+   const available=new Set(
+     baseProducts.map(getValue).filter(Boolean)
+   );
+
+   container.querySelectorAll('button').forEach(button=>{
+
+     const value=
+       button.dataset.value||
+       button.dataset.platform||
+       button.dataset.condition||
+       button.dataset.accessory||
+       button.dataset.collectible||
+       '';
+
+     const selected=
+       button.getAttribute('aria-pressed')==='true';
+
+     button.hidden=!available.has(value)&&!selected;
+   });
+ }
+  cdRefreshFilterSections();
+}
+function cdRefreshFilterSections(){
+  const tcg=currentGroup==='pokemon'||currentGroup==='tcg';
+  const types={
+    'cd-language-section': tcg,
+    'sealedTypeSection': tcg&&lockedPokemonType==='sealed',
+    'accessoryTypeSection': currentGroup==='accessori',
+    'collectibleTypeSection': currentGroup==='collezione',
+    'cd-condition-section': tcg&&lockedPokemonType==='singole',
+    'gameConditionSection': currentGroup==='videogiochi',
+    'platformSection': currentGroup==='videogiochi',
+    'gradingCompanySection': tcg&&lockedPokemonType==='gradate',
+    'cd-grade-section': tcg&&lockedPokemonType==='gradate'
+  };
+  for(const [id,applies] of Object.entries(types)){
+    const section=document.getElementById(id);
+    if(!section)continue;
+    const buttons=Array.from(section.querySelectorAll('.category-filters button'));
+    section.hidden=!(applies&&buttons.some(button=>!button.hidden));
+  }
+}
+function render(){let q=document.getElementById('find').value.toLowerCase();let ids=products.map((p,i)=>i).filter(i=>{let p=products[i];return(p.catalog_group||'pokemon')===currentGroup&&(!lockedPokemonType||p[2]===lockedPokemonType)&&p[2]!=='funko'&&(selectedCategories.size===0||selectedCategories.has(p[2]))&&(selectedLanguages.size===0||selectedLanguages.has((p[10]||'ITA').toUpperCase()))&&(selectedConditions.size===0||p[2]!=='singole'||selectedConditions.has(p[5]))&&graderMatches(p)&&gradeMatches(p)&&sealedTypeMatches(p)&&platformMatches(p)&&gameConditionMatches(p)&&accessoryTypeMatches(p)&&collectibleTypeMatches(p)&&label(p).toLowerCase().includes(q)});ids=ids.filter(i=>priceFilterMatches(products[i]));ids=sortProductIds(ids);visibleProductIds=ids;const totalPages=Math.max(1,Math.ceil(ids.length/PAGE_SIZE));currentPage=Math.min(Math.max(1,currentPage),totalPages);const pageIds=ids.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);document.getElementById('count').textContent=ids.length+' prodotti'+(ids.length?' · Pagina '+currentPage+' di '+totalPages:'');document.getElementById('emptyCatalog').classList.toggle('hidden',ids.length!==0);document.getElementById('catalogGrid').innerHTML=pageIds.map(i=>{let p=products[i];return `<article class="product" role="button" tabindex="0" aria-label="Visualizza dettagli di ${escapeHtml(p[0]||'prodotto')}" data-id="${i}"><div class="photo">${p[7]&&p[7].length?`<div class="preview-pair ${p[7].length===1?'one':''}">${p[7].slice(0,1).map((src,n)=>`<img src="${escapeHtml(safeImageUrl(src))}" alt="Foto ${n+1} del prodotto" loading="lazy" decoding="async">`).join('')}</div>`:`<div class="mock-card">${escapeHtml(p[6]||'')}</div>`}</div><div class="product-info ${(['singole','gradate'].includes(p[2])&&p[1])?'has-code':'no-code'}"><h3 class="preview-product-name" title="${escapeHtml(p[0]||'')}">${escapeHtml(p[0]||'')}</h3><div class="preview-product-code" title="${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')}">${escapeHtml((['singole','gradate'].includes(p[2])?p[1]:'')||'')||'&nbsp;'}</div><div class="price">${escapeHtml(price(p))}</div><div class="card-actions"><button type="button" class="quick-add" data-quick-add="${i}" aria-label="Aggiungi ${escapeHtml(label(p))} alla lista richieste">Aggiungi alla lista</button></div></div></article>`}).join('');document.querySelectorAll('[data-id]').forEach(e=>{e.onclick=event=>{if(event.target.closest('.quick-add'))return;openDetail(+e.dataset.id)};e.onkeydown=x=>{if((x.key==='Enter'||x.key===' ')&&!x.target.closest('.quick-add')){x.preventDefault();openDetail(+e.dataset.id)}}});document.querySelectorAll('.quick-add').forEach(b=>{const i=Number(b.dataset.quickAdd);const selected=getRequests().includes(products[i].id);b.textContent=selected?'✓ Nella lista':'Aggiungi alla lista';b.classList.toggle('is-added',selected);b.setAttribute('aria-pressed',String(selected));b.onclick=event=>{event.stopPropagation();toggleRequest(products[i].id);updateQuickButtons()}});renderPagination(totalPages,ids.length);updateDynamicFilters()}
 function renderPagination(totalPages,totalCount){
  const nav=document.getElementById('catalogPagination');
  nav.hidden=totalCount<=PAGE_SIZE;
@@ -289,7 +1151,7 @@ document.getElementById('close').onclick=closeDetail;document.getElementById('ov
 const sections=document.getElementById('catalogSections');
 sections.innerHTML=Object.entries(groupNames).map(([key,name])=>`<a class="catalog-home-card" href="catalogo.html?catalogo=${key}"><span class="catalog-home-icon" aria-hidden="true">${({pokemon:'✦',tcg:'◇',videogiochi:'▣',accessori:'✧',collezione:'✧'})[key]}</span><strong>${({pokemon:"TCG Pokémon",tcg:"Altri TCG",videogiochi:"Consoles e Videogames",accessori:"Accessori",collezione:"Oggetti da collezione"})[key]||name}</strong><span class="catalog-home-arrow" aria-hidden="true">→</span></a>`).join('');
 const languageOptions=['ITA','ENG','JPN','CHN','KOR'];const conditionOptions=['Near Mint','Excellent','Good','Light Played','Played','Poor'];
-const gradeOptions=["1","1.5","2","2.5","3","3.5","4","4.5","5","5.5","6","6.5","7","7.5","8","8.5","9","9.5","10","Black Label"];
+const gradeOptions=["10","9–9.5","8–8.5","7–7.5","1–6.5","Black Label"];
 const typeOptions={pokemon:[['singole','Carte raw'],['gradate','Carte gradate'],['sealed','Prodotti Sealed']],tcg:[['singole','Carte raw'],['gradate','Carte gradate'],['sealed','Prodotti Sealed']],videogiochi:[['console','Consoles'],['videogiochi','Videogiochi']],accessori:[],collezione:[]};
 function setSubcategory(c){selectedCategories.clear();if(c)selectedCategories.add(c);currentPage=1;updateCategoryButtons();render()}
 function updateSubcategories(){
@@ -298,16 +1160,75 @@ function updateSubcategories(){
   const options=typeOptions[currentGroup];const filter=document.getElementById('typeFilters');
   filter.innerHTML=options.map(([key,name])=>`<button type="button" class="category-toggle" data-category="${key}" aria-pressed="false">${name}</button>`).join('');
   const tcgGroup=currentGroup==='pokemon'||currentGroup==='tcg';
-  const extra=document.getElementById('extraFilters');extra.hidden=!tcgGroup||!['singole','gradate','sealed'].includes(lockedPokemonType);
+  const extra=document.getElementById('extraFilters');extra.hidden=false;
   const langs=document.getElementById('languageFilters');const conditions=document.getElementById('conditionFilters');const gradeFilter=document.getElementById('gradeFilters');
-  langs.innerHTML=tcgGroup?languageOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedLanguages.has(v)}">${v}</button>`).join(''):'';
+  
+  const sealedSection=document.getElementById('sealedTypeSection');
+  const sealedBox=document.getElementById('sealedTypeFilters');
+
+  sealedSection.hidden=!(
+    tcgGroup&&lockedPokemonType==='sealed'
+  );
+
+  sealedBox.innerHTML=sealedTypes.map(v=>
+    `<button type="button"
+      class="category-toggle"
+      data-value="${v}"
+      aria-pressed="${selectedSealedTypes.has(v)}"
+    >${v}</button>`
+  ).join('');
+
+  sealedBox.querySelectorAll('button').forEach(b=>{
+    b.onclick=()=>{
+      const v=b.dataset.value;
+
+      if(selectedSealedTypes.has(v))
+        selectedSealedTypes.delete(v);
+      else
+        selectedSealedTypes.add(v);
+
+      b.setAttribute(
+        'aria-pressed',
+        String(selectedSealedTypes.has(v))
+      );
+
+      currentPage=1;
+      render();
+    };
+  });
+
+langs.innerHTML=tcgGroup?languageOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedLanguages.has(v)}">${v}</button>`).join(''):'';
   conditions.innerHTML=tcgGroup&&lockedPokemonType==='singole'?conditionOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedConditions.has(v)}">${v}</button>`).join(''):'';
-  gradeFilter.innerHTML=tcgGroup&&lockedPokemonType==='gradate'?gradeOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedGrades.has(v)}">${v}</button>`).join(''):'';
+  
+  const graderSection=document.getElementById('gradingCompanySection');
+  const graderBox=document.getElementById('gradingCompanyFilters');
+
+  graderSection.hidden=!(tcgGroup&&lockedPokemonType==='gradate');
+
+  graderBox.innerHTML=gradingCompanies.map(v=>
+    `<button type="button" class="category-toggle"
+      data-value="${v}"
+      aria-pressed="${selectedGraders.has(v)}">${v}</button>`
+  ).join('');
+
+  graderBox.querySelectorAll('button').forEach(b=>{
+    b.onclick=()=>{
+      const v=b.dataset.value;
+      if(selectedGraders.has(v))selectedGraders.delete(v);
+      else selectedGraders.add(v);
+      b.setAttribute('aria-pressed',
+        String(selectedGraders.has(v)));
+      currentPage=1;
+      render();
+    };
+  });
+
+gradeFilter.innerHTML=tcgGroup&&lockedPokemonType==='gradate'?gradeOptions.map(v=>`<button type="button" class="category-toggle" data-value="${v}" aria-pressed="${selectedGrades.has(v)}">${v}</button>`).join(''):'';
   gradeFilter.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.value;selectedGrades.has(v)?selectedGrades.delete(v):selectedGrades.add(v);b.setAttribute('aria-pressed',String(selectedGrades.has(v)));currentPage=1;render()});
   langs.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.value;selectedLanguages.has(v)?selectedLanguages.delete(v):selectedLanguages.add(v);b.setAttribute('aria-pressed',String(selectedLanguages.has(v)));currentPage=1;render()});
   conditions.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.value;selectedConditions.has(v)?selectedConditions.delete(v):selectedConditions.add(v);b.setAttribute('aria-pressed',String(selectedConditions.has(v)));currentPage=1;render()});
-  document.getElementById('filterDrawer').hidden=!tcgGroup||!lockedPokemonType;
-  document.getElementById('filterDrawer').open=false;
+  document.getElementById('filterDrawer').hidden=false;
+  document.getElementById('filterDrawer').open=false;updatePlatformUI();updateAccessoryTypeUI();updateCollectibleTypeUI();updateGameConditionUI();
   filter.querySelectorAll('button').forEach(b=>b.onclick=()=>setSubcategory(selectedCategories.has(b.dataset.category)?'':b.dataset.category));
 }
 function showCatalog(group,subcategory){
@@ -317,7 +1238,7 @@ function showCatalog(group,subcategory){
   document.getElementById('catalogContent').hidden=!valid;
   document.getElementById('catalogContent').dataset.catalogGroup=valid?group:'';
   if(!valid){document.title='Catalogo | CARTE DIEM AREZZO';return}
-  currentGroup=group;currentPage=1;selectedCategories.clear();selectedLanguages.clear();selectedConditions.clear();selectedGrades.clear();document.getElementById('find').value='';
+  currentGroup=group;currentPage=1;selectedCategories.clear();selectedLanguages.clear();selectedSealedTypes.clear();selectedConditions.clear();selectedGrades.clear();selectedPlatforms.clear();selectedAccessoryTypes.clear();selectedCollectibleTypes.clear();selectedGameConditions.clear();selectedGraders.clear();document.getElementById('find').value='';
   document.getElementById('catalogTitle').textContent=groupNames[group];
   document.title=groupNames[group]+' | CARTE DIEM AREZZO';
   updateSubcategories();
@@ -354,6 +1275,7 @@ function showCatalog(group,subcategory){
 }
 showCatalog(initialGroup,initialSubcategory);
 window.addEventListener('popstate',()=>{const q=new URLSearchParams(location.search);showCatalog(q.get('catalogo'),q.get('sottocategoria'));});
+
 loadProducts().then(data=>{
   products=data;
   const requestedId=new URLSearchParams(location.search).get('prodotto');
@@ -418,4 +1340,136 @@ if ('serviceWorker' in navigator) {
   body nav.mobile-dock>a.active{color:#ffd05e!important}
   body nav.mobile-dock>a span{display:block!important;font:400 24px/1 Arial,sans-serif!important;color:inherit!important}
 }
-</style><script src="shared-mobile-dock.js?v=1"></script></body></html>
+</style><script src="shared-mobile-dock.js?v=1"></script>
+<script id="cd-filter-memory">
+(function(){
+  const prefix='cd-local-filter-state-v1:';
+  let clearing=false;
+
+  function key(){
+    const q=new URLSearchParams(location.search);
+    const group=q.get('catalogo');
+    if(!group)return null;
+    return prefix+group+':'+(q.get('sottocategoria')||'');
+  }
+
+  function sets(){
+    return {
+      languages:selectedLanguages,
+      conditions:selectedConditions,
+      grades:selectedGrades,
+      graders:selectedGraders,
+      sealed:selectedSealedTypes,
+      platforms:selectedPlatforms,
+      gameConditions:selectedGameConditions,
+      accessories:selectedAccessoryTypes,
+      collectibles:selectedCollectibleTypes
+    };
+  }
+
+  function save(){
+    if(clearing)return;
+    const k=key();
+    if(!k)return;
+
+    const values={};
+    for(const [name,set] of Object.entries(sets()))
+      values[name]=[...set];
+
+    const state={
+      values,
+      search:document.getElementById('find').value,
+      min:document.getElementById('filterMinPrice').value,
+      max:document.getElementById('filterMaxPrice').value,
+      sort:document.getElementById('catalogSort').value,
+      page:currentPage,
+      scroll:window.scrollY
+    };
+
+    try{
+      sessionStorage.setItem(k,JSON.stringify(state));
+    }catch(e){
+      console.warn('Memoria filtri non disponibile',e);
+    }
+  }
+
+  function restore(){
+    const k=key();
+    if(!k)return;
+
+    let state;
+    try{
+      state=JSON.parse(sessionStorage.getItem(k)||'null');
+    }catch(e){return}
+    if(!state)return;
+
+    for(const [name,set] of Object.entries(sets())){
+      set.clear();
+      const allowed=state.values?.[name];
+      if(Array.isArray(allowed)){
+        allowed.forEach(v=>{
+          if(typeof v==='string')set.add(v);
+        });
+      }
+    }
+
+    const input=(id,value)=>{
+      document.getElementById(id).value=
+        typeof value==='string'?value:'';
+    };
+
+    input('find',state.search);
+    input('filterMinPrice',state.min);
+    input('filterMaxPrice',state.max);
+
+    const sort=document.getElementById('catalogSort');
+    if([...sort.options].some(o=>o.value===state.sort))
+      sort.value=state.sort;
+
+    updateSubcategories();
+
+    currentPage=Number.isInteger(state.page)
+      ?Math.max(1,state.page):1;
+
+    render();
+
+    const position=Number(state.scroll)||0;
+    if(position>0){
+      let restored=false;
+      const grid=document.getElementById('catalogGrid');
+
+      const observer=new MutationObserver(()=>{
+        if(restored)return;
+        restored=true;
+        observer.disconnect();
+        requestAnimationFrame(()=>{
+          window.scrollTo(0,position);
+        });
+      });
+
+      observer.observe(grid,{childList:true});
+
+      window.addEventListener('load',()=>{
+        if(!restored && products.length){
+          restored=true;
+          observer.disconnect();
+          window.scrollTo(0,position);
+        }
+      },{once:true});
+    }
+  }
+
+  document.addEventListener('click',e=>{
+    const reset=e.target.closest('#clearAllCatalogFilters');
+    if(!reset)return;
+
+    clearing=true;
+    const k=key();
+    if(k)sessionStorage.removeItem(k);
+  },true);
+
+  window.addEventListener('pagehide',save);
+  restore();
+})();
+</script>
+</body></html>

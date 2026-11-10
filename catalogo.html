@@ -399,21 +399,56 @@ body > header .brand .gold {
 }
 </style>
 <style id="cd-catalog-filter-layout-clean">
+/* Spaziatura verticale comune a tutti i cataloghi e sottocategorie. */
 #filterDrawer #typeFilters{display:none!important}
-#filterDrawer #extraFilters{border:0!important;padding:0!important;margin:0!important;display:flex;flex-direction:column;gap:19px}
-#filterDrawer #extraFilters[hidden]{display:none!important}
-#filterDrawer .cd-filter-section[hidden],#filterDrawer [hidden]{display:none!important}
-#filterDrawer .cd-filter-section{margin:0!important;padding:0!important;border:0!important}
-#filterDrawer .cd-filter-section .filter-heading{font-size:14px;font-weight:700;color:#d5b36a;margin:0 0 9px!important}
-#filterDrawer .cd-filter-section .category-filters{margin:0!important;padding:0!important;border:0!important;display:flex;gap:9px;flex-wrap:wrap}
-#filterDrawer #cd-panel-sort{width:100%;display:flex;flex-direction:column;gap:9px;margin:13px 0 19px}
-#filterDrawer #cd-panel-sort label{display:block;color:#d5b36a;font-size:14px;font-weight:700}
-#filterDrawer #catalogSort{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;font-size:16px!important}
-#filterDrawer .price-filter-section{margin:0 0 16px!important;padding:0!important}
-#filterDrawer .price-filter-section>.filter-heading{font-size:14px;font-weight:700;margin:0 0 9px!important}
-#filterDrawer .price-filter-section>div:has(#filterMinPrice){margin:0!important}
+#filterDrawer #cd-panel-sort{
+  display:flex;flex-direction:column;gap:8px;
+  width:100%;margin:10px 0 17px!important;padding:0!important
+}
+#filterDrawer #cd-panel-sort label{
+  display:block;color:#d5b36a;font-size:14px;font-weight:700;
+  line-height:1.35;margin:0!important
+}
+#filterDrawer #catalogSort{
+  display:block!important;width:100%!important;max-width:none!important;
+  min-width:0!important;box-sizing:border-box!important;
+  margin:0!important;font-size:16px!important
+}
+#filterDrawer #extraFilters{
+  display:flex;flex-direction:column;gap:17px;
+  margin:0!important;padding:0!important;border:0!important
+}
+#filterDrawer #extraFilters[hidden],
+#filterDrawer .cd-filter-section[hidden],
+#filterDrawer [hidden]{display:none!important}
+#filterDrawer .cd-filter-section{
+  margin:0!important;padding:0!important;border:0!important
+}
+#filterDrawer .cd-filter-section .filter-heading{
+  color:#d5b36a;font-size:14px;font-weight:700;line-height:1.35;
+  margin:0 0 8px!important
+}
+#filterDrawer .cd-filter-section .category-filters{
+  display:flex;flex-wrap:wrap;gap:8px 9px;
+  margin:0!important;padding:0!important;border:0!important
+}
+#filterDrawer .cd-filter-section .category-toggle{
+  margin:0!important
+}
+#filterDrawer .price-filter-section{
+  margin:20px 0 17px!important;padding:0!important
+}
+#filterDrawer .price-filter-section>.filter-heading{
+  font-size:14px;font-weight:700;line-height:1.35;
+  margin:0 0 8px!important
+}
+#filterDrawer .price-filter-section>div:has(#filterMinPrice){
+  margin:0!important;gap:9px!important
+}
 #filterDrawer .price-filter-section label{min-width:0!important}
-#filterDrawer .price-filter-section input{width:100%!important;min-width:0!important;box-sizing:border-box!important}
+#filterDrawer .price-filter-section input{
+  width:100%!important;min-width:0!important;box-sizing:border-box!important
+}
 </style></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="index.html#chi-siamo">Chi siamo</a><a href="index.html#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header><main><section class="container" id="catalogIntro" style="padding-bottom:0"><div class="eyebrow">CARTE DIEM AREZZO</div><h1 class="section-title">Il nostro catalogo</h1><p class="sub">Esplora gli articoli disponibili. Il sito è una vetrina: nessun acquisto o pagamento online.</p></section><section class="container" id="catalogo"><div id="catalogSections" class="catalog-sections"></div><div id="catalogContent" hidden><a class="catalog-back" href="catalogo.html">← Tutti i cataloghi</a><h2 class="section-title" id="catalogTitle">Scegli un catalogo</h2><div id="subcatalogSections" class="subcatalog-sections" aria-label="Sottocategorie"></div><div class="filter"><input aria-label="Cerca" id="find" placeholder="Cerca nome o sigla…" type="search"/></div><details class="filter-drawer" id="filterDrawer"><summary>☷ Filtri <span aria-hidden="true">▾</span></summary>
 
 <div aria-label="Filtra per tipologia" class="category-filters" id="typeFilters" role="group"></div><div id="cd-panel-sort"><label for="catalogSort">Ordina per</label><select id="catalogSort" style="background:#171719;color:white;

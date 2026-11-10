@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>CARTE DIEM AREZZO — Amministrazione</title>
+<link rel="icon" href="icona-192.png"><link rel="stylesheet" href="shared-base.css?v=1">
+<link rel="stylesheet" href="admin-nuovo.css?v=1">
+</head><body>
+<section id="authGate" class="admin-auth">
+ <div class="admin-login">
+  <img alt="Carte Diem Arezzo" src="logo-ottimizzato.webp">
+  <h1>CARTE DIEM AREZZO</h1><p>Accesso amministratore</p>
+  <form id="loginForm">
+   <label>Email<input id="loginEmail" type="email" autocomplete="username" required></label>
+   <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+   <button type="submit">Accedi</button>
+  </form>
+  <button class="admin-link" id="recoverPassword" type="button">Recupera password</button>
+  <p id="authMessage" role="status"></p>
+  <a href="index.html">Torna alla vetrina pubblica</a>
+ </div>
+</section>
+<section id="adminRoot" hidden>
+ <div id="adminBar" class="admin-bar"><strong>AMMINISTRAZIONE</strong>
+  <span id="saveMessage" role="status"></span>
+  <button id="adminLogout" type="button">Esci dall'amministrazione</button>
+ </div>
+ <iframe id="adminView" title="Vetrina amministrativa" src="about:blank"></iframe>
+</section>
+<dialog id="adminModal" class="admin-modal"><form id="adminForm" method="dialog" novalidate>
+ <div class="admin-modal-head"><h2 id="adminModalTitle">Nuovo articolo</h2><button type="button" class="admin-close" id="adminModalClose" aria-label="Chiudi">×</button></div>
+ <div id="adminFields"></div>
+ <p id="adminModalMessage" role="status"></p>
+ <div class="admin-actions"><button type="button" class="admin-danger" id="adminDelete" hidden>Elimina</button><button type="button" class="admin-secondary" id="adminCancel">Annulla</button><button type="submit" class="admin-save" id="adminSave">Salva</button></div>
+ </form></dialog>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="admin-nuovo.js?v=1"></script>
+</body></html>

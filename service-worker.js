@@ -1,12 +1,13 @@
 /* CARTE DIEM AREZZO: cache selettiva delle sole risorse pubbliche statiche. */
-const CACHE = 'carte-diem-static-v6';
+const CACHE = 'carte-diem-static-v7';
 const STATIC = [
   './shared-base.css?v=1',
   './shared-catalog-layout.css?v=1',
   './shared-overlay.css?v=1',
   './shared-mobile-nav.css?v=1',
   './shared-requests.js?v=1',
-  './supabase-config.js',
+  './thumbs/index.js?v=1',
+  './supabase-config.js?v=2',
   './mancolista-home.js',
   './logo-ottimizzato.webp',
   './sfondo-home-definitivo.webp',

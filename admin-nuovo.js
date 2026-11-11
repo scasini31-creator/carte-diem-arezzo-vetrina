@@ -126,13 +126,11 @@ async function saveOrder(key,items){
  orders[key]=items;
 }
 async function saveNumberOrder(table,keyField,list){
- for(let i=0;i<list.length;i++){
-  const field=table==='featured_products'?'display_order':'posizione';
-  const {error}=await sb.from(table).update({[field]:i+1}).eq(keyField,list[i]);
-  if(error)throw error;
- }
+ const {error}=await sb.rpc('admin_reorder_list',{p_list:table,p_ids:list.map(String)});
+ if(error)throw error;
  await refreshLists();
 }
+
 function sortExisting(container,selector,ids,getId){
  if(!container||!Array.isArray(ids)||ids.length===0||container.dataset.cdAdminOrderApplied)return;
  const cards=[...container.querySelectorAll(selector)];

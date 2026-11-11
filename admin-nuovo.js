@@ -39,6 +39,24 @@ $('recoverPassword').onclick=async()=>{
  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href});
  showLogin(error?error.message:'Email di recupero inviata, se l’indirizzo è registrato.');
 };
+$('passwordResetForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const password=$('newPassword').value;
+ if(password.length<8){showLogin('La password deve contenere almeno 8 caratteri.');return;}
+ const {error}=await sb.auth.updateUser({password});
+ if(error){showLogin(error.message);return;}
+ history.replaceState(null,'',location.pathname);
+ $('passwordResetForm').hidden=true;$('loginForm').hidden=false;
+ await checkLogin();
+});
+sb.auth.onAuthStateChange(event=>{
+ if(event==='PASSWORD_RECOVERY'){
+  gate.hidden=false;root.hidden=true;
+  $('loginForm').hidden=true;$('recoverPassword').hidden=true;
+  $('passwordResetForm').hidden=false;
+  $('authMessage').textContent='Imposta la tua nuova password.';
+ }
+});
 $('adminLogout').onclick=async()=>{await sb.auth.signOut();activeUser=null;view.src='about:blank';showLogin();location.href='index.html';};
 async function refreshLists(){
  const [pr,fr,wr,or]=await Promise.all([
@@ -453,5 +471,8 @@ $('adminDelete').onclick=async()=>{
   await refreshLists();closeDialog();notify('Articolo eliminato.');view.contentWindow.location.reload();
  }catch(err){notify('Eliminazione non riuscita: '+err.message,true);}
 };
-checkLogin();
+if(location.hash.includes('type=recovery')||new URLSearchParams(location.search).get('type')==='recovery'){
+ gate.hidden=false;root.hidden=true;$('loginForm').hidden=true;$('recoverPassword').hidden=true;$('passwordResetForm').hidden=false;
+ $('authMessage').textContent='Imposta la tua nuova password.';
+}else checkLogin();
 })();

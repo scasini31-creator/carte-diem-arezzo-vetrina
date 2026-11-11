@@ -500,7 +500,7 @@ async function saveProduct(){
  const raw={
   name,sigla:['singole','gradate'].includes(category)?f('sigla').value.trim()||null:null,
   catalog_group:group,category,language:f('language').value,price:priceText===''?null:Number(priceText),
-  condition_or_grade:category==='singole'?f('condition').value:category==='gradate'?f('grader').value+' '+f('grade').value:null,
+  condition_or_grade:category==='singole'?f('condition').value:category==='gradate'?f('grade').value:null,
   quantity:Math.max(0,Math.floor(Number(f('quantity').value)||0)),description:f('description').value,
   image_paths:paths,details
  };

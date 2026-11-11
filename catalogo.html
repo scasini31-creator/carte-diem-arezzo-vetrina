@@ -81,12 +81,12 @@
 <style id="cd-v21-mobile-dock">@media(max-width:800px){.mobile-dock{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}.mobile-dock>a{min-width:0}}</style><link rel="stylesheet" href="shared-mobile-nav.css?v=2"><style id="cd-v24-category-banners">
 /* V27: remove baked-in image frames; use one matching card border and right-aligned crop. */
 .catalog-home-card{position:relative;overflow:hidden;padding:0!important;min-height:0!important;aspect-ratio:1620/222;background-color:#101725;background-repeat:no-repeat;background-position:center;background-size:cover;border-radius:17px;border:1px solid #d4b465!important}
-#catalogSections .catalog-home-card[href*="catalogo=pokemon"]{background-image:url('banner-pokemon.webp')}
-#catalogSections .catalog-home-card[href*="catalogo=tcg"]{background-image:url('banner-tcg.webp');border-color:#a96fe1!important}
-#catalogSections .catalog-home-card[href*="catalogo=collezione"]{background-image:url('banner-collezione.webp');background-size:auto calc(100% + 12px)!important;background-position:right center!important;border-color:#d5b36a!important}
-#catalogSections .catalog-home-card[href*="catalogo=videogiochi"]{background-image:url('banner-videogiochi.webp');border-color:#4fd3fa!important}
+#catalogSections .catalog-home-card[data-catalog="pokemon"]{background-image:url('banner-pokemon.webp')}
+#catalogSections .catalog-home-card[data-catalog="tcg"]{background-image:url('banner-tcg.webp');border-color:#a96fe1!important}
+#catalogSections .catalog-home-card[data-catalog="collezione"]{background-image:url('banner-collezione.webp');background-size:auto calc(100% + 12px)!important;background-position:right center!important;border-color:#d5b36a!important}
+#catalogSections .catalog-home-card[data-catalog="videogiochi"]{background-image:url('banner-videogiochi.webp');border-color:#4fd3fa!important}
 .catalog-home-card{border-width:2px!important;border-style:solid!important;box-shadow:none!important}
-#catalogSections .catalog-home-card[href*="catalogo=accessori"]{background-image:url('banner-accessori.webp');border-color:#ee77d8!important}
+#catalogSections .catalog-home-card[data-catalog="accessori"]{background-image:url('banner-accessori.webp');border-color:#ee77d8!important}
 /* V28: labels are HTML overlays, not part of the banner images. */
 .catalog-home-card>.catalog-home-icon,.catalog-home-card>.catalog-home-arrow{display:none!important}
 .catalog-home-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,8,17,.88) 0%,rgba(5,8,17,.65) 24%,rgba(5,8,17,.12) 56%,transparent 78%)}
@@ -1159,7 +1159,7 @@ function chooseCategory(c){currentPage=1;selectedCategories.clear();if(c&&c!=='a
 document.getElementById('find').addEventListener('input',()=>{currentPage=1;render()});
 document.getElementById('close').onclick=closeDetail;document.getElementById('overlay').onclick=e=>{if(e.target.id==='overlay')closeDetail()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('photoLightbox').hidden)closeDetail();else if(!document.getElementById('overlay').classList.contains('hidden')&&document.getElementById('photoLightbox').hidden&&e.key==='ArrowLeft'){e.preventDefault();navigateDetail(-1)}else if(!document.getElementById('overlay').classList.contains('hidden')&&document.getElementById('photoLightbox').hidden&&e.key==='ArrowRight'){e.preventDefault();navigateDetail(1)}});const params=new URLSearchParams(location.search);const initialGroup=params.get('catalogo');const initialSubcategory=params.get('sottocategoria');if(initialGroup&&groupNames[initialGroup])currentGroup=initialGroup;
 const sections=document.getElementById('catalogSections');
-sections.innerHTML=Object.entries(groupNames).map(([key,name])=>`<a class="catalog-home-card" href="catalogo.html?catalogo=${key}"><span class="catalog-home-icon" aria-hidden="true">${({pokemon:'✦',tcg:'◇',videogiochi:'▣',accessori:'✧',collezione:'✧'})[key]}</span><strong>${({pokemon:"TCG Pokémon",tcg:"Altri TCG",videogiochi:"Consoles e Videogames",accessori:"Accessori",collezione:"Oggetti da collezione"})[key]||name}</strong><span class="catalog-home-arrow" aria-hidden="true">→</span></a>`).join('');
+sections.innerHTML=Object.entries(groupNames).map(([key,name])=>`<a class="catalog-home-card" data-catalog="${key}" href="catalogo.html?catalogo=${key}"><span class="catalog-home-icon" aria-hidden="true">${({pokemon:'✦',tcg:'◇',videogiochi:'▣',accessori:'✧',collezione:'✧'})[key]}</span><strong>${({pokemon:"TCG Pokémon",tcg:"Altri TCG",videogiochi:"Consoles e Videogames",accessori:"Accessori",collezione:"Oggetti da collezione"})[key]||name}</strong><span class="catalog-home-arrow" aria-hidden="true">→</span></a>`).join('');
 const languageOptions=['ITA','ENG','JPN','CHN','KOR'];const conditionOptions=['Near Mint','Excellent','Good','Light Played','Played','Poor'];
 const gradeOptions=["10","9–9.5","8–8.5","7–7.5","1–6.5","Black Label"];
 const typeOptions={pokemon:[['singole','Carte raw'],['gradate','Carte gradate'],['sealed','Prodotti Sealed']],tcg:[['singole','Carte raw'],['gradate','Carte gradate'],['sealed','Prodotti Sealed']],videogiochi:[['console','Consoles'],['videogiochi','Videogiochi']],accessori:[],collezione:[]};

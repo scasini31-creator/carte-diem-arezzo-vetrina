@@ -182,11 +182,13 @@ function homeTools(doc){
    const record=card.dataset.wishlistId?wishlist.find(x=>String(x.id)===card.dataset.wishlistId):wishlist[i];if(!record)return;
    if(!card.dataset.wishlistId)card.dataset.wishlistId=record.id;
    if(card.querySelector('.cd-admin-wish-edit'))return;
-   card.style.position='relative';
+   const imageBox=card.querySelector('.cd-mancolista-image-box');
+   if(!imageBox)return;
+   imageBox.style.position='relative';
    const btn=doc.createElement('button');btn.className='cd-admin-wish-edit';btn.type='button';
    btn.textContent='✎';btn.title='Modifica mancolista';btn.setAttribute('aria-label','Modifica '+record.nome);
-   btn.onclick=e=>{e.stopPropagation();openWish(record)};
-   card.append(btn);
+   btn.onclick=e=>{e.preventDefault();e.stopPropagation();openWish(record)};
+   imageBox.append(btn);
   });
  }
 }

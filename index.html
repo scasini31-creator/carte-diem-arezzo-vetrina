@@ -137,9 +137,9 @@ header{padding:6px 15px!important;min-height:62px!important}header .brand{font-s
 #categorie .cd-category-copy strong{font-family:Arial,Helvetica,sans-serif!important;font-size:clamp(16px,1.65vw,23px)!important;font-weight:800!important;line-height:1.15!important;max-width:70%!important;color:#fff!important;text-shadow:0 2px 8px #000!important}
 #categorie .cd-category-mark{display:none!important}
 #categorie .cd-arrow{margin-left:auto!important;font-size:28px!important;text-shadow:0 2px 6px #000!important}
-#categorie .category:nth-child(2){border-color:#b87ef1!important}
-#categorie .category:nth-child(4){border-color:#58d4fa!important}
-#categorie .category:nth-child(5){border-color:#e877d9!important}
+#categorie .category[href*="catalogo=tcg"]{border-color:#b87ef1!important}
+#categorie .category[href*="catalogo=videogiochi"]{border-color:#58d4fa!important}
+#categorie .category[href*="catalogo=accessori"]{border-color:#e877d9!important}
 /* Bordo più leggibile per il primo e il quinto riquadro, senza variare la tonalità oro. */
 #categorie .grid>.category{border-width:2px!important;border-style:solid!important;box-shadow:none!important}
 @media(max-width:800px){#categorie .grid>.category{min-height:165px!important}#categorie .cd-category-copy strong{font-size:18px!important}}

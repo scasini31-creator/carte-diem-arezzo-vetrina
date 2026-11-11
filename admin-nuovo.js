@@ -41,11 +41,12 @@ $('recoverPassword').onclick=async()=>{
 };
 $('adminLogout').onclick=async()=>{await sb.auth.signOut();activeUser=null;view.src='about:blank';showLogin();location.href='index.html';};
 async function refreshLists(){
- const [pr,fr,wr]=await Promise.all([
+ const [pr,fr,wr,or]=await Promise.all([
    loadProducts(),loadFeaturedProducts(),
-   sb.from('mancolista').select('id,nome,espansione,immagine_url,posizione').order('posizione',{ascending:true}).order('created_at',{ascending:true})
+   sb.from('mancolista').select('id,nome,espansione,immagine_url,posizione').order('posizione',{ascending:true}).order('created_at',{ascending:true}),
+   sb.from('catalog_ui_orders').select('id,items')
  ]);
- products=pr;featured=fr;ensure(!wr.error,wr.error?.message||'Mancolista non disponibile');wishlist=wr.data||[];
+ products=pr;featured=fr;ensure(!wr.error,wr.error?.message||'Mancolista non disponibile');wishlist=wr.data||[];if(or.error)throw or.error;orders=Object.fromEntries((or.data||[]).map(row=>[row.id,row.items]));
 }
 function adminStyle(doc){
  const style=doc.createElement('style');style.id='cd-admin-overlay';
@@ -132,9 +133,17 @@ async function saveNumberOrder(table,keyField,list){
  }
  await refreshLists();
 }
+function sortExisting(container,selector,ids,getId){
+ if(!container||!Array.isArray(ids)||ids.length===0)return;
+ const cards=[...container.querySelectorAll(selector)];
+ const order=new Map(ids.map((id,i)=>[id,i]));
+ const sorted=cards.slice().sort((a,b)=>(order.get(getId(a))??(100+cards.indexOf(a)))-(order.get(getId(b))??(100+cards.indexOf(b))));
+ if(sorted.some((card,i)=>cards[i]!==card))sorted.forEach(card=>container.append(card));
+}
 function homeTools(doc){
  const categorySection=doc.querySelector('#categorie'),catTitle=categorySection?.querySelector('h2');
  const catGrid=categorySection?.querySelector('.grid');
+ sortExisting(catGrid,'a.category',orders.main,itemCardId);
  if(catTitle&&catGrid&&!catTitle.querySelector('.cd-admin-title-btn')){
   const btn=iconButton(doc,'Riordina categorie','⇅',()=>{});catTitle.append(btn);
   wireSort(doc,btn,catGrid,'a.category',itemCardId,ids=>saveOrder('main',ids));
@@ -152,8 +161,8 @@ function homeTools(doc){
  }
  if(wishTrack){
   [...wishTrack.querySelectorAll('.cd-featured-card')].forEach((card,i)=>{
-   const record=wishlist[i];if(!record)return;
-   card.dataset.wishlistId=record.id;
+   const record=card.dataset.wishlistId?wishlist.find(x=>String(x.id)===card.dataset.wishlistId):wishlist[i];if(!record)return;
+   if(!card.dataset.wishlistId)card.dataset.wishlistId=record.id;
    if(card.querySelector('.cd-admin-wish-edit'))return;
    card.style.position='relative';
    const btn=doc.createElement('button');btn.className='cd-admin-wish-edit';btn.type='button';
@@ -168,11 +177,13 @@ function catalogTools(doc){
  const general=!group;
  const intro=doc.querySelector('#catalogIntro .section-title');
  const grid=doc.getElementById('catalogSections');
+ sortExisting(grid,'a.catalog-home-card',orders.main,itemCardId);
  if(general&&intro&&grid&&!intro.querySelector('.cd-admin-title-btn')){
   const btn=iconButton(doc,'Riordina categorie','⇅',()=>{});intro.append(btn);
   wireSort(doc,btn,grid,'a.catalog-home-card',itemCardId,ids=>saveOrder('main',ids));
  }
  const contentTitle=doc.getElementById('catalogTitle'),subGrid=doc.getElementById('subcatalogSections');
+ if(group&&!sub)sortExisting(subGrid,'a.catalog-home-card',orders['sub:'+group],subCardId);
  if(group&&contentTitle&&subGrid&&!sub&&subGrid.querySelector('a.catalog-home-card')&&!contentTitle.querySelector('.cd-admin-title-btn')){
   const btn=iconButton(doc,'Riordina sottocategorie','⇅',()=>{});contentTitle.append(btn);
   wireSort(doc,btn,subGrid,'a.catalog-home-card',subCardId,ids=>saveOrder('sub:'+group,ids));

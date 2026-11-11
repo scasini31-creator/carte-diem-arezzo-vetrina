@@ -307,6 +307,42 @@ function syncProductFields(){
  accessoryType:cat==='accessori',collectibleType:cat==='collezione'};
  for(const [name,visible] of Object.entries(shown))document.querySelector('[data-field="'+name+'"]').hidden=!visible;
 }
+function installPhotoDrag(){
+ const box=$('photoItems');if(!box||box.dataset.photoDrag)return;
+ box.dataset.photoDrag='1';
+ let held=null,timer=null,drag=false,startX=0,startY=0;
+ const clear=()=>{clearTimeout(timer);timer=null;};
+ box.addEventListener('pointerdown',e=>{
+  if(e.target.closest('button'))return;
+  const card=e.target.closest('.admin-photo');if(!card)return;
+  held=card;drag=false;startX=e.clientX;startY=e.clientY;
+  clear();
+  timer=setTimeout(()=>{if(held){drag=true;held.classList.add('cd-dragging');try{held.setPointerCapture(e.pointerId)}catch{}}},350);
+ });
+ box.addEventListener('pointermove',e=>{
+  if(!held)return;
+  if(!drag){
+    if(Math.hypot(e.clientX-startX,e.clientY-startY)>12){clear();held=null;}
+    return;
+  }
+  e.preventDefault();
+  const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.admin-photo');
+  if(target&&target!==held&&box.contains(target)){
+    const rect=target.getBoundingClientRect();
+    box.insertBefore(held,e.clientX<(rect.left+rect.width/2)?target:target.nextSibling);
+  }
+ },{passive:false});
+ box.addEventListener('pointerup',e=>{
+  clear();if(!held)return;
+  const moved=drag;
+  held.classList.remove('cd-dragging');held=null;drag=false;
+  if(!moved)return;
+  e.preventDefault();
+  const order=[...box.querySelectorAll('.admin-photo')].map(el=>Number(el.dataset.index));
+  photos=order.map(i=>photos[i]);redrawPhotos();
+ });
+ box.addEventListener('pointercancel',()=>{clear();held?.classList.remove('cd-dragging');held=null;drag=false;});
+}
 function redrawPhotos(){
  const box=$('photoItems');box.replaceChildren();
  photos.forEach((o,i)=>{
@@ -320,6 +356,7 @@ function redrawPhotos(){
   const del=document.createElement('button');del.type='button';del.textContent='Rimuovi';del.onclick=()=>{photos.splice(i,1);redrawPhotos();};
   wrap.append(img,actions,del);box.append(wrap);
  });
+ installPhotoDrag();
 }
 function openProduct(p,group,category){
  formMode='product';editing=p||null;

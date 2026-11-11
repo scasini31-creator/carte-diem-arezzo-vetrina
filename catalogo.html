@@ -1340,7 +1340,8 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
  const stage=lb.querySelector('.zoom-stage');
  const counter=lb.querySelector('.zoom-counter');
  const resetButton=lb.querySelector('.zoom-reset');
- let photos=[],current=0,zoom=1,offsetX=0,offsetY=0;
+ let photos=[],current=0,zoom=1,offsetX=0,offsetY=0,displayToken=0;
+ const fullCache=new Map();
  const pointers=new Map();
  let lastPoint=null,lastDistance=null;
  const MAX_ZOOM=5;
@@ -1359,25 +1360,53 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
    pointers.clear();lastPoint=null;lastDistance=null;
    offsetX=0;offsetY=0;setZoom(1);
  }
+ // La miniatura è già in cache dal catalogo: appare subito al cambio.
+ // L'originale sostituisce la miniatura soltanto dopo il caricamento completo.
+ function warmFull(index){
+   const item=photos[index];
+   if(!item)return Promise.resolve(null);
+   const previous=fullCache.get(item.full);
+   if(previous)return previous;
+   const pending=new Promise(resolve=>{
+     const img=new Image();
+     img.onload=()=>resolve(item.full);
+     img.onerror=()=>resolve(null);
+     img.src=item.full;
+   });
+   fullCache.set(item.full,pending);
+   return pending;
+ }
  function show(n){
    if(!photos.length)return;
    current=(n+photos.length)%photos.length;
+   const token=++displayToken;
+   const item=photos[current];
    resetZoom();
-   photo.src=photos[current];
+   // Cambia subito la foto, anche su connessioni mobili lente.
+   photo.src=item.preview;
    photo.alt='Fotografia '+(current+1)+' di '+photos.length;
    counter.textContent=(current+1)+' / '+photos.length;
    lb.querySelector('.zoom-prev').hidden=photos.length<2;
    lb.querySelector('.zoom-next').hidden=photos.length<2;
+   warmFull(current).then(full=>{
+     // Evita che un download precedente sovrascriva la foto selezionata.
+     if(full&&token===displayToken&&!lb.hidden)photo.src=full;
+   });
+   // In background prepara soltanto le due foto adiacenti.
+   if(photos.length>1){
+     warmFull((current+1)%photos.length);
+     warmFull((current+photos.length-1)%photos.length);
+   }
  }
  function close(){
-   lb.hidden=true;resetZoom();photo.removeAttribute('src');
+   displayToken++;lb.hidden=true;resetZoom();photo.removeAttribute('src');
    document.body.style.overflow=document.getElementById('overlay').classList.contains('hidden')?'':'hidden';
  }
  document.getElementById('detailPhoto').addEventListener('click',function(e){
    const target=e.target.closest('.detail-gallery img');
    if(!target)return;
    const imgs=[...this.querySelectorAll('.detail-gallery img')];
-   photos=imgs.map(x=>x.dataset.full||x.src);
+   photos=imgs.map(x=>({full:x.dataset.full||x.src,preview:x.src}));
    lb.hidden=false;show(imgs.indexOf(target));
    document.body.style.overflow='hidden';
  });

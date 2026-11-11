@@ -1,6 +1,7 @@
 /* Ordine condiviso categorie Home/Catalogo e sottocategorie, solo lettura pubblica. */
 (function(){
 'use strict';
+try{if(window.parent!==window&&window.parent.document.getElementById('adminRoot'))return;}catch(e){}
 const cache={};
 async function load(){
  try{

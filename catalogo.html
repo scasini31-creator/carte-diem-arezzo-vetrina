@@ -81,12 +81,12 @@
 <style id="cd-v21-mobile-dock">@media(max-width:800px){.mobile-dock{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}.mobile-dock>a{min-width:0}}</style><link rel="stylesheet" href="shared-mobile-nav.css?v=2"><style id="cd-v24-category-banners">
 /* V27: remove baked-in image frames; use one matching card border and right-aligned crop. */
 .catalog-home-card{position:relative;overflow:hidden;padding:0!important;min-height:0!important;aspect-ratio:1620/222;background-color:#101725;background-repeat:no-repeat;background-position:center;background-size:cover;border-radius:17px;border:1px solid #d4b465!important}
-.catalog-home-card:nth-child(1){background-image:url('banner-pokemon.webp')}
-.catalog-home-card:nth-child(2){background-image:url('banner-tcg.webp');border-color:#a96fe1!important}
-.catalog-home-card:nth-child(3){background-image:url('banner-collezione.webp');background-size:auto calc(100% + 12px)!important;background-position:right center!important;border-color:#d5b36a!important}
-.catalog-home-card:nth-child(4){background-image:url('banner-videogiochi.webp');border-color:#4fd3fa!important}
+#catalogSections .catalog-home-card[href*="catalogo=pokemon"]{background-image:url('banner-pokemon.webp')}
+#catalogSections .catalog-home-card[href*="catalogo=tcg"]{background-image:url('banner-tcg.webp');border-color:#a96fe1!important}
+#catalogSections .catalog-home-card[href*="catalogo=collezione"]{background-image:url('banner-collezione.webp');background-size:auto calc(100% + 12px)!important;background-position:right center!important;border-color:#d5b36a!important}
+#catalogSections .catalog-home-card[href*="catalogo=videogiochi"]{background-image:url('banner-videogiochi.webp');border-color:#4fd3fa!important}
 .catalog-home-card{border-width:2px!important;border-style:solid!important;box-shadow:none!important}
-.catalog-home-card:nth-child(5){background-image:url('banner-accessori.webp');border-color:#ee77d8!important}
+#catalogSections .catalog-home-card[href*="catalogo=accessori"]{background-image:url('banner-accessori.webp');border-color:#ee77d8!important}
 /* V28: labels are HTML overlays, not part of the banner images. */
 .catalog-home-card>.catalog-home-icon,.catalog-home-card>.catalog-home-arrow{display:none!important}
 .catalog-home-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,8,17,.88) 0%,rgba(5,8,17,.65) 24%,rgba(5,8,17,.12) 56%,transparent 78%)}
@@ -170,9 +170,9 @@
   background-color:#080b0e;background-repeat:no-repeat;background-size:cover;
   background-position:right center;background-size:auto 125%;border:2px solid #d4b465!important;border-radius:17px;
 }
-#catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card:nth-child(1){background-image:none}
-#catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card:nth-child(2){background-image:none}
-#catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card:nth-child(3){background-image:none}
+#catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=singole"]{background-image:none}
+#catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=gradate"]{background-image:none}
+#catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=sealed"]{background-image:none}
 #catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card::before{
   content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.73),rgba(0,0,0,.35) 32%,transparent 60%);pointer-events:none
 }
@@ -188,7 +188,7 @@
  #catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card{
   aspect-ratio:3.55/1;background-position:right center;background-size:auto 135%;border-radius:14px
  }
- #catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card:nth-child(3){
+ #catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=sealed"]{
   background-size:auto 185%;background-position:right 52%
  }
  #catalogContent[data-catalog-group="pokemon"] .subcatalog-sections .catalog-home-card>strong{
@@ -205,9 +205,9 @@
  background-color:#13081f;background-repeat:no-repeat;background-size:cover;
  background-position:right center;background-size:auto 125%;border:2px solid #c67af5!important;border-radius:17px
 }
-#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card:nth-child(1){background-image:none}
-#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card:nth-child(2){background-image:none}
-#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card:nth-child(3){background-image:none}
+#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=singole"]{background-image:none}
+#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=gradate"]{background-image:none}
+#catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=sealed"]{background-image:none}
 #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card::before{
  content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,1,17,.7),rgba(7,1,17,.25) 33%,transparent 62%);pointer-events:none
 }
@@ -224,11 +224,11 @@
   aspect-ratio:3.55/1;background-size:auto 125%;background-position:right center;border-radius:14px
  }
  /* Carte gradate: maggiore ritaglio per nascondere il bordo incorporato. */
- #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card:nth-child(2){
+ #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=gradate"]{
   background-size:auto 145%;background-position:right 52%
  }
  /* Prodotti sigillati: ritaglio dedicato per nascondere il bordo interno. */
- #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card:nth-child(3){
+ #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card[href*="sottocategoria=sealed"]{
   background-size:auto 185%;background-position:right 52%
  }
  #catalogContent[data-catalog-group="tcg"] .subcatalog-sections .catalog-home-card>strong{

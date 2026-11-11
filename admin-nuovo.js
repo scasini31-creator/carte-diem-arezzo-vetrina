@@ -123,25 +123,22 @@ function wireSort(doc,button,container,selector,idOf,saveFn){
   if(selected===card){clearSelection();return;}
   const first=selected,second=card;
   clearSelection();
-  const firstMark=doc.createComment('prima anteprima');
-  const secondMark=doc.createComment('seconda anteprima');
-  first.before(firstMark);
-  second.before(secondMark);
-  firstMark.replaceWith(second);
-  secondMark.replaceWith(first);
+  const swapNodes=(a,b)=>{
+   const markerA=doc.createComment('posizione A');
+   const markerB=doc.createComment('posizione B');
+   a.before(markerA);b.before(markerB);
+   markerA.replaceWith(b);
+   markerB.replaceWith(a);
+  };
+  swapNodes(first,second);
   busy=true;
   try{
    const ids=[...container.querySelectorAll(selector)].map(idOf);
    await saveFn(ids);
    notify('Nuovo ordine salvato.');
   }catch(err){
-   // In caso di errore, ripristina le posizioni originali.
-   const oldFirst=doc.createComment('ripristino prima');
-   const oldSecond=doc.createComment('ripristino seconda');
-   first.before(oldSecond);
-   second.before(oldFirst);
-   oldSecond.replaceWith(second);
-   oldFirst.replaceWith(first);
+   // In caso di errore, ripristina esattamente l'ordine precedente.
+   swapNodes(first,second);
    notify('Riordino non salvato: '+err.message,true);
   }finally{busy=false;}
  },true);

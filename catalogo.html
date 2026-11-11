@@ -578,7 +578,7 @@ const gradingCompanies=[
 function productGrader(p){
  if(p[2]!=='gradate')return '';
  const saved=String(p.details?.grader||'');
- if(saved)return saved;
+ if(saved)return gradingCompanies.includes(saved)?saved:'Altre';
  const raw=String(p[5]||'').trim().toUpperCase();
  const match=raw.match(/^(PSA|BGS|CGC|GRAAD)(?=\s|[-:]|[0-9]|$)/);
  if(match)return match[1];

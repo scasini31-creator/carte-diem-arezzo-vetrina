@@ -61,6 +61,12 @@ def main():
         json.dumps(dict(sorted(results.items())), ensure_ascii=False, separators=(",", ":")) + "\n",
         encoding="utf-8"
     )
+    # La mappa JS consente alle pagine di scegliere soltanto miniature realmente presenti.
+    # Nessuna dipendenza da Supabase Pro o trasformazioni esterne.
+    index_js = "window.CD_STATIC_THUMBS=" + json.dumps(
+        dict(sorted(results.items())), ensure_ascii=True, separators=(",", ":")
+    ) + ";\n"
+    (ROOT / "index.js").write_text(index_js, encoding="utf-8")
     print(f"Miniature generate: {len(results)} / {len(set(PATHS))}", flush=True)
     if len(results) < max(1, len(set(PATHS)) // 2):
         raise SystemExit("Troppe immagini non scaricabili: non pubblicare miniature parziali")

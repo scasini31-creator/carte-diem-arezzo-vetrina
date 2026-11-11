@@ -70,7 +70,7 @@ function adminStyle(doc){
  const style=doc.createElement('style');style.id='cd-admin-overlay';
  style.textContent='.cd-admin-title-btn{display:inline-grid;place-items:center;vertical-align:middle;margin-left:8px;width:36px;height:36px;border:1px solid #d5b36a;border-radius:8px;color:#d5b36a;background:#11131be8;font-size:22px;cursor:pointer}.cd-admin-title-btn[aria-pressed="true"]{color:#101010;background:#f5c968}.cd-admin-new{cursor:pointer;border:1px dashed #d5b36a!important}.cd-admin-new .photo{display:grid!important;place-items:center!important;color:#d5b36a;font-size:58px;background:#101115!important}.cd-admin-new h3{text-align:center!important}.cd-admin-new .quick-add{font-size:21px!important}.cd-admin-edit{display:block;width:100%;margin-top:6px;border:1px solid #d5b36a;background:#1b1921;color:#efd096;border-radius:5px;min-height:34px;cursor:pointer;font-size:11px;font-weight:700}.cd-admin-star{position:absolute;right:6px;bottom:6px;z-index:4;display:grid;place-items:center;border:1px solid #d8b56e;background:#131418e8;color:#d2cbbd;border-radius:50%;width:34px;height:34px;font-size:24px;cursor:pointer;line-height:1}.cd-admin-star.is-featured{color:#ffc845}.cd-admin-wish-edit{position:absolute;right:6px;bottom:6px;z-index:5;border:1px solid #d5b36a;color:#ffd885;background:#131418e9;border-radius:7px;width:34px;height:34px;cursor:pointer}.cd-admin-grab{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;cursor:grab!important}.cd-admin-grab.cd-dragging{opacity:.56;outline:2px dashed #ffdb8a}.cd-admin-active{outline:1px dashed #dfbb75;outline-offset:3px}.cd-admin-title-btn:focus-visible,.cd-admin-star:focus-visible,.cd-admin-edit:focus-visible{outline:2px solid white;outline-offset:2px}';
  style.textContent += '#catalogGrid .cd-admin-new .photo{display:grid!important;place-items:center!important}';
- style.textContent += '.cd-admin-swap-mode > a,.cd-admin-swap-mode > .cd-featured-card{cursor:pointer!important}.cd-admin-swap-selected{outline:3px solid #ffd05e!important;outline-offset:-3px!important;box-shadow:0 0 0 2px #211811,0 0 18px #ffd05e80!important}.cd-admin-title-btn[aria-pressed="true"]{background:#f5c968!important;color:#101010!important}';
+ style.textContent += '.cd-admin-swap-mode > a,.cd-admin-swap-mode > .cd-featured-card{cursor:pointer!important}.cd-admin-swap-mode{scroll-snap-type:none!important;scroll-behavior:auto!important;overflow-anchor:none!important}.cd-admin-swap-mode > *{scroll-snap-align:none!important}.cd-admin-swap-selected{outline:3px solid #ffd05e!important;outline-offset:-3px!important;box-shadow:0 0 0 2px #211811,0 0 18px #ffd05e80!important}.cd-admin-title-btn[aria-pressed="true"]{background:#f5c968!important;color:#101010!important}';
  doc.head.appendChild(style);
 }
 function iconButton(doc,title,icon,fn){
@@ -103,7 +103,10 @@ function wireSort(doc,button,container,selector,idOf,saveFn){
   enabled=!enabled;
   highlight(button,enabled);
   clearSelection();
+  const currentScroll=container.scrollLeft;
   container.classList.toggle('cd-admin-swap-mode',enabled);
+  // Mantiene la finestra visibile anche quando si attiva/disattiva la modalità.
+  if(container.scrollWidth>container.clientWidth)container.scrollLeft=currentScroll;
  };
  // Intercetta il clic prima dei collegamenti della vetrina: in modalità
  // riordino le anteprime non devono aprire la scheda o navigare.
@@ -123,14 +126,24 @@ function wireSort(doc,button,container,selector,idOf,saveFn){
   if(selected===card){clearSelection();return;}
   const first=selected,second=card;
   clearSelection();
+  // Salva la posizione del carosello: lo scambio dei nodi non deve
+  // attivare scroll anchoring o far scattare lo scroll-snap.
+  const keepLeft=container.scrollLeft;
+  const keepTop=container.scrollTop;
+  const restoreScroll=()=>{
+   container.scrollLeft=keepLeft;
+   container.scrollTop=keepTop;
+  };
   const swapNodes=(a,b)=>{
    const markerA=doc.createComment('posizione A');
    const markerB=doc.createComment('posizione B');
    a.before(markerA);b.before(markerB);
    markerA.replaceWith(b);
    markerB.replaceWith(a);
+   restoreScroll();
   };
   swapNodes(first,second);
+  doc.defaultView.requestAnimationFrame(restoreScroll);
   busy=true;
   try{
    const ids=[...container.querySelectorAll(selector)].map(idOf);

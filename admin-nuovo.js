@@ -403,7 +403,7 @@ function openProduct(p,group,category){
  formMode='product';editing=p||null;
  const cat=category||p?.[2]||choices[group][0][0];
  const g=p?.catalog_group||group||'pokemon';
- photos=(p?.paths||[]).map((path,i)=>({path,url:p?.[7]?.[i]||imageUrl(path)}));
+ photos=(p?.paths||[]).map((path,i)=>({path,thumbPath:p?.details?.preview_paths?.[i]||null,url:p?.[7]?.[i]||imageUrl(path)}));
  showDialog(p?'Modifica prodotto':'Nuovo articolo',productFields(p,g,cat));
  f('group').onchange=syncProductFields;f('category').onchange=syncProductFields;
  syncProductFields();f('category').value=cat;syncProductFields();
@@ -431,8 +431,36 @@ async function uploadImage(file,bucket='product-images'){
  ensure(file.size<12*1024*1024,'Ogni immagine deve essere inferiore a 12 MB.');
  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
  const path='admin/'+crypto.randomUUID()+'.'+ext;
- const {error}=await sb.storage.from(bucket).upload(path,file,{contentType:file.type,upsert:false});
+ const {error}=await sb.storage.from(bucket).upload(path,file,{contentType:file.type,cacheControl:'31536000',upsert:false});
  if(error)throw error;
+ return path;
+}
+// Le miniature sono copie aggiuntive: le immagini originali non vengono alterate.
+async function createPreviewBlob(file){
+ if(!file.type.startsWith('image/'))return null;
+ let image;
+ try{
+  image=await createImageBitmap(file);
+  const longest=Math.max(image.width,image.height);
+  const ratio=Math.min(1,480/Math.max(1,longest));
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(image.width*ratio));
+  canvas.height=Math.max(1,Math.round(image.height*ratio));
+  const context=canvas.getContext('2d',{alpha:false});
+  if(!context)return null;
+  context.drawImage(image,0,0,canvas.width,canvas.height);
+  return await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',0.76));
+ }catch(e){console.warn('Miniatura non generata:',e);return null;}
+ finally{image?.close?.();}
+}
+async function uploadPreview(file){
+ const blob=await createPreviewBlob(file);
+ if(!blob||blob.type!=='image/webp')return null;
+ const path='admin/previews/'+crypto.randomUUID()+'.webp';
+ const {error}=await sb.storage.from('product-images').upload(path,blob,{
+  contentType:'image/webp',cacheControl:'31536000',upsert:false
+ });
+ if(error){console.warn('Miniatura non caricata:',error);return null;}
  return path;
 }
 async function saveProduct(){
@@ -440,15 +468,33 @@ async function saveProduct(){
  ensure(name,'Inserisci il nome del prodotto.');
  ensure((choices[group]||[]).some(([id])=>id===category),'Catalogo e tipologia non compatibili.');
  ensure(photos.length<=6,'Puoi caricare al massimo 6 fotografie.');
- const paths=[];
- for(const ph of photos)paths.push(ph.path||await uploadImage(ph.file));
+ const btn=$('adminSave'),paths=new Array(photos.length),previewPaths=new Array(photos.length);
+ const fresh=photos.filter(ph=>ph.file).length;
+ let uploaded=0;
+ // Massimo due foto contemporaneamente: più rapido del caricamento seriale,
+ // senza saturare la rete mobile né elaborare tutte le immagini insieme.
+ const jobs=photos.map((ph,i)=>async()=>{
+  if(ph.path){
+   paths[i]=ph.path;previewPaths[i]=ph.thumbPath||null;
+  }else{
+   paths[i]=await uploadImage(ph.file);
+   previewPaths[i]=await uploadPreview(ph.file);
+   uploaded++;
+   $('adminModalMessage').textContent='Fotografie caricate: '+uploaded+' di '+fresh;
+  }
+ });
+ for(let i=0;i<jobs.length;i+=2)await Promise.all(jobs.slice(i,i+2).map(fn=>fn()));
+ $('adminModalMessage').textContent='Salvataggio articolo…';
+ const originalDetails=editing?.details||{};
  const details={
+  ...originalDetails,
   grader:category==='gradate'?f('grader').value:null,
   sealedType:category==='sealed'?f('sealedType').value:null,
   platform:['console','videogiochi'].includes(category)?f('platform').value:null,
   gameCondition:['console','videogiochi'].includes(category)?f('gameCondition').value:null,
   accessoryType:category==='accessori'?f('accessoryType').value:null,
-  collectibleType:category==='collezione'?f('collectibleType').value:null
+  collectibleType:category==='collezione'?f('collectibleType').value:null,
+  preview_paths:previewPaths
  };
  const priceText=f('price').value.trim();
  const raw={
@@ -460,9 +506,13 @@ async function saveProduct(){
  };
  ensure(raw.price===null||Number.isFinite(raw.price)&&raw.price>=0,'Prezzo non valido.');
  const query=editing?sb.from('products').update(raw).eq('id',editing.id):sb.from('products').insert(raw);
- const {error}=await query;if(error)throw error;
- await refreshLists();notify('Prodotto salvato correttamente.');
- closeDialog();view.contentWindow.location.reload();
+ const {error}=await query;
+ if(error)throw error;
+ closeDialog();
+ notify('Prodotto salvato correttamente.');
+ // Al ricaricamento la pagina recupera già i dati aggiornati: niente
+ // seconda lettura preventiva di tutte le tabelle.
+ view.contentWindow.location.reload();
 }
 async function saveWish(){
  const name=f('wishName').value.trim();ensure(name,'Inserisci il nome dell’articolo.');

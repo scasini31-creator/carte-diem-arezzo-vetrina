@@ -1405,6 +1405,13 @@ if ('serviceWorker' in navigator) {
     const k=key();
     if(!k)return;
 
+    // Le pagine intermedie mostrano le sottocategorie, non i filtri
+    // dei prodotti. Il ripristino richiamerebbe updateSubcategories(),
+    // che svuota e nasconde i banner appena costruiti da showCatalog().
+    const params=new URLSearchParams(location.search);
+    if(['pokemon','tcg','videogiochi'].includes(params.get('catalogo')) &&
+       !params.get('sottocategoria'))return;
+
     let state;
     try{
       state=JSON.parse(sessionStorage.getItem(k)||'null');

@@ -42,3 +42,6 @@ html,body{height:100%;margin:0;background:var(--admin-dark);color:#f9f4eb;font-f
 .admin-help{font-size:12px;color:#bcb2a4;line-height:1.5}
 .admin-toast-error{color:#ffacac!important}
 @media(max-width:520px){.admin-modal{padding:14px}.admin-bar{padding:5px 7px}.admin-bar strong{font-size:10px}.admin-field-row{grid-template-columns:1fr}}
+
+.admin-photo{touch-action:none;user-select:none;-webkit-user-select:none}
+.admin-photo.cd-dragging{opacity:.55;outline:2px dashed #ffdb8a}

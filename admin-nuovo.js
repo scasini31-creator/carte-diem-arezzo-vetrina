@@ -134,8 +134,10 @@ async function saveNumberOrder(table,keyField,list){
  await refreshLists();
 }
 function sortExisting(container,selector,ids,getId){
- if(!container||!Array.isArray(ids)||ids.length===0)return;
+ if(!container||!Array.isArray(ids)||ids.length===0||container.dataset.cdAdminOrderApplied)return;
  const cards=[...container.querySelectorAll(selector)];
+ if(!cards.length)return;
+ container.dataset.cdAdminOrderApplied='1';
  const order=new Map(ids.map((id,i)=>[id,i]));
  const sorted=cards.slice().sort((a,b)=>(order.get(getId(a))??(100+cards.indexOf(a)))-(order.get(getId(b))??(100+cards.indexOf(b))));
  if(sorted.some((card,i)=>cards[i]!==card))sorted.forEach(card=>container.append(card));

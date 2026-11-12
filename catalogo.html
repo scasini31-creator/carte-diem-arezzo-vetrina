@@ -1174,10 +1174,10 @@ function updateDetailRequest(){if(activeDetail<0)return;document.getElementById(
  const url=new URL('catalogo.html',location.href);
  url.searchParams.set('catalogo',p.catalog_group||'pokemon');
  url.searchParams.set('prodotto',String(p.id));
- const title=label(p);
- if(navigator.share){try{await navigator.share({title,text:title,url:url.href});return}catch(err){if(err&&err.name==='AbortError')return;}}
- try{await navigator.clipboard.writeText(url.href);alert('Link della scheda prodotto copiato!')}
- catch(err){prompt('Copia il link della scheda prodotto:',url.href)}
+ const message='Ciao! Ho trovato in vendita questa carta che potrebbe interessarti!\n\n'+label(p)+'\n\n'+url.href;
+ if(navigator.share){try{await navigator.share({text:message});return}catch(err){if(err&&err.name==='AbortError')return;}}
+ try{await navigator.clipboard.writeText(message);alert('Messaggio di condivisione copiato!')}
+ catch(err){prompt('Copia il messaggio da condividere:',message)}
 }
 document.getElementById('detailShare').addEventListener('click',shareActiveProduct);
 function openDetail(i){activeDetail=i;updateDetailRequest();updateDetailNavigation();let p=products[i];document.getElementById('detailName').textContent=label(p);document.getElementById('detailCategory').textContent=categoryNames[p[2]];document.getElementById('detailCondition').textContent=([ 'singole','gradate'].includes(p[2])&&p[5]?p[5]+' - ':'')+(p[10]||'ITA');document.getElementById('detailCondition').style.display='';const description=document.getElementById('detailDescription');description.textContent=String(p[9]||'').trim();description.hidden=!description.textContent;document.getElementById('detailPriceValue').textContent=price(p);const available=Number(p[8]);const detailQuantity=document.getElementById('detailQuantity');detailQuantity.hidden=!(Number.isFinite(available)&&available>1);detailQuantity.textContent=detailQuantity.hidden?'':available+' disponibili';const detailImages=p[7]||[];const previews=p.preview_urls||[];document.getElementById('detailSymbol').innerHTML=detailImages.length?'<div class="detail-gallery" aria-label="Fotografie del prodotto: tocca una foto per ingrandirla">'+detailImages.map((src,n)=>'<img alt="Foto '+(n+1)+' di '+detailImages.length+'" src="'+escapeHtml(safeImageUrl(previews[n]||src))+'" data-full="'+escapeHtml(safeImageUrl(src))+'" loading="eager" decoding="async" draggable="false">').join('')+'</div>'+(detailImages.length>1?'<span class="gallery-hint">Tocca una foto per ingrandirla</span>':''):escapeHtml(p[6]||'');document.getElementById('overlay').classList.remove('hidden');const gallery=document.querySelector('.detail-gallery');if(gallery)gallery.scrollLeft=0;document.body.style.overflow='hidden';document.getElementById('close').focus()}

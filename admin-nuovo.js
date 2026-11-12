@@ -15,6 +15,17 @@ const graders=['PSA','BGS','CGC','GRAAD','TAG','ACE','Altre','Non specificata'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));}
 function notify(t,error=false){status.textContent=t;status.classList.toggle('admin-toast-error',error);$('adminModalMessage').textContent=t;}
 function ensure(ok,message){if(!ok)throw new Error(message);}
+// Torna alla pagina pubblica da cui è stato aperto il pannello, mantenendo i filtri URL.
+function returnPage(){
+ const raw=new URLSearchParams(location.search).get('return')||'index.html';
+ try{
+  const url=new URL(raw,location.href);
+  const page=url.pathname.split('/').pop()||'index.html';
+  const base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);
+  if(url.origin!==location.origin||!url.pathname.startsWith(base)||!['index.html','catalogo.html','richieste.html'].includes(page))return 'index.html';
+  return page+url.search+url.hash;
+ }catch{return 'index.html';}
+}
 async function checkLogin(){
  try{
   const {data:{user},error}=await sb.auth.getUser();
@@ -22,7 +33,7 @@ async function checkLogin(){
   const {data,error:e}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
   if(e||!data){showLogin('Questo account non dispone dei permessi amministrativi.');return;}
   activeUser=user;gate.hidden=true;root.hidden=false;
-  if(view.src==='about:blank')view.src='index.html';
+  if(view.src==='about:blank')view.src=returnPage();
   await refreshLists();
  }catch(e){showLogin(e.message);}
 }

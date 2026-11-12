@@ -91,7 +91,7 @@ async function refreshLists(){
 function adminStyle(doc){
  const style=doc.createElement('style');style.id='cd-admin-overlay';
  style.textContent='.cd-admin-title-btn{display:inline-grid;place-items:center;vertical-align:middle;margin-left:8px;width:36px;height:36px;border:1px solid #d5b36a;border-radius:8px;color:#d5b36a;background:#11131be8;font-size:22px;cursor:pointer}.cd-admin-title-btn[aria-pressed="true"]{color:#101010;background:#f5c968}.cd-admin-new{cursor:pointer;border:1px dashed #d5b36a!important}.cd-admin-new .photo{display:grid!important;place-items:center!important;color:#d5b36a;font-size:58px;background:#101115!important}.cd-admin-new h3{text-align:center!important}.cd-admin-new .quick-add{font-size:21px!important}.cd-admin-edit{display:block;width:100%;margin-top:6px;border:1px solid #d5b36a;background:#1b1921;color:#efd096;border-radius:5px;min-height:34px;cursor:pointer;font-size:11px;font-weight:700}.cd-admin-star{position:absolute;right:6px;bottom:6px;z-index:4;display:grid;place-items:center;border:1px solid #d8b56e;background:#131418e8;color:#d2cbbd;border-radius:50%;width:34px;height:34px;font-size:24px;cursor:pointer;line-height:1}.cd-admin-star.is-featured{color:#ffc845}.cd-admin-wish-edit{position:absolute;right:6px;bottom:6px;z-index:5;border:1px solid #d5b36a;color:#ffd885;background:#131418e9;border-radius:7px;width:34px;height:34px;cursor:pointer}.cd-admin-grab{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;cursor:grab!important}.cd-admin-grab.cd-dragging{opacity:.56;outline:2px dashed #ffdb8a}.cd-admin-active{outline:1px dashed #dfbb75;outline-offset:3px}.cd-admin-title-btn:focus-visible,.cd-admin-star:focus-visible,.cd-admin-edit:focus-visible{outline:2px solid white;outline-offset:2px}';
- style.textContent += '.cd-admin-photo-crop{position:relative;flex:0 0 88%;width:88%;height:100%;min-width:0;scroll-snap-align:center}.cd-admin-photo-crop>img{width:100%!important;height:100%!important;max-width:100%!important;flex:none!important}.cd-admin-crop-btn{position:absolute;right:9px;bottom:9px;z-index:10;display:grid;place-items:center;width:36px;height:36px;min-height:36px;padding:6px;border-radius:8px;border:1px solid #d5b36a;background:#171718e8;color:#ffdb8b;cursor:pointer;touch-action:manipulation}.cd-admin-photo-crop .cd-admin-crop-btn{bottom:8px}.cd-admin-crop-btn:disabled{opacity:.45}@media(max-width:650px){.cd-admin-photo-crop{flex-basis:90%;width:90%}}';
+ style.textContent += '.cd-admin-photo-crop{position:relative;flex:0 0 auto!important;width:auto!important;height:100%;min-width:0;max-height:210px;scroll-snap-align:start}.cd-admin-photo-crop>img{display:block!important;flex:none!important;width:auto!important;max-width:180px!important;height:100%!important;max-height:210px!important;object-fit:contain!important}.cd-admin-crop-btn{position:absolute;right:9px;bottom:9px;z-index:10;display:grid;place-items:center;width:36px;height:36px;min-height:36px;padding:6px;border-radius:8px;border:1px solid #d5b36a;background:#171718e8;color:#ffdb8b;cursor:pointer;touch-action:manipulation}.cd-admin-photo-crop .cd-admin-crop-btn{bottom:8px}.cd-admin-crop-btn:disabled{opacity:.45}@media(max-width:650px){.cd-admin-photo-crop{max-height:195px}.cd-admin-photo-crop>img{max-width:155px!important;max-height:195px!important}}';
  style.textContent += '#catalogGrid .cd-admin-new .photo{display:grid!important;place-items:center!important}';
  style.textContent += '.cd-admin-swap-mode > a,.cd-admin-swap-mode > .cd-featured-card{cursor:pointer!important}.cd-admin-swap-mode{scroll-snap-type:none!important;scroll-behavior:auto!important;overflow-anchor:none!important}.cd-admin-swap-mode > *{scroll-snap-align:none!important}.cd-admin-swap-selected{outline:3px solid #ffd05e!important;outline-offset:-3px!important;box-shadow:0 0 0 2px #211811,0 0 18px #ffd05e80!important}.cd-admin-title-btn[aria-pressed="true"]{background:#f5c968!important;color:#101010!important}';
  doc.head.appendChild(style);
@@ -403,6 +403,46 @@ function decorateProductPhotos(doc){
   wrap.append(btn);
  });
 }
+function decorateEnlargedPhoto(doc){
+ const lightbox=doc.getElementById('photoLightbox');
+ if(!lightbox)return;
+ const stage=lightbox.querySelector('.zoom-stage'),image=lightbox.querySelector('.zoom-image');
+ const counter=lightbox.querySelector('.zoom-counter');
+ if(!stage||!image||!counter)return;
+ let btn=stage.querySelector('.cd-admin-zoom-crop');
+ if(!btn){
+  btn=doc.createElement('button');
+  btn.type='button';btn.className='cd-admin-crop-btn cd-admin-zoom-crop';
+  btn.innerHTML=cropIcon;btn.title='Ritaglia questa fotografia';btn.setAttribute('aria-label','Ritaglia questa fotografia');
+  stage.append(btn);
+  const position=()=>{
+   if(lightbox.hidden)return;
+   const photo=image.getBoundingClientRect(),bounds=stage.getBoundingClientRect();
+   if(!photo.width||!photo.height)return;
+   const x=Math.max(8,Math.min(bounds.width-44,photo.right-bounds.left-44));
+   const y=Math.max(8,Math.min(bounds.height-44,photo.bottom-bounds.top-44));
+   btn.style.left=x+'px';btn.style.top=y+'px';
+  };
+  image.addEventListener('load',position);
+  doc.defaultView.addEventListener('resize',position);
+  const observer=new MutationObserver(()=>requestAnimationFrame(position));
+  observer.observe(image,{attributes:true,attributeFilter:['src','style']});
+  observer.observe(counter,{childList:true,characterData:true,subtree:true});
+  observer.observe(lightbox,{attributes:true,attributeFilter:['hidden']});
+  btn.onclick=async e=>{
+   e.preventDefault();e.stopPropagation();
+   const gallery=doc.querySelector('#overlay:not(.hidden) .detail-gallery');
+   const first=gallery?.querySelector('img')?.dataset.full;
+   const product=products.find(p=>p.id&&p[7]?.some(url=>url===first));
+   const index=Number((counter.textContent||'').split('/')[0].trim())-1;
+   if(!product||index<0||index>=(product.paths||[]).length){notify('Impossibile identificare la fotografia.',true);return}
+   btn.disabled=true;
+   try{await cropExistingProductPhoto(product,index)}catch(err){notify('Ritaglio non salvato: '+err.message,true)}
+   finally{btn.disabled=false}
+  };
+ }
+ btn.hidden=lightbox.hidden;
+}
 function attach(doc){
  if(!activeUser||doc.location.origin!==location.origin)return;
  currentDoc=doc;
@@ -413,7 +453,7 @@ function attach(doc){
    queued=false;
    if(!activeUser||view.contentDocument!==doc)return;
    if(doc.location.pathname.endsWith('/index.html')||doc.location.pathname.endsWith('/'))homeTools(doc);
-   else if(doc.location.pathname.endsWith('/catalogo.html')){catalogTools(doc);decorateProductPhotos(doc);}
+   else if(doc.location.pathname.endsWith('/catalogo.html')){catalogTools(doc);decorateProductPhotos(doc);decorateEnlargedPhoto(doc);}
  });};
  listenObserver=new MutationObserver(render);
  listenObserver.observe(doc.body,{childList:true,subtree:true});

@@ -18,9 +18,18 @@ function ensure(ok,message){if(!ok)throw new Error(message);}
 // Torna alla pagina pubblica da cui è stato aperto il pannello, mantenendo i filtri URL.
 function returnPage(){
  const params=new URLSearchParams(location.search);
- const raw=params.get('return')||sessionStorage.getItem('cd-admin-return-page')||'index.html';
+ let raw=params.get('return');
+ if(!raw){
+  try{raw=sessionStorage.getItem('cd-admin-return-page')}catch(e){}
+ }
+ if(!raw&&document.referrer){
+  try{
+   const previous=new URL(document.referrer);
+   if(previous.origin===location.origin)raw=previous.pathname+previous.search+previous.hash;
+  }catch(e){}
+ }
  try{
-  const url=new URL(raw,location.href);
+  const url=new URL(raw||'index.html',location.href);
   const page=url.pathname.split('/').pop()||'index.html';
   const base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);
   if(url.origin!==location.origin||url.pathname!==base+page||!['index.html','catalogo.html','richieste.html'].includes(page))return 'index.html';

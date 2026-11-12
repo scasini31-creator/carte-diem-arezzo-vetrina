@@ -381,7 +381,13 @@ async function cropExistingProductPhoto(product,photoIndex){
  const {error}=await sb.from('products').update({image_paths:previousPaths,details}).eq('id',product.id);
  if(error)throw error;
  notify('Fotografia ritagliata e salvata.');
- view.contentWindow.location.reload();
+ const target=new URL('catalogo.html',view.contentWindow.location.href);
+ const group=product.catalog_group||'pokemon';
+ target.searchParams.set('catalogo',group);
+ if(['pokemon','tcg','videogiochi'].includes(group))target.searchParams.set('sottocategoria',product[2]);
+ else target.searchParams.delete('sottocategoria');
+ target.searchParams.set('prodotto',String(product.id));
+ view.contentWindow.location.replace(target.href);
 }
 function decorateProductPhotos(doc){
  const gallery=doc.querySelector('#overlay:not(.hidden) .detail-gallery');

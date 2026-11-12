@@ -299,15 +299,15 @@ const cropIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stro
 function cropPhoto(source,caption='Ritaglia fotografia'){
  return new Promise((resolve,reject)=>{
   let closed=false,drag=null;
-  const overlay=document.createElement('div');
+  const overlay=document.createElement('dialog');
   overlay.className='cd-crop-overlay';
   overlay.innerHTML='<div class="cd-crop-dialog" role="dialog" aria-modal="true" aria-label="Ritaglia fotografia"><header><strong>Ritaglia fotografia</strong><button type="button" data-action="cancel" aria-label="Chiudi">×</button></header><p>Trascina il riquadro per spostarlo oppure trascina l’angolo per ridimensionarlo.</p><div class="cd-crop-stage"><img alt="Fotografia da ritagliare" draggable="false"><div class="cd-crop-selection"><span class="cd-crop-handle"></span></div></div><div class="cd-crop-actions"><button type="button" data-action="reset">Ripristina</button><button type="button" data-action="cancel">Annulla</button><button type="button" data-action="apply" disabled>Applica ritaglio</button></div><p class="cd-crop-error" role="status"></p></div>';
-  document.body.append(overlay);
+  document.body.append(overlay);overlay.showModal();
   const image=overlay.querySelector('img'),stage=overlay.querySelector('.cd-crop-stage'),selection=overlay.querySelector('.cd-crop-selection');
   const apply=overlay.querySelector('[data-action="apply"]'),msg=overlay.querySelector('.cd-crop-error');
   const oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
   let rect={x:0,y:0,w:1,h:1},sourceWidth=0,sourceHeight=0;
-  const finish=(value,error)=>{if(closed)return;closed=true;document.body.style.overflow=oldOverflow;overlay.remove();if(error)reject(error);else resolve(value)};
+  const finish=(value,error)=>{if(closed)return;closed=true;document.body.style.overflow=oldOverflow;overlay.close();overlay.remove();if(error)reject(error);else resolve(value)};
   const draw=()=>{
    const w=image.clientWidth,h=image.clientHeight;
    if(!w||!h)return;
@@ -318,6 +318,7 @@ function cropPhoto(source,caption='Ritaglia fotografia'){
   };
   overlay.querySelectorAll('[data-action="cancel"]').forEach(b=>b.onclick=()=>finish(null));
   overlay.querySelector('[data-action="reset"]').onclick=()=>{rect={x:0,y:0,w:1,h:1};draw()};
+  overlay.addEventListener('cancel',e=>{e.preventDefault();finish(null)});
   overlay.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();finish(null)}});
   selection.addEventListener('pointerdown',e=>{
    e.preventDefault();e.stopPropagation();
@@ -344,8 +345,7 @@ function cropPhoto(source,caption='Ritaglia fotografia'){
   image.onerror=()=>{msg.textContent='Impossibile caricare questa fotografia per il ritaglio.'};
   image.crossOrigin='anonymous';image.src=source;
   const observer=new ResizeObserver(draw);observer.observe(stage);
-  const oldFinish=finish;
-  // L'observer viene disconnesso dalla rimozione del dialogo.
+  overlay.addEventListener('close',()=>observer.disconnect());
   overlay.querySelectorAll('[data-action="cancel"]').forEach(b=>b.addEventListener('click',()=>observer.disconnect()));
   apply.onclick=async()=>{
    apply.disabled=true;msg.textContent='Elaborazione in corso…';

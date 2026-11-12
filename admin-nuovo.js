@@ -19,14 +19,14 @@ function ensure(ok,message){if(!ok)throw new Error(message);}
 function returnPage(){
  const params=new URLSearchParams(location.search);
  let raw=params.get('return');
- if(!raw){
-  try{raw=sessionStorage.getItem('cd-admin-return-page')}catch(e){}
- }
  if(!raw&&document.referrer){
   try{
    const previous=new URL(document.referrer);
-   if(previous.origin===location.origin)raw=previous.pathname+previous.search+previous.hash;
+   if(previous.origin===location.origin && !previous.pathname.endsWith('/amministrazione.html'))raw=previous.pathname+previous.search+previous.hash;
   }catch(e){}
+ }
+ if(!raw){
+  try{raw=sessionStorage.getItem('cd-admin-return-page')}catch(e){}
  }
  try{
   const url=new URL(raw||'index.html',location.href);

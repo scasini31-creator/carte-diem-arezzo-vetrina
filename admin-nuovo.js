@@ -636,6 +636,46 @@ async function uploadImage(file,bucket='product-images'){
  if(error)throw error;
  return path;
 }
+// Prepara una copia ottimizzata delle nuove fotografie prima del caricamento.
+// Le carte rimangono leggibili anche ingrandite; non vengono modificate le foto già salvate.
+async function prepareProductImages(file){
+ ensure(file.type.startsWith('image/'),'Seleziona una fotografia valida.');
+ let bitmap;
+ try{
+  bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
+  const make=async(maxSide,quality)=>{
+   const ratio=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
+   const width=Math.max(1,Math.round(bitmap.width*ratio));
+   const height=Math.max(1,Math.round(bitmap.height*ratio));
+   const canvas=document.createElement('canvas');
+   canvas.width=width;canvas.height=height;
+   const ctx=canvas.getContext('2d',{alpha:false});
+   if(!ctx)throw new Error('Impossibile preparare la fotografia.');
+   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,width,height);
+   ctx.drawImage(bitmap,0,0,width,height);
+   const blob=await new Promise((resolve,reject)=>canvas.toBlob(
+     b=>b?resolve(b):reject(new Error('Compressione fotografia non riuscita.')),
+     'image/webp',quality
+   ));
+   canvas.width=0;canvas.height=0;
+   return blob;
+  };
+  const [original,preview]=await Promise.all([make(2400,0.86),make(480,0.76)]);
+  return {
+   original:new File([original],'foto-ottimizzata.webp',{type:'image/webp'}),
+   preview
+  };
+ }finally{bitmap?.close?.()}
+}
+async function uploadPreparedPreview(blob){
+ if(!blob)return null;
+ const path='admin/previews/'+crypto.randomUUID()+'.webp';
+ const {error}=await sb.storage.from('product-images').upload(path,blob,{
+  contentType:'image/webp',cacheControl:'31536000',upsert:false
+ });
+ if(error){console.warn('Miniatura non caricata:',error);return null}
+ return path;
+}
 // Le miniature sono copie aggiuntive: le immagini originali non vengono alterate.
 async function createPreviewBlob(file){
  if(!file.type.startsWith('image/'))return null;
@@ -678,8 +718,14 @@ async function saveProduct(){
   if(ph.path){
    paths[i]=ph.path;previewPaths[i]=ph.thumbPath||null;
   }else{
-   paths[i]=await uploadImage(ph.file);
-   previewPaths[i]=await uploadPreview(ph.file);
+   $('adminModalMessage').textContent='Ottimizzazione fotografie…';
+   const prepared=await prepareProductImages(ph.file);
+   $('adminModalMessage').textContent='Caricamento fotografie: '+uploaded+' di '+fresh;
+   const [originalPath,previewPath]=await Promise.all([
+    uploadImage(prepared.original),
+    uploadPreparedPreview(prepared.preview)
+   ]);
+   paths[i]=originalPath;previewPaths[i]=previewPath;
    uploaded++;
    $('adminModalMessage').textContent='Fotografie caricate: '+uploaded+' di '+fresh;
   }

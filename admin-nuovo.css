@@ -45,3 +45,24 @@ html,body{height:100%;margin:0;background:var(--admin-dark);color:#f9f4eb;font-f
 
 .admin-photo{touch-action:none;user-select:none;-webkit-user-select:none}
 .admin-photo.cd-dragging{opacity:.55;outline:2px dashed #ffdb8a}
+
+/* Editor di ritaglio immagini, accessibile soltanto dall'area amministrativa. */
+.cd-crop-overlay{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:10px;border:0;color:#f4e7c7;background:rgba(0,0,0,.92);box-sizing:border-box;overflow:auto}
+.cd-crop-overlay::backdrop{background:#000d}
+.cd-crop-dialog{width:min(96vw,780px);margin:10px auto;padding:14px;border:1px solid #9d793d;border-radius:12px;background:#10131b}
+.cd-crop-dialog header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cd-crop-dialog header strong{font-size:17px;color:#ebce8b}
+.cd-crop-dialog header button{font-size:26px;background:transparent;color:white;border:0;cursor:pointer}
+.cd-crop-dialog p{font-size:12px;line-height:1.5;color:#c9c2b5}
+.cd-crop-stage{position:relative;display:flex;align-items:center;justify-content:center;height:min(58dvh,600px);background:#050609;overflow:hidden;user-select:none}
+.cd-crop-stage img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.cd-crop-selection{position:absolute;border:2px solid #ffca62;box-shadow:0 0 0 9999px #0008,inset 0 0 0 1px #0008;cursor:move;touch-action:none;box-sizing:border-box}
+.cd-crop-handle{position:absolute;right:-9px;bottom:-9px;width:24px;height:24px;background:#ffd16d;border:2px solid #19130b;border-radius:5px;cursor:nwse-resize;touch-action:none}
+.cd-crop-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.cd-crop-actions button{border:1px solid #a8894e;border-radius:7px;padding:11px;background:#191b22;color:#f4d894;cursor:pointer}
+.cd-crop-actions [data-action="apply"]{background:#d5b36a;color:#1a140b;font-weight:700}
+.cd-crop-actions button:disabled{opacity:.45}
+.cd-crop-error{color:#ffa8a8!important;min-height:16px}
+.admin-photo{position:relative}
+.admin-photo>.cd-admin-crop-btn{position:absolute;right:7px;bottom:37px;display:grid;place-items:center;width:30px;height:30px;padding:4px;background:#15151de8;border:1px solid #d5b36a;color:#f6d385;cursor:pointer;z-index:2}
+.admin-photo>.cd-admin-crop-btn svg{width:18px;height:18px}

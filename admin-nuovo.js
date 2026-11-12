@@ -643,28 +643,22 @@ async function prepareProductImages(file){
  let bitmap;
  try{
   bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
-  const make=async(maxSide,quality)=>{
-   const ratio=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
-   const width=Math.max(1,Math.round(bitmap.width*ratio));
-   const height=Math.max(1,Math.round(bitmap.height*ratio));
-   const canvas=document.createElement('canvas');
-   canvas.width=width;canvas.height=height;
-   const ctx=canvas.getContext('2d',{alpha:false});
-   if(!ctx)throw new Error('Impossibile preparare la fotografia.');
-   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,width,height);
-   ctx.drawImage(bitmap,0,0,width,height);
-   const blob=await new Promise((resolve,reject)=>canvas.toBlob(
-     b=>b?resolve(b):reject(new Error('Compressione fotografia non riuscita.')),
-     'image/webp',quality
-   ));
-   canvas.width=0;canvas.height=0;
-   return blob;
-  };
-  const [original,preview]=await Promise.all([make(2400,0.86),make(480,0.76)]);
-  return {
-   original:new File([original],'foto-ottimizzata.webp',{type:'image/webp'}),
-   preview
-  };
+  const longest=Math.max(bitmap.width,bitmap.height);
+  const scale=Math.min(1,2200/Math.max(1,longest));
+  const width=Math.max(1,Math.round(bitmap.width*scale));
+  const height=Math.max(1,Math.round(bitmap.height*scale));
+  const canvas=document.createElement('canvas');
+  canvas.width=width;canvas.height=height;
+  const ctx=canvas.getContext('2d',{alpha:false});
+  if(!ctx)throw new Error('Impossibile elaborare la fotografia.');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,width,height);
+  ctx.drawImage(bitmap,0,0,width,height);
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(
+   b=>b?resolve(b):reject(new Error('Compressione fotografia non riuscita.')),
+   'image/webp',0.82
+  ));
+  canvas.width=canvas.height=0;
+  return {original:new File([blob],'foto-ottimizzata.webp',{type:'image/webp'})};
  }finally{bitmap?.close?.()}
 }
 async function uploadPreparedPreview(blob){
@@ -711,6 +705,7 @@ async function saveProduct(){
  ensure(photos.length<=6,'Puoi caricare al massimo 6 fotografie.');
  const btn=$('adminSave'),paths=new Array(photos.length),previewPaths=new Array(photos.length);
  const fresh=photos.filter(ph=>ph.file).length;
+ const saveStarted=performance.now();
  let uploaded=0;
  // Massimo due foto contemporaneamente: più rapido del caricamento seriale,
  // senza saturare la rete mobile né elaborare tutte le immagini insieme.
@@ -718,20 +713,31 @@ async function saveProduct(){
   if(ph.path){
    paths[i]=ph.path;previewPaths[i]=ph.thumbPath||null;
   }else{
-   $('adminModalMessage').textContent='Ottimizzazione fotografie…';
+   const started=performance.now();
+   $('adminModalMessage').textContent='Preparazione foto '+(i+1)+' di '+photos.length+'…';
    const prepared=await prepareProductImages(ph.file);
-   $('adminModalMessage').textContent='Caricamento fotografie: '+uploaded+' di '+fresh;
-   const [originalPath,previewPath]=await Promise.all([
-    uploadImage(prepared.original),
-    uploadPreparedPreview(prepared.preview)
-   ]);
-   paths[i]=originalPath;previewPaths[i]=previewPath;
+   const prepSeconds=((performance.now()-started)/1000).toFixed(1);
+   const uploadStart=performance.now();
+   $('adminModalMessage').textContent='Invio foto '+(i+1)+' di '+photos.length+' ('+Math.ceil(prepared.original.size/1024)+' KB)…';
+   try{
+    paths[i]=await uploadImage(prepared.original);
+   }catch(e){
+    throw new Error('Invio foto '+(i+1)+' non riuscito dopo '+((performance.now()-uploadStart)/1000).toFixed(1)+' s: '+e.message);
+   }
+   // Il file è già ottimizzato: una sola richiesta Storage per fotografia.
+   // Senza miniatura separata il catalogo usa la stessa immagine compressa.
+   previewPaths[i]=null;
+   // Riutilizza il file già caricato se il salvataggio del database va ripetuto.
+   ph.path=paths[i];ph.thumbPath=null;
+   ph.uploadSeconds=((performance.now()-uploadStart)/1000).toFixed(1);
+   ph.prepareSeconds=prepSeconds;
    uploaded++;
-   $('adminModalMessage').textContent='Fotografie caricate: '+uploaded+' di '+fresh;
+   $('adminModalMessage').textContent='Foto '+uploaded+'/'+fresh+' caricate ('+prepSeconds+' s preparazione, '+ph.uploadSeconds+' s invio).';
   }
  });
  for(let i=0;i<jobs.length;i+=2)await Promise.all(jobs.slice(i,i+2).map(fn=>fn()));
- $('adminModalMessage').textContent='Salvataggio articolo…';
+ $('adminModalMessage').textContent='Registrazione articolo nel database…';
+ const databaseStarted=performance.now();
  const originalDetails=editing?.details||{};
  const details={
   ...originalDetails,
@@ -753,10 +759,13 @@ async function saveProduct(){
  };
  ensure(raw.price===null||Number.isFinite(raw.price)&&raw.price>=0,'Prezzo non valido.');
  const query=editing?sb.from('products').update(raw).eq('id',editing.id):sb.from('products').insert(raw);
- const {error}=await query;
- if(error)throw error;
+ let error;
+ try{({error}=await query)}catch(e){throw new Error('Connessione al database: '+e.message)}
+ if(error)throw new Error('Database: '+error.message);
+ const totalSeconds=((performance.now()-saveStarted)/1000).toFixed(1);
+ const dbSeconds=((performance.now()-databaseStarted)/1000).toFixed(1);
  closeDialog();
- notify('Prodotto salvato correttamente.');
+ notify('Prodotto salvato in '+totalSeconds+' s (database '+dbSeconds+' s).');
  // Al ricaricamento la pagina recupera già i dati aggiornati: niente
  // seconda lettura preventiva di tutte le tabelle.
  view.contentWindow.location.reload();

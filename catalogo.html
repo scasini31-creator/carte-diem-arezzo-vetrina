@@ -523,15 +523,19 @@ border-radius:7px;padding:10px;width:100%">
 
 </details>
 <div class="filter" style="margin-top:8px"></div><p class="sub" id="count"></p><div class="products" id="catalogGrid"></div><nav id="catalogPagination" class="catalog-pagination" aria-label="Pagine del catalogo" hidden></nav><p class="sub hidden" id="emptyCatalog">Nessun risultato.</p></div></section><div class="hidden" id="overlay" role="presentation"><div aria-label="Scheda prodotto" aria-modal="true" id="detail" role="dialog"><button aria-label="Chiudi" id="close">×</button><div class="photo" id="detailPhoto"><div class="mock-card" id="detailSymbol"></div></div><div id="detailText"><div class="eyebrow" id="detailCategory"></div><h2 id="detailName"></h2><p class="sub" id="detailCondition"></p><p id="detailDescription" class="detail-description" hidden></p><h3 class="gold" id="detailPrice"><span id="detailPriceValue"></span><small id="detailQuantity" class="detail-quantity" hidden></small></h3><div class="detail-action-row"><button class="button secondary" id="detailAdd" type="button">Aggiungi alla lista</button> <a class="button secondary" href="richieste.html">Apri lista</a> <button class="button secondary" id="detailShare" type="button" aria-label="Condividi scheda prodotto" title="Condividi scheda prodotto" style="display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;min-width:48px;padding:10px 12px"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 13.5 6.6 4m0-11-6.6 4"/></svg></button></div><div class="detail-product-nav" aria-label="Navigazione tra prodotti"><button type="button" id="detailPrev" aria-label="Prodotto precedente">‹ Precedente</button><span id="detailPosition" aria-live="polite"></span><button type="button" id="detailNext" aria-label="Prodotto successivo">Successivo ›</button></div></div></div></div>
-</main><footer>© 2026 CARTE DIEM AREZZO<a href="amministrazione.html" data-cd-admin-return="1" style="display:block;margin-top:12px;font-size:11px;color:#777;text-decoration:none;text-align:center;">pannello amministratore</a></footer><script id="cd-admin-origin-link">
+</main><footer>© 2026 CARTE DIEM AREZZO<a href="amministrazione.html?return=catalogo.html" data-cd-admin-return="1" style="display:block;margin-top:12px;font-size:11px;color:#777;text-decoration:none;text-align:center;">pannello amministratore</a></footer><script id="cd-admin-origin-link">
 (function(){
   var a=document.querySelector('a[data-cd-admin-return="1"]');
   if(!a)return;
   var page=location.pathname.split('/').pop()||'index.html';
-  var originPage=page+location.search+location.hash;
-  var target='amministrazione.html?return='+encodeURIComponent(originPage);
-  a.setAttribute('href',target);
+  function destination(){
+    var originPage=page+location.search+location.hash;
+    a.href='amministrazione.html?return='+encodeURIComponent(originPage);
+    return originPage;
+  }
+  destination();
   a.addEventListener('click',function(){
+    var originPage=destination();
     try{sessionStorage.setItem('cd-admin-return-page',originPage)}catch(e){}
   });
 })();

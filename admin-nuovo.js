@@ -452,6 +452,21 @@ function decorateEnlargedPhoto(doc){
  }
  btn.hidden=lightbox.hidden;
 }
+function displayAdminVisitCount(doc){
+ const footer=doc.querySelector('footer');
+ if(!footer||footer.querySelector('#cd-admin-visits'))return;
+ const small=doc.createElement('div');
+ small.id='cd-admin-visits';
+ small.textContent='Visite registrate: …';
+ small.style.cssText='margin-top:9px;font:400 11px/1.5 Arial,sans-serif;color:#888;text-align:center;';
+ const adminLink=footer.querySelector('a[href*="amministrazione.html"]');
+ if(adminLink)footer.insertBefore(small,adminLink);
+ else footer.append(small);
+ sb.rpc('admin_site_visit_count').then(({data,error})=>{
+  if(!small.isConnected)return;
+  small.textContent=error?'Visite non disponibili':'Visite registrate: '+Number(data||0).toLocaleString('it-IT');
+ }).catch(()=>{if(small.isConnected)small.textContent='Visite non disponibili'});
+}
 function attach(doc){
  if(!activeUser||doc.location.origin!==location.origin)return;
  currentDoc=doc;
@@ -461,6 +476,7 @@ function attach(doc){
  const render=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{
    queued=false;
    if(!activeUser||view.contentDocument!==doc)return;
+   displayAdminVisitCount(doc);
    if(doc.location.pathname.endsWith('/index.html')||doc.location.pathname.endsWith('/'))homeTools(doc);
    else if(doc.location.pathname.endsWith('/catalogo.html')){catalogTools(doc);decorateProductPhotos(doc);decorateEnlargedPhoto(doc);}
  });};

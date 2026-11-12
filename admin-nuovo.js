@@ -91,6 +91,7 @@ async function refreshLists(){
 function adminStyle(doc){
  const style=doc.createElement('style');style.id='cd-admin-overlay';
  style.textContent='.cd-admin-title-btn{display:inline-grid;place-items:center;vertical-align:middle;margin-left:8px;width:36px;height:36px;border:1px solid #d5b36a;border-radius:8px;color:#d5b36a;background:#11131be8;font-size:22px;cursor:pointer}.cd-admin-title-btn[aria-pressed="true"]{color:#101010;background:#f5c968}.cd-admin-new{cursor:pointer;border:1px dashed #d5b36a!important}.cd-admin-new .photo{display:grid!important;place-items:center!important;color:#d5b36a;font-size:58px;background:#101115!important}.cd-admin-new h3{text-align:center!important}.cd-admin-new .quick-add{font-size:21px!important}.cd-admin-edit{display:block;width:100%;margin-top:6px;border:1px solid #d5b36a;background:#1b1921;color:#efd096;border-radius:5px;min-height:34px;cursor:pointer;font-size:11px;font-weight:700}.cd-admin-star{position:absolute;right:6px;bottom:6px;z-index:4;display:grid;place-items:center;border:1px solid #d8b56e;background:#131418e8;color:#d2cbbd;border-radius:50%;width:34px;height:34px;font-size:24px;cursor:pointer;line-height:1}.cd-admin-star.is-featured{color:#ffc845}.cd-admin-wish-edit{position:absolute;right:6px;bottom:6px;z-index:5;border:1px solid #d5b36a;color:#ffd885;background:#131418e9;border-radius:7px;width:34px;height:34px;cursor:pointer}.cd-admin-grab{touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;cursor:grab!important}.cd-admin-grab.cd-dragging{opacity:.56;outline:2px dashed #ffdb8a}.cd-admin-active{outline:1px dashed #dfbb75;outline-offset:3px}.cd-admin-title-btn:focus-visible,.cd-admin-star:focus-visible,.cd-admin-edit:focus-visible{outline:2px solid white;outline-offset:2px}';
+ style.textContent += '.cd-admin-photo-crop{position:relative;flex:0 0 88%;width:88%;height:100%;min-width:0;scroll-snap-align:center}.cd-admin-photo-crop>img{width:100%!important;height:100%!important;max-width:100%!important;flex:none!important}.cd-admin-crop-btn{position:absolute;right:9px;bottom:9px;z-index:10;display:grid;place-items:center;width:36px;height:36px;min-height:36px;padding:6px;border-radius:8px;border:1px solid #d5b36a;background:#171718e8;color:#ffdb8b;cursor:pointer;touch-action:manipulation}.cd-admin-photo-crop .cd-admin-crop-btn{bottom:8px}.cd-admin-crop-btn:disabled{opacity:.45}@media(max-width:650px){.cd-admin-photo-crop{flex-basis:90%;width:90%}}';
  style.textContent += '#catalogGrid .cd-admin-new .photo{display:grid!important;place-items:center!important}';
  style.textContent += '.cd-admin-swap-mode > a,.cd-admin-swap-mode > .cd-featured-card{cursor:pointer!important}.cd-admin-swap-mode{scroll-snap-type:none!important;scroll-behavior:auto!important;overflow-anchor:none!important}.cd-admin-swap-mode > *{scroll-snap-align:none!important}.cd-admin-swap-selected{outline:3px solid #ffd05e!important;outline-offset:-3px!important;box-shadow:0 0 0 2px #211811,0 0 18px #ffd05e80!important}.cd-admin-title-btn[aria-pressed="true"]{background:#f5c968!important;color:#101010!important}';
  doc.head.appendChild(style);
@@ -292,6 +293,116 @@ function catalogTools(doc){
   productGrid.prepend(card);
  }
 }
+
+/* Ritocco fotografico amministrativo: ritaglio non distruttivo, per foto. */
+const cropIcon='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14"/></svg>';
+function cropPhoto(source,caption='Ritaglia fotografia'){
+ return new Promise((resolve,reject)=>{
+  let closed=false,drag=null;
+  const overlay=document.createElement('div');
+  overlay.className='cd-crop-overlay';
+  overlay.innerHTML='<div class="cd-crop-dialog" role="dialog" aria-modal="true" aria-label="Ritaglia fotografia"><header><strong>Ritaglia fotografia</strong><button type="button" data-action="cancel" aria-label="Chiudi">×</button></header><p>Trascina il riquadro per spostarlo oppure trascina l’angolo per ridimensionarlo.</p><div class="cd-crop-stage"><img alt="Fotografia da ritagliare" draggable="false"><div class="cd-crop-selection"><span class="cd-crop-handle"></span></div></div><div class="cd-crop-actions"><button type="button" data-action="reset">Ripristina</button><button type="button" data-action="cancel">Annulla</button><button type="button" data-action="apply" disabled>Applica ritaglio</button></div><p class="cd-crop-error" role="status"></p></div>';
+  document.body.append(overlay);
+  const image=overlay.querySelector('img'),stage=overlay.querySelector('.cd-crop-stage'),selection=overlay.querySelector('.cd-crop-selection');
+  const apply=overlay.querySelector('[data-action="apply"]'),msg=overlay.querySelector('.cd-crop-error');
+  const oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+  let rect={x:0,y:0,w:1,h:1},sourceWidth=0,sourceHeight=0;
+  const finish=(value,error)=>{if(closed)return;closed=true;document.body.style.overflow=oldOverflow;overlay.remove();if(error)reject(error);else resolve(value)};
+  const draw=()=>{
+   const w=image.clientWidth,h=image.clientHeight;
+   if(!w||!h)return;
+   selection.style.left=(image.offsetLeft+rect.x*w)+'px';
+   selection.style.top=(image.offsetTop+rect.y*h)+'px';
+   selection.style.width=(rect.w*w)+'px';
+   selection.style.height=(rect.h*h)+'px';
+  };
+  overlay.querySelectorAll('[data-action="cancel"]').forEach(b=>b.onclick=()=>finish(null));
+  overlay.querySelector('[data-action="reset"]').onclick=()=>{rect={x:0,y:0,w:1,h:1};draw()};
+  overlay.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();finish(null)}});
+  selection.addEventListener('pointerdown',e=>{
+   e.preventDefault();e.stopPropagation();
+   drag={id:e.pointerId,x:e.clientX,y:e.clientY,r:{...rect},resize:!!e.target.closest('.cd-crop-handle')};
+   selection.setPointerCapture(e.pointerId);
+  });
+  selection.addEventListener('pointermove',e=>{
+   if(!drag||drag.id!==e.pointerId)return;
+   const w=Math.max(image.clientWidth,1),h=Math.max(image.clientHeight,1);
+   const dx=(e.clientX-drag.x)/w,dy=(e.clientY-drag.y)/h;
+   const minW=Math.min(1,32/w),minH=Math.min(1,32/h);
+   if(drag.resize){
+    rect.w=Math.max(minW,Math.min(1-drag.r.x,drag.r.w+dx));
+    rect.h=Math.max(minH,Math.min(1-drag.r.y,drag.r.h+dy));
+   }else{
+    rect.x=Math.max(0,Math.min(1-drag.r.w,drag.r.x+dx));
+    rect.y=Math.max(0,Math.min(1-drag.r.h,drag.r.y+dy));
+   }
+   draw();
+  });
+  selection.addEventListener('pointerup',()=>{drag=null});
+  selection.addEventListener('pointercancel',()=>{drag=null});
+  image.onload=()=>{sourceWidth=image.naturalWidth;sourceHeight=image.naturalHeight;rect={x:0.05,y:0.05,w:0.9,h:0.9};apply.disabled=false;requestAnimationFrame(draw)};
+  image.onerror=()=>{msg.textContent='Impossibile caricare questa fotografia per il ritaglio.'};
+  image.crossOrigin='anonymous';image.src=source;
+  const observer=new ResizeObserver(draw);observer.observe(stage);
+  const oldFinish=finish;
+  // L'observer viene disconnesso dalla rimozione del dialogo.
+  overlay.querySelectorAll('[data-action="cancel"]').forEach(b=>b.addEventListener('click',()=>observer.disconnect()));
+  apply.onclick=async()=>{
+   apply.disabled=true;msg.textContent='Elaborazione in corso…';
+   try{
+    const max=3000;
+    const scale=Math.min(1,max/Math.max(rect.w*sourceWidth,rect.h*sourceHeight));
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(rect.w*sourceWidth*scale));
+    canvas.height=Math.max(1,Math.round(rect.h*sourceHeight*scale));
+    canvas.getContext('2d',{alpha:false}).drawImage(image,rect.x*sourceWidth,rect.y*sourceHeight,rect.w*sourceWidth,rect.h*sourceHeight,0,0,canvas.width,canvas.height);
+    const blob=await new Promise(res=>canvas.toBlob(res,'image/webp',0.9));
+    if(!blob)throw new Error('Impossibile generare il ritaglio.');
+    const file=new File([blob],'foto-ritagliata.webp',{type:'image/webp'});
+    observer.disconnect();finish(file);
+   }catch(err){msg.textContent='Ritaglio non riuscito: '+err.message;apply.disabled=false}
+  };
+ });
+}
+async function cropExistingProductPhoto(product,photoIndex){
+ const source=product?.[7]?.[photoIndex];
+ if(!source||!product.id)throw new Error('Fotografia non disponibile.');
+ const result=await cropPhoto(source);
+ if(!result)return;
+ const previousPaths=[...(product.paths||[])];
+ ensure(photoIndex>=0&&photoIndex<previousPaths.length,'Fotografia non trovata.');
+ const previousPreviews=[...(product.details?.preview_paths||[])];
+ const newPath=await uploadImage(result);
+ const preview=await uploadPreview(result);
+ previousPaths[photoIndex]=newPath;
+ previousPreviews[photoIndex]=preview;
+ const details={...(product.details||{}),preview_paths:previousPreviews};
+ const {error}=await sb.from('products').update({image_paths:previousPaths,details}).eq('id',product.id);
+ if(error)throw error;
+ notify('Fotografia ritagliata e salvata.');
+ view.contentWindow.location.reload();
+}
+function decorateProductPhotos(doc){
+ const gallery=doc.querySelector('#overlay:not(.hidden) .detail-gallery');
+ if(!gallery||!gallery.querySelector('img'))return;
+ const imgs=[...gallery.querySelectorAll('img')];
+ const first=imgs[0]?.dataset.full;
+ const product=products.find(p=>p.id&&p[7]?.some(url=>url===first));
+ if(!product)return;
+ imgs.forEach((img,i)=>{
+  if(img.closest('.cd-admin-photo-crop'))return;
+  const wrap=doc.createElement('div');wrap.className='cd-admin-photo-crop';
+  img.parentNode.insertBefore(wrap,img);wrap.append(img);
+  const btn=doc.createElement('button');btn.type='button';btn.className='cd-admin-crop-btn';
+  btn.title='Ritaglia questa fotografia';btn.setAttribute('aria-label','Ritaglia fotografia '+(i+1));btn.innerHTML=cropIcon;
+  btn.onclick=async e=>{
+   e.preventDefault();e.stopPropagation();
+   btn.disabled=true;
+   try{await cropExistingProductPhoto(product,i)}catch(err){notify('Ritaglio non salvato: '+err.message,true);btn.disabled=false}
+  };
+  wrap.append(btn);
+ });
+}
 function attach(doc){
  if(!activeUser||doc.location.origin!==location.origin)return;
  currentDoc=doc;
@@ -302,7 +413,7 @@ function attach(doc){
    queued=false;
    if(!activeUser||view.contentDocument!==doc)return;
    if(doc.location.pathname.endsWith('/index.html')||doc.location.pathname.endsWith('/'))homeTools(doc);
-   else if(doc.location.pathname.endsWith('/catalogo.html'))catalogTools(doc);
+   else if(doc.location.pathname.endsWith('/catalogo.html')){catalogTools(doc);decorateProductPhotos(doc);}
  });};
  listenObserver=new MutationObserver(render);
  listenObserver.observe(doc.body,{childList:true,subtree:true});
@@ -416,6 +527,9 @@ function redrawPhotos(){
    const b=document.createElement('button');b.type='button';b.textContent=label;b.disabled=i+move<0||i+move>=photos.length;
    b.onclick=()=>{[photos[i],photos[i+move]]=[photos[i+move],photos[i]];redrawPhotos();};actions.append(b);
   }
+  const crop=document.createElement('button');crop.type='button';crop.className='cd-admin-crop-btn';crop.title='Ritaglia fotografia';crop.setAttribute('aria-label','Ritaglia fotografia '+(i+1));crop.innerHTML=cropIcon;
+  crop.onclick=async()=>{crop.disabled=true;try{const result=await cropPhoto(photos[i].url);if(result){photos[i]={file:result,url:URL.createObjectURL(result)};redrawPhotos()}}catch(err){$('adminModalMessage').textContent='Ritaglio non riuscito: '+err.message}finally{crop.disabled=false}};
+  wrap.append(crop);
   const del=document.createElement('button');del.type='button';del.textContent='Rimuovi';del.onclick=()=>{photos.splice(i,1);redrawPhotos();};
   wrap.append(img,actions,del);box.append(wrap);
  });

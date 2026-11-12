@@ -669,7 +669,7 @@ aria-labelledby="cd-mancolista-title">
   });
 
   const shareBtn = document.getElementById('cd-share-btn');
-  const shareUrl = new URL('index.html', window.location.href).href;
+  const shareUrl = 'https://scasini31-creator.github.io/carte-diem-arezzo-vetrina/';
   shareBtn.addEventListener('click', async () => {
     if (navigator.share) {
       try { await navigator.share({title:'CARTE DIEM AREZZO',url:shareUrl}); return; }

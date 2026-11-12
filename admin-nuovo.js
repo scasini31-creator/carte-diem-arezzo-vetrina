@@ -497,7 +497,7 @@ function productFields(p,group,category){
  html+=field('category','Tipologia','select',category,choices[group]);
  html+=field('sigla','Sigla carta','text',p?.[1]||'');
  html+=field('language','Lingua','select',p?.[10]||'ITA',['ITA','ENG','JPN','CHN','KOR']);
- html+=field('condition','Condizione','select',category==='singole'?p?.[5]||'Near Mint':'Near Mint',['Near Mint','Excellent','Good','Light Played','Played','Poor']);
+ html+=field('condition','Condizione','select',category==='singole'?p?.[5]||'Near Mint':'Near Mint',['Sigillata','Near Mint','Excellent','Good','Light Played','Played','Poor']);
  html+=field('grader','Casa di gradazione','select',d.grader||'PSA',graders);
  html+=field('grade','Voto','select',category==='gradate'?((p?.[5]||'').match(/\b(10|[1-9](?:[.,]5)?|Black Label)\b/i)||[])[0]||'10':'10',Array.from({length:19},(_,i)=>String((i+2)/2)).concat('Black Label'));
  html+=field('sealedType','Tipologia sigillati','select',d.sealedType||'ETB',sealed);

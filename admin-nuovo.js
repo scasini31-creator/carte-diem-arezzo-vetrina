@@ -17,12 +17,13 @@ function notify(t,error=false){status.textContent=t;status.classList.toggle('adm
 function ensure(ok,message){if(!ok)throw new Error(message);}
 // Torna alla pagina pubblica da cui è stato aperto il pannello, mantenendo i filtri URL.
 function returnPage(){
- const raw=new URLSearchParams(location.search).get('return')||'index.html';
+ const params=new URLSearchParams(location.search);
+ const raw=params.get('return')||sessionStorage.getItem('cd-admin-return-page')||'index.html';
  try{
   const url=new URL(raw,location.href);
   const page=url.pathname.split('/').pop()||'index.html';
   const base=location.pathname.slice(0,location.pathname.lastIndexOf('/')+1);
-  if(url.origin!==location.origin||!url.pathname.startsWith(base)||!['index.html','catalogo.html','richieste.html'].includes(page))return 'index.html';
+  if(url.origin!==location.origin||url.pathname!==base+page||!['index.html','catalogo.html','richieste.html'].includes(page))return 'index.html';
   return page+url.search+url.hash;
  }catch{return 'index.html';}
 }
@@ -33,7 +34,8 @@ async function checkLogin(){
   const {data,error:e}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
   if(e||!data){showLogin('Questo account non dispone dei permessi amministrativi.');return;}
   activeUser=user;gate.hidden=true;root.hidden=false;
-  if(view.src==='about:blank')view.src=returnPage();
+  const target=returnPage();
+  if(view.getAttribute('src')!==target)view.setAttribute('src',target);
   await refreshLists();
  }catch(e){showLogin(e.message);}
 }

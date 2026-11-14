@@ -10,7 +10,7 @@
   'LIGHT PLAYED':['LP','Light Played'],'LP':['LP','Light Played'],
   'PLAYED':['PL','Played'],'PL':['PL','Played'],
   'POOR':['PR','Poor'],'PR':['PR','Poor'],
-  'SIGILLATA':['SIG','Sigillata'],'SEALED':['SIG','Sigillata'],'SIG':['SIG','Sigillata']
+  'SIGILLATA':['SEALED','SEALED'],'SEALED':['SEALED','SEALED'],'SIG':['SEALED','SEALED']
  };
  if(['console','videogiochi'].includes(category) && p.catalog_group==='videogiochi'){
   const condition=String(p.details?.gameCondition||'').trim();

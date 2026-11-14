@@ -103,6 +103,7 @@ const sharedEntries=shareParam===null?null:Array.from(new Map(shareParam.split('
  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)&&Number.isSafeInteger(qty)&&qty>0&&qty<=999?{id,qty}:null;
 }).filter(Boolean).map(item=>[item.id,item])).values());
 let isRequestAdmin=false,archivedRequestProducts=[],requestAdminBusy=false,lastSaleLaunchUrl=null;
+let adminAuthCheckSeq=0;
 const adminCheckedProducts=new Set();
 const requestAdminArea=document.createElement('div');
 requestAdminArea.id='adminRequestActions';
@@ -142,6 +143,16 @@ function renderRequestAdminActions(){
  requestAdminArea.hidden=false;
  requestAdminArea.replaceChildren();
  const heading=document.createElement('strong');heading.textContent='Gestione amministratore · Cataloghi';requestAdminArea.append(heading);
+ const authRow=document.createElement('div');authRow.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0';
+ const authStatus=document.createElement('span');authStatus.textContent='Sessione amministratore attiva';authStatus.style.cssText='font-size:12px;color:#f5d48c';
+ const signOutBtn=document.createElement('button');signOutBtn.type='button';signOutBtn.textContent='Esci dall’amministrazione';signOutBtn.style.cssText='border:1px solid #8e7753;border-radius:7px;padding:8px;background:#211d1a;color:#fff;font-size:12px';
+ signOutBtn.onclick=async()=>{
+  signOutBtn.disabled=true;
+  const {error}=await sb.auth.signOut();
+  if(error){alert('Impossibile chiudere la sessione: '+error.message);signOutBtn.disabled=false;return;}
+  invalidateRequestAdmin();
+ };
+ authRow.append(authStatus,signOutBtn);requestAdminArea.append(authRow);
  const intro=document.createElement('p');intro.textContent='Seleziona uno o più articoli. Entrambe le azioni li rimuovono dal catalogo; solo la conferma vendita apre il gestionale. Gli articoli restano ripristinabili.';intro.style.cssText='font-size:13px;opacity:.85';requestAdminArea.append(intro);
  const active=selectedProducts(),validIds=new Set(active.map(p=>p.id));
  for(const id of [...adminCheckedProducts])if(!validIds.has(id))adminCheckedProducts.delete(id);
@@ -223,6 +234,7 @@ function openGestionaleSale(uri){
 }
 async function changeCatalogVisibility(ids,restore,launchSale=false){
  if(!isRequestAdmin||requestAdminBusy||!ids.length)return;
+ if(!await verifyRequestAdmin()){alert('Sessione amministratore non attiva. Accedi dal pannello amministratore.');return;}
  const action=restore?'ripristinare':'rimuovere dai cataloghi';
  if(!confirm('Confermi di voler '+action+' '+ids.length+' prodotto/i?\n\n'+(restore?'Torneranno visibili nella vetrina.':launchSale?'Saranno archiviati e si aprirà una scheda modificabile nel gestionale. La vendita sarà contabilizzata solo dopo il salvataggio.':'Saranno archiviati senza registrare alcuna vendita.')))return;
  let gestionaleSaleUri=null;
@@ -242,16 +254,39 @@ async function changeCatalogVisibility(ids,restore,launchSale=false){
   try{await refreshRequestCatalog()}catch(_){}
  }finally{requestAdminBusy=false;renderRequestAdminActions();}
 }
-async function initializeRequestAdmin(){
- try{
-  const {data,error}=await sb.auth.getUser();
-  if(error||!data?.user)return;
-  const {data:admin,error:checkError}=await sb.from('admin_users').select('user_id').eq('user_id',data.user.id).maybeSingle();
-  if(checkError||!admin)return;
-  isRequestAdmin=true;
-  await refreshRequestCatalog();
- }catch(e){console.warn('Controllo amministratore lista non disponibile:',e?.message||e);}
+function invalidateRequestAdmin(){
+ adminAuthCheckSeq++;
+ isRequestAdmin=false;
+ adminCheckedProducts.clear();
+ lastSaleLaunchUrl=null;
+ archivedRequestProducts=[];
+ requestAdminArea.hidden=true;
+ requestAdminArea.replaceChildren();
 }
+async function verifyRequestAdmin(){
+ const seq=++adminAuthCheckSeq;
+ try{
+  const {data:userData,error:userError}=await sb.auth.getUser();
+  if(seq!==adminAuthCheckSeq)return false;
+  if(userError||!userData?.user){invalidateRequestAdmin();return false;}
+  const {data:allowed,error:checkError}=await sb.rpc('is_admin');
+  if(seq!==adminAuthCheckSeq)return false;
+  if(checkError||allowed!==true){invalidateRequestAdmin();return false;}
+  isRequestAdmin=true;
+  return true;
+ }catch(e){if(seq===adminAuthCheckSeq)invalidateRequestAdmin();return false;}
+}
+async function initializeRequestAdmin(){
+ if(await verifyRequestAdmin()){
+  try{await refreshRequestCatalog()}catch(e){invalidateRequestAdmin();console.warn('Ricaricamento amministratore non riuscito:',e?.message||e);}
+ }
+}
+sb.auth.onAuthStateChange((event)=>{
+ if(event==='SIGNED_OUT'||event==='USER_DELETED'){invalidateRequestAdmin();}
+ else if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){queueMicrotask(()=>{initializeRequestAdmin()});}
+});
+window.addEventListener('pageshow',()=>{initializeRequestAdmin()});
+window.addEventListener('focus',()=>{initializeRequestAdmin()});
 
 loadProducts().then(data=>{products=data;renderRequests();initializeRequestAdmin()}).catch(e=>{document.getElementById('requestEmpty').textContent='Errore caricamento prodotti: '+e.message});
 </script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a href="catalogo.html"><span>▦</span>Catalogo</a><a class="active" href="richieste.html"><span>♡</span>Lista</a></nav>

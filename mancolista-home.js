@@ -16,19 +16,38 @@
   style.id = 'cd-mancolista-details-style';
   style.textContent = `
     #cd-mancolista-track .cd-featured-card.cd-wish-clickable{cursor:pointer}
-    #cd-mancolista-track .cd-mancolista-image-box{position:relative!important}
-    #cd-mancolista-track .cd-wish-language,#cd-mancolista-track .cd-wish-conditions>span{
-      display:inline-flex;align-items:center;justify-content:center;
-      box-sizing:border-box;min-height:21px;padding:3px 5px;
-      border:1px solid #ffffff60;border-radius:5px;background:#070a12d9;
-      color:#fff;font:700 10px/1.15 Arial,Helvetica,sans-serif;
-      text-shadow:0 1px 2px #000;box-shadow:0 1px 5px #0009;
-      pointer-events:none;overflow-wrap:anywhere
+    /* I badge sono sovrapposti alla fotografia, non elementi del layout della card. */
+    #cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box{
+      position:relative!important;isolation:isolate;overflow:hidden!important;
     }
-    #cd-mancolista-track .cd-wish-language{position:absolute;left:5px;bottom:5px;z-index:3}
-    #cd-mancolista-track .cd-wish-language .cd-wish-flag{font:normal 17px/1 "Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif}
-    #cd-mancolista-track .cd-wish-conditions{position:absolute;right:5px;bottom:5px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:3px;max-width:calc(100% - 48px);pointer-events:none}
-    #cd-mancolista-track .cd-wish-conditions>span{max-width:100%;text-align:right;white-space:normal}
+    #cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box > img{
+      position:relative;z-index:0;
+    }
+    #cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box > .cd-wish-language{
+      position:absolute!important;left:5px!important;bottom:5px!important;
+      right:auto!important;top:auto!important;z-index:20!important;
+      display:inline-flex!important;align-items:center;justify-content:center;
+      box-sizing:border-box;min-height:22px;padding:2px 4px;
+      border:1px solid #ffffff60;border-radius:5px;background:#070a12e8;
+      color:#fff;font:700 11px/1.2 Arial,sans-serif;pointer-events:none;
+      box-shadow:0 1px 6px #000c;
+    }
+    #cd-mancolista-track .cd-wish-language .cd-wish-flag{
+      display:block;font:normal 17px/1 "Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif;
+    }
+    #cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box > .cd-wish-conditions{
+      position:absolute!important;right:5px!important;bottom:5px!important;
+      left:auto!important;top:auto!important;z-index:20!important;
+      display:flex!important;flex-direction:column!important;align-items:flex-end!important;
+      justify-content:flex-end!important;gap:3px;max-width:calc(100% - 48px);pointer-events:none;
+    }
+    #cd-mancolista-track .cd-wish-conditions > .cd-wish-condition{
+      display:inline-flex!important;align-items:center;justify-content:center;
+      box-sizing:border-box;max-width:100%;min-height:22px;padding:3px 5px;
+      border:1px solid #ffffff60;border-radius:5px;background:#070a12e8;
+      color:#fff;font:700 10px/1.2 Arial,sans-serif;text-shadow:0 1px 2px #000;
+      white-space:normal;overflow-wrap:anywhere;text-align:right;box-shadow:0 1px 6px #000c;
+    }
     #cd-mancolista-detail .cd-wish-condition-lines{display:flex;flex-direction:column;align-items:flex-start;gap:3px;white-space:pre-wrap}
 
     #cd-mancolista-track .cd-featured-card.cd-wish-clickable:focus-visible{outline:3px solid #ffd05e;outline-offset:3px}
@@ -112,6 +131,7 @@
       list.setAttribute('aria-label', 'Condizioni: ' + conditions.join(', '));
       for (const condition of conditions) {
         const badge = document.createElement('span');
+        badge.className = 'cd-wish-condition';
         badge.textContent = condition;
         list.appendChild(badge);
       }

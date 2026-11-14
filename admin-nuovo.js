@@ -83,7 +83,7 @@ $('adminLogout').onclick=async()=>{await sb.auth.signOut();activeUser=null;view.
 async function refreshLists(){
  const [pr,fr,wr,or]=await Promise.all([
    loadProducts(),loadFeaturedProducts(),
-   sb.from('mancolista').select('id,nome,espansione,immagine_url,posizione,lingua,condizioni').order('posizione',{ascending:true}).order('created_at',{ascending:true}),
+   sb.from('mancolista').select('id,nome,espansione,immagine_url,posizione,lingua,condizioni,descrizione').order('posizione',{ascending:true}).order('created_at',{ascending:true}),
    sb.from('catalog_ui_orders').select('id,items')
  ]);
  products=pr;featured=fr;ensure(!wr.error,wr.error?.message||'Mancolista non disponibile');wishlist=wr.data||[];if(or.error)throw or.error;orders=Object.fromEntries((or.data||[]).map(row=>[row.id,row.items]));
@@ -625,6 +625,7 @@ function openWish(p){
   field('wishExpansion','Espansione','text',p?.espansione||'')+
   field('wishLanguage','Lingua','select',p?.lingua||'', [['','Non specificata'],['ITA','ITA'],['ENG','ENG'],['JPN','JPN'],['CHN','CHN'],['KOR','KOR']])+
   field('wishCondition','Condizioni (inserimento libero)','text',p?.condizioni||'')+
+  field('wishDescription','Descrizione','textarea',p?.descrizione||'')+
   field('wishImage','Indirizzo immagine (facoltativo)','url',p?.immagine_url||'')+
   '<label>Oppure carica una fotografia<input id="f_wishFile" type="file" accept="image/*"></label>');
  if(p)$('adminDelete').hidden=false;
@@ -777,7 +778,7 @@ async function saveWish(){
  let url=f('wishImage').value.trim();
  const file=f('wishFile').files[0];
  if(file){const path=await uploadImage(file,'mancolista');url=sb.storage.from('mancolista').getPublicUrl(path).data.publicUrl;}
- const data={nome:name,espansione:f('wishExpansion').value.trim()||null,lingua:f('wishLanguage').value||null,condizioni:f('wishCondition').value.trim()||null,immagine_url:url||null};
+ const data={nome:name,espansione:f('wishExpansion').value.trim()||null,lingua:f('wishLanguage').value||null,condizioni:f('wishCondition').value.trim()||null,descrizione:f('wishDescription').value.trim()||null,immagine_url:url||null};
  if(!editing)data.posizione=Math.max(0,...wishlist.map(x=>x.posizione||0))+1;
  const {error}=await(editing?sb.from('mancolista').update(data).eq('id',editing.id):sb.from('mancolista').insert(data));
  if(error)throw error;

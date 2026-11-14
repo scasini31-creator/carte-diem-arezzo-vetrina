@@ -103,6 +103,7 @@ const sharedEntries=shareParam===null?null:Array.from(new Map(shareParam.split('
  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)&&Number.isSafeInteger(qty)&&qty>0&&qty<=999?{id,qty}:null;
 }).filter(Boolean).map(item=>[item.id,item])).values());
 let isRequestAdmin=false,archivedRequestProducts=[],requestAdminBusy=false,lastSaleLaunchUrl=null;
+const adminCheckedProducts=new Set();
 const requestAdminArea=document.createElement('div');
 requestAdminArea.id='adminRequestActions';
 requestAdminArea.hidden=true;
@@ -141,28 +142,40 @@ function renderRequestAdminActions(){
  requestAdminArea.hidden=false;
  requestAdminArea.replaceChildren();
  const heading=document.createElement('strong');heading.textContent='Gestione amministratore · Cataloghi';requestAdminArea.append(heading);
- const intro=document.createElement('p');intro.textContent='Rimuovi uno o più prodotti dai cataloghi senza cancellarne i dati. Potrai ripristinarli da questa stessa lista.';intro.style.cssText='font-size:13px;opacity:.85';requestAdminArea.append(intro);
- const active=selectedProducts();
+ const intro=document.createElement('p');intro.textContent='Seleziona uno o più articoli. Entrambe le azioni li rimuovono dal catalogo; solo la conferma vendita apre il gestionale. Gli articoli restano ripristinabili.';intro.style.cssText='font-size:13px;opacity:.85';requestAdminArea.append(intro);
+ const active=selectedProducts(),validIds=new Set(active.map(p=>p.id));
+ for(const id of [...adminCheckedProducts])if(!validIds.has(id))adminCheckedProducts.delete(id);
+ const selectedCount=document.createElement('p');selectedCount.style.cssText='font-size:13px;margin:10px 0;color:#f5d48c';requestAdminArea.append(selectedCount);
+ const updateButtons=()=>{
+  selectedCount.textContent=adminCheckedProducts.size+' articoli selezionati su '+active.length;
+  removeBtn.disabled=requestAdminBusy||!adminCheckedProducts.size;
+  saleBtn.disabled=requestAdminBusy||!adminCheckedProducts.size;
+ };
  for(const p of active){
-  const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;justify-content:space-between;margin:9px 0';
-  const name=document.createElement('span');name.textContent=label(p);name.style.cssText='font-size:13px;min-width:0;overflow-wrap:anywhere';
-  const btn=document.createElement('button');btn.type='button';btn.textContent='Rimuovi dal catalogo';btn.style.cssText='flex-shrink:0;border:1px solid #cf9c63;background:#36221b;color:#fff;border-radius:6px;padding:8px;font-size:12px';
-  btn.disabled=requestAdminBusy;btn.onclick=()=>changeCatalogVisibility([p.id],false);
-  row.append(name,btn);requestAdminArea.append(row);
+  const row=document.createElement('label');row.style.cssText='display:flex;align-items:center;gap:11px;margin:8px 0;padding:9px;border:1px solid #51462e;border-radius:8px;cursor:pointer';
+  const check=document.createElement('input');check.type='checkbox';check.checked=adminCheckedProducts.has(p.id);check.disabled=requestAdminBusy;check.style.cssText='width:21px;height:21px;accent-color:#d6b35c;flex-shrink:0';
+  check.onchange=()=>{if(check.checked)adminCheckedProducts.add(p.id);else adminCheckedProducts.delete(p.id);updateButtons();};
+  const name=document.createElement('span');name.textContent=label(p);name.style.cssText='font-size:14px;min-width:0;overflow-wrap:anywhere';
+  row.append(check,name);requestAdminArea.append(row);
  }
- if(active.length){
-  const all=document.createElement('button');all.type='button';all.textContent='Rimuovi tutti i '+active.length+' prodotti dai cataloghi';
-  all.style.cssText='margin-top:12px;padding:11px;width:100%;background:#71301f;color:white;border:1px solid #f2bd82;border-radius:8px;font-weight:bold';
-  all.disabled=requestAdminBusy;all.onclick=()=>changeCatalogVisibility(active.map(p=>p.id),false);
-  requestAdminArea.append(all);
- }
+ const selAll=document.createElement('button');selAll.type='button';selAll.textContent='Seleziona tutti / Deseleziona tutti';selAll.style.cssText='width:100%;padding:9px;margin:8px 0;border-radius:7px;border:1px solid #b39959;background:#2a251c;color:#f5d48c';
+ selAll.disabled=requestAdminBusy||!active.length;
+ selAll.onclick=()=>{const all=active.every(p=>adminCheckedProducts.has(p.id));for(const p of active){if(all)adminCheckedProducts.delete(p.id);else adminCheckedProducts.add(p.id);}renderRequestAdminActions();};
+ requestAdminArea.append(selAll);
+ const actions=document.createElement('div');actions.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0';
+ const removeBtn=document.createElement('button');removeBtn.type='button';removeBtn.textContent='Rimuovi dal catalogo';removeBtn.style.cssText='min-height:48px;padding:10px 6px;border-radius:8px;border:1px solid #d5a45f;background:#36221b;color:white;font-weight:bold;font-size:13px';
+ removeBtn.onclick=()=>changeCatalogVisibility([...adminCheckedProducts],false,false);
+ const saleBtn=document.createElement('button');saleBtn.type='button';saleBtn.textContent='Conferma vendita';saleBtn.style.cssText='min-height:48px;padding:10px 6px;border-radius:8px;border:1px solid #d5b961;background:#675020;color:white;font-weight:bold;font-size:13px';
+ saleBtn.onclick=()=>changeCatalogVisibility([...adminCheckedProducts],false,true);
+ actions.append(removeBtn,saleBtn);requestAdminArea.append(actions);
+ updateButtons();
  if(archivedRequestProducts.length){
   const h=document.createElement('h3');h.textContent='Prodotti rimossi · Ripristino';h.style.cssText='margin:18px 0 10px;font-size:15px';requestAdminArea.append(h);
   for(const p of archivedRequestProducts){
    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;justify-content:space-between;margin:9px 0';
    const labelNode=document.createElement('span');labelNode.textContent=p.name+(p.sigla?' - '+p.sigla:'');labelNode.style.cssText='font-size:13px;overflow-wrap:anywhere';
    const btn=document.createElement('button');btn.type='button';btn.textContent='Ripristina';btn.style.cssText='padding:8px;color:#f9d48b;border:1px solid #d1a557;background:#242017;border-radius:6px';
-   btn.disabled=requestAdminBusy;btn.onclick=()=>changeCatalogVisibility([p.id],true);
+   btn.disabled=requestAdminBusy;btn.onclick=()=>changeCatalogVisibility([p.id],true,false);
    row.append(labelNode,btn);requestAdminArea.append(row);
   }
  }
@@ -195,7 +208,7 @@ function makeGestionaleSaleLink(ids){
   price:p[3]==null?null:Math.round(Number(p[3])*100)
  }));
  if(items.some(p=>!Number.isInteger(p.qty)||p.price!==null&&(!Number.isSafeInteger(p.price)||p.price<0)))throw Error('I dati di prezzo o quantità non sono validi.');
- const payload={v:1,id:crypto.randomUUID(),source:'Lista condivisa dalla vetrina',items};
+ const payload={v:1,id:crypto.randomUUID(),source:sharedEntries?'Lista condivisa dalla vetrina':'Lista personale amministratore',sourceListUrl:publicListUrl(),items};
  const bytes=new TextEncoder().encode(JSON.stringify(payload));
  let raw='';for(const byte of bytes)raw+=String.fromCharCode(byte);
  const encoded=btoa(raw).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -208,12 +221,12 @@ function openGestionaleSale(uri){
  renderRequestAdminActions();
  location.href=uri;
 }
-async function changeCatalogVisibility(ids,restore){
+async function changeCatalogVisibility(ids,restore,launchSale=false){
  if(!isRequestAdmin||requestAdminBusy||!ids.length)return;
  const action=restore?'ripristinare':'rimuovere dai cataloghi';
- if(!confirm('Confermi di voler '+action+' '+ids.length+' prodotto/i?\n\n'+(restore?'Torneranno visibili nella vetrina.':'I prodotti rimarranno nel database e saranno recuperabili.')))return;
+ if(!confirm('Confermi di voler '+action+' '+ids.length+' prodotto/i?\n\n'+(restore?'Torneranno visibili nella vetrina.':launchSale?'Saranno archiviati e si aprirà una scheda modificabile nel gestionale. La vendita sarà contabilizzata solo dopo il salvataggio.':'Saranno archiviati senza registrare alcuna vendita.')))return;
  let gestionaleSaleUri=null;
- if(!restore){try{gestionaleSaleUri=makeGestionaleSaleLink(ids);}catch(e){alert('Impossibile preparare la scheda vendita: '+(e?.message||e));return;}}
+ if(!restore&&launchSale){try{gestionaleSaleUri=makeGestionaleSaleLink(ids);}catch(e){alert('Impossibile preparare la scheda vendita: '+(e?.message||e));return;}}
  requestAdminBusy=true;renderRequestAdminActions();
  try{
   let req=sb.from('products').update({archived_at:restore?null:new Date().toISOString()}).in('id',ids);
@@ -223,7 +236,7 @@ async function changeCatalogVisibility(ids,restore){
   if((data||[]).length!==ids.length)throw Error('Operazione parziale: modificati '+(data||[]).length+' articoli su '+ids.length+'.');
   await refreshRequestCatalog();
   if(gestionaleSaleUri){openGestionaleSale(gestionaleSaleUri);}
-  else alert('Prodotti ripristinati.');
+  else alert(restore?'Prodotti ripristinati.':'Prodotti rimossi dal catalogo senza registrare una vendita.');
  }catch(e){
   alert('Impossibile completare la modifica: '+(e?.message||e));
   try{await refreshRequestCatalog()}catch(_){}

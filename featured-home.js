@@ -14,7 +14,7 @@
  };
  if(['console','videogiochi'].includes(category) && p.catalog_group==='videogiochi'){
   const condition=String(p.details?.gameCondition||'').trim();
-  const value=['CIB','Boxed','Loose','Sealed'].find(v=>v.toLowerCase()===condition.toLowerCase());
+  const value=['SEALED','CIB','BOXED','LOOSE'].find(v=>v.toLowerCase()===condition.toLowerCase());
   return value?'<span class="cd-product-condition-badge" title="Condizione: '+value+'" aria-label="Condizione: '+value+'">'+value+'</span>':'';
  }
  if(category==='singole'){

@@ -713,7 +713,7 @@ aria-labelledby="cd-mancolista-title">
 })();
 </script>
 <script src="featured-home.js?v=19"></script>
-<script src="mancolista-home.js?v=7"></script>
+<script src="mancolista-home.js?v=8"></script>
 
 <script>
 if ('serviceWorker' in navigator) {
@@ -776,4 +776,26 @@ if ('serviceWorker' in navigator) {
  line-clamp:unset!important;
  text-align:center!important;
 }
-</style><script defer src="catalog-order.js?v=1"></script></body></html>
+</style><script defer src="catalog-order.js?v=1"></script><style id="cd-mancolista-badges-fixed">
+/* Stessa posizione dei badge negli articoli in evidenza. */
+#cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box{
+  position:relative!important;
+}
+#cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box > .cd-product-language-badge{
+  position:absolute!important;left:6px!important;bottom:6px!important;
+  top:auto!important;right:auto!important;z-index:30!important;
+  display:inline-flex!important;
+}
+#cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box > .cd-wish-conditions{
+  position:absolute!important;right:6px!important;bottom:6px!important;
+  top:auto!important;left:auto!important;z-index:30!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:flex-end!important;gap:3px!important;
+  max-width:calc(100% - 48px)!important;
+}
+#cd-mancolista-track .cd-wish-conditions .cd-product-condition-badge{
+  position:relative!important;right:auto!important;bottom:auto!important;
+  display:inline-flex!important;max-width:100%!important;white-space:normal!important;
+  overflow-wrap:anywhere!important;text-align:right!important;
+}
+</style></body></html>

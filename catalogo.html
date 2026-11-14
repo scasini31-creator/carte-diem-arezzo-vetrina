@@ -461,7 +461,32 @@ body > header .brand .gold {
 #photoLightbox .zoom-prev[hidden],#photoLightbox .zoom-next[hidden]{display:none!important}
 #photoLightbox .zoom-prev,#photoLightbox .zoom-next{z-index:2}
 #photoLightbox .zoom-counter{flex:0 0 auto}
-</style><style id="cd-detail-quantity-style">#detailPrice .detail-quantity{font-size:.57em;font-weight:500;color:#cbbd9e;margin-left:10px;white-space:nowrap;vertical-align:middle}#detailPrice .detail-quantity[hidden]{display:none!important}</style></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="index.html#chi-siamo">Chi siamo</a><a href="index.html#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header><main><section class="container" id="catalogIntro" style="padding-bottom:0"><div class="eyebrow">CARTE DIEM AREZZO</div><h1 class="section-title">Il nostro catalogo</h1><p class="sub">Esplora gli articoli disponibili. Il sito è una vetrina: nessun acquisto o pagamento online.</p></section><section class="container" id="catalogo"><div id="catalogSections" class="catalog-sections"></div><div id="catalogContent" hidden><a class="catalog-back" href="catalogo.html">← Tutti i cataloghi</a><h2 class="section-title" id="catalogTitle">Scegli un catalogo</h2><div id="subcatalogSections" class="subcatalog-sections" aria-label="Sottocategorie"></div><div class="filter"><input aria-label="Cerca" id="find" placeholder="Cerca nome o sigla…" type="search"/></div><details class="filter-drawer" id="filterDrawer"><summary>☷ Filtri <span aria-hidden="true">▾</span></summary>
+</style><style id="cd-detail-quantity-style">#detailPrice .detail-quantity{font-size:.57em;font-weight:500;color:#cbbd9e;margin-left:10px;white-space:nowrap;vertical-align:middle}#detailPrice .detail-quantity[hidden]{display:none!important}</style>
+<style id="cd-subcatalog-match-main-card-size">
+/* Le sottocategorie usano le dimensioni delle categorie principali
+   su ciascun dispositivo, senza imporre misure desktop al mobile. */
+#subcatalogSections.subcatalog-sections:not([hidden]){
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:16px!important;
+  margin:24px 0 36px!important;
+}
+#subcatalogSections .catalog-home-card{
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  aspect-ratio:1620/222!important;
+}
+@media(max-width:650px){
+  #subcatalogSections.subcatalog-sections:not([hidden]){
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:12px!important;
+  }
+  #subcatalogSections .catalog-home-card{
+    aspect-ratio:3.55/1!important;
+  }
+}
+</style></head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="index.html#chi-siamo">Chi siamo</a><a href="index.html#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header><main><section class="container" id="catalogIntro" style="padding-bottom:0"><div class="eyebrow">CARTE DIEM AREZZO</div><h1 class="section-title">Il nostro catalogo</h1><p class="sub">Esplora gli articoli disponibili. Il sito è una vetrina: nessun acquisto o pagamento online.</p></section><section class="container" id="catalogo"><div id="catalogSections" class="catalog-sections"></div><div id="catalogContent" hidden><a class="catalog-back" href="catalogo.html">← Tutti i cataloghi</a><h2 class="section-title" id="catalogTitle">Scegli un catalogo</h2><div id="subcatalogSections" class="subcatalog-sections" aria-label="Sottocategorie"></div><div class="filter"><input aria-label="Cerca" id="find" placeholder="Cerca nome o sigla…" type="search"/></div><details class="filter-drawer" id="filterDrawer"><summary>☷ Filtri <span aria-hidden="true">▾</span></summary>
 
 <div aria-label="Filtra per tipologia" class="category-filters" id="typeFilters" role="group"></div><div id="cd-panel-sort"><label for="catalogSort">Ordina per</label><select id="catalogSort" style="background:#171719;color:white;
 border:1px solid #d5b36a;

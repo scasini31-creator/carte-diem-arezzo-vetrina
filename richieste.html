@@ -181,10 +181,35 @@ async function refreshRequestCatalog(){
  }
  renderRequests();
 }
+// Collegamento gestionale: nessuna scrittura contabile dal sito pubblico.
+function makeGestionaleSaleLink(ids){
+ const selected=selectedProducts().filter(p=>ids.includes(p.id));
+ if(selected.length!==ids.length||selected.length>80)throw Error('La selezione non è più disponibile o contiene troppi articoli.');
+ const items=selected.map(p=>({
+  id:p.id,name:label(p),qty:Math.min(999,Math.max(1,getQuantity(p.id))),
+  price:p[3]==null?null:Math.round(Number(p[3])*100)
+ }));
+ if(items.some(p=>!Number.isInteger(p.qty)||p.price!==null&&(!Number.isSafeInteger(p.price)||p.price<0)))throw Error('I dati di prezzo o quantità non sono validi.');
+ const payload={v:1,id:crypto.randomUUID(),source:'Lista condivisa dalla vetrina',items};
+ const bytes=new TextEncoder().encode(JSON.stringify(payload));
+ let raw='';for(const byte of bytes)raw+=String.fromCharCode(byte);
+ const encoded=btoa(raw).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ if(encoded.length>12000)throw Error('Troppi dati per aprire il gestionale in una sola operazione.');
+ return 'cartediemgestionale://vendita?d='+encoded;
+}
+function openGestionaleSale(uri){
+ const message=document.createElement('p');message.style.cssText='padding:12px;border:1px solid #be9b54;border-radius:8px;background:#292218;color:#fff;margin-top:12px';
+ message.textContent='Articoli rimossi. Si sta aprendo la scheda vendita nel gestionale. Se non si apre automaticamente: ';
+ const retry=document.createElement('a');retry.href=uri;retry.textContent='Apri scheda vendita';retry.style.cssText='color:#f5d48c;font-weight:bold;text-decoration:underline';
+ message.append(retry);requestAdminArea.append(message);
+ location.href=uri;
+}
 async function changeCatalogVisibility(ids,restore){
  if(!isRequestAdmin||requestAdminBusy||!ids.length)return;
  const action=restore?'ripristinare':'rimuovere dai cataloghi';
  if(!confirm('Confermi di voler '+action+' '+ids.length+' prodotto/i?\n\n'+(restore?'Torneranno visibili nella vetrina.':'I prodotti rimarranno nel database e saranno recuperabili.')))return;
+ let gestionaleSaleUri=null;
+ if(!restore){try{gestionaleSaleUri=makeGestionaleSaleLink(ids);}catch(e){alert('Impossibile preparare la scheda vendita: '+(e?.message||e));return;}}
  requestAdminBusy=true;renderRequestAdminActions();
  try{
   let req=sb.from('products').update({archived_at:restore?null:new Date().toISOString()}).in('id',ids);
@@ -193,7 +218,8 @@ async function changeCatalogVisibility(ids,restore){
   if(error)throw error;
   if((data||[]).length!==ids.length)throw Error('Operazione parziale: modificati '+(data||[]).length+' articoli su '+ids.length+'.');
   await refreshRequestCatalog();
-  alert(restore?'Prodotti ripristinati.':'Prodotti rimossi dai cataloghi. Puoi ripristinarli da questa lista.');
+  if(gestionaleSaleUri){openGestionaleSale(gestionaleSaleUri);}
+  else alert('Prodotti ripristinati.');
  }catch(e){
   alert('Impossibile completare la modifica: '+(e?.message||e));
   try{await refreshRequestCatalog()}catch(_){}

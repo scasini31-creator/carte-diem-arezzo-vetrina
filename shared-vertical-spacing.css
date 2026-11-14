@@ -1,0 +1,75 @@
+/* CARTE DIEM AREZZO – ritmo verticale coerente delle pagine pubbliche.
+   Non modifica misure di banner, anteprime o pulsanti. */
+:root{--cd-section-space:28px;--cd-section-gap:18px}
+
+/* Il catalogo ha due sezioni consecutive: niente doppio spazio fra testo e banner. */
+body:has(#catalogIntro) #catalogIntro.container{
+  padding-top:var(--cd-section-space)!important;
+  padding-bottom:0!important;
+}
+body:has(#catalogIntro) #catalogIntro .section-title{margin-top:8px;margin-bottom:8px}
+body:has(#catalogIntro) #catalogIntro .sub{margin:0;line-height:1.55}
+body:has(#catalogIntro) #catalogo.container{
+  padding-top:var(--cd-section-gap)!important;
+  padding-bottom:var(--cd-section-space)!important;
+}
+#catalogSections.catalog-sections{
+  margin-top:0!important;
+  margin-bottom:0!important;
+}
+#catalogContent .catalog-back{margin-bottom:14px}
+#catalogContent #catalogTitle{margin-top:0;margin-bottom:12px}
+#subcatalogSections.subcatalog-sections:not([hidden]){
+  margin-top:14px!important;
+  margin-bottom:18px!important;
+}
+#catalogContent .filter{margin-top:16px}
+
+/* La Lista adotta margini coerenti anche quando non contiene articoli. */
+body:has(.request-list) main.container{
+  padding-top:var(--cd-section-space)!important;
+  padding-bottom:var(--cd-section-space)!important;
+}
+body:has(.request-list) main .section-title{margin:8px 0 10px}
+body:has(.request-list) main>.sub{margin:0;line-height:1.55}
+body:has(.request-list) .request-list{
+  margin:var(--cd-section-gap) auto 0!important;
+}
+
+/* Home: non alterare il ritmo compatto già stabilito per le tre vetrine.
+   Ridurre soltanto lo stacco delle sezioni informative successive. */
+body:has(#categorie) #chi-siamo{padding-top:30px!important;padding-bottom:30px!important}
+body:has(#categorie) #contatti.container{
+  padding-top:22px!important;
+  padding-bottom:26px!important;
+}
+
+/* Footer compatto, identico nella distanza dai contenuti. */
+body:has(#catalogIntro) footer,
+body:has(#categorie) footer,
+body:has(.request-list) footer{
+  padding-top:24px!important;
+  padding-bottom:26px!important;
+}
+
+@media(max-width:800px){
+  :root{--cd-section-space:20px;--cd-section-gap:12px}
+  body:has(#catalogIntro) #catalogIntro .section-title{margin-top:6px;margin-bottom:8px}
+  body:has(#catalogIntro) #catalogo.container{padding-top:12px!important}
+  #catalogContent .catalog-back{margin-bottom:12px}
+  #subcatalogSections.subcatalog-sections:not([hidden]){
+    margin-top:12px!important;
+    margin-bottom:14px!important;
+  }
+  body:has(#categorie) #chi-siamo{padding-top:24px!important;padding-bottom:24px!important}
+  body:has(#categorie) #contatti.container{
+    padding-top:18px!important;
+    padding-bottom:22px!important;
+  }
+  body:has(#catalogIntro) footer,
+  body:has(#categorie) footer,
+  body:has(.request-list) footer{
+    padding-top:20px!important;
+    padding-bottom:22px!important;
+  }
+}

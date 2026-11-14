@@ -1,5 +1,13 @@
 
 (async function () {
+  function featuredLanguageBadge(value){
+    const code=String(value||'ITA').trim().toUpperCase();
+    const flags={ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']};
+    const item=flags[code];
+    if(item)return '<span class="cd-product-language-badge" role="img" aria-label="Lingua: '+item[1]+'" title="'+item[1]+'"><span class="cd-language-flag" aria-hidden="true">'+item[0]+'</span></span>';
+    const safe=code.replace(/[^A-Z0-9]/g,'').slice(0,5);
+    return safe?'<span class="cd-product-language-badge" title="Lingua: '+safe+'">'+safe+'</span>':'';
+  }
   const track = document.getElementById('cd-featured-track');
   if (!track) return;
 
@@ -46,7 +54,7 @@
       img.alt = p[0] || 'Articolo Carte Diem';
       img.src = (p.preview_urls && p.preview_urls[0]) || (p[7] && p[7][0]) || 'logo-ottimizzato.webp';
       imageBox.appendChild(img);
-      imageBox.insertAdjacentHTML('beforeend', productLanguageBadgeMarkup(p[10]));
+      imageBox.insertAdjacentHTML('beforeend', featuredLanguageBadge(p[10]));
 
       const nome = document.createElement('strong');
       nome.className = 'cd-mancolista-name';

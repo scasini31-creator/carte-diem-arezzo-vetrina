@@ -96,28 +96,121 @@ const price=p=>p[3]===null?'Prezzo su richiesta':new Intl.NumberFormat('it-IT',{
 
 const quantityKey='carte-diem-richieste-quantita-v1';
 const whatsappNumber='393517171630';
+// A shared selection lives in the URL, not in the visitor's local storage.
+const shareParam=new URLSearchParams(location.search).get('lista');
+const sharedEntries=shareParam===null?null:Array.from(new Map(shareParam.split(',').slice(0,100).map(part=>{
+ const bits=part.split(':');const id=bits[0],qty=Number(bits[1]||1);
+ return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)&&Number.isSafeInteger(qty)&&qty>0&&qty<=999?{id,qty}:null;
+}).filter(Boolean).map(item=>[item.id,item])).values());
+let isRequestAdmin=false,archivedRequestProducts=[],requestAdminBusy=false;
+const requestAdminArea=document.createElement('div');
+requestAdminArea.id='adminRequestActions';
+requestAdminArea.hidden=true;
+requestAdminArea.style.cssText='margin-top:20px;padding:14px;border:1px solid #be9b54;border-radius:10px;background:#171717;color:#fff';
+document.querySelector('.request-list').append(requestAdminArea);
+function listEntries(){return sharedEntries||getRequests().map(id=>({id,qty:getQuantities()[id]||1}))}
+function publicListUrl(){
+ const url=new URL('richieste.html',location.href);
+ url.searchParams.set('lista',selectedProducts().map(p=>p.id+':'+getQuantity(p.id)).join(','));
+ return url.href;
+}
 function getQuantities(){try{return JSON.parse(localStorage.getItem(quantityKey)||'{}')||{}}catch(e){return {}}}
-function getQuantity(id){const n=Number(getQuantities()[id]);return Number.isInteger(n)&&n>0?n:1}
-function saveQuantity(id,n){const p=products.find(x=>x.id===id);if(!p)return;const max=Math.max(1,Number(p[8])||1);const value=Math.min(max,Math.max(1,Math.floor(Number(n)||1)));const q=getQuantities();q[id]=value;localStorage.setItem(quantityKey,JSON.stringify(q));renderRequests()}
+function getQuantity(id){const n=Number(sharedEntries?sharedEntries.find(x=>x.id===id)?.qty:getQuantities()[id]);return Number.isInteger(n)&&n>0?n:1}
+function saveQuantity(id,n){if(sharedEntries)return;const p=products.find(x=>x.id===id);if(!p)return;const max=Math.max(1,Number(p[8])||1);const value=Math.min(max,Math.max(1,Math.floor(Number(n)||1)));const q=getQuantities();q[id]=value;localStorage.setItem(quantityKey,JSON.stringify(q));renderRequests()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function selectedProducts(){return getRequests().map(id=>products.find(p=>p.id===id)).filter(Boolean)}
+function selectedProducts(){return listEntries().map(item=>products.find(p=>p.id===item.id)).filter(Boolean)}
 function requestMessage(){const items=selectedProducts();return 'Ciao CARTE DIEM AREZZO! Vorrei informazioni sui seguenti prodotti:\n\n'+items.map((p,n)=>{
  const parts=[(n+1)+'. '+label(p),'Categoria: '+categoryNames[p[2]],'Lingua: '+(p[10]||'ITA')];
  if(['singole','gradate'].includes(p[2])&&p[5])parts.push((p[2]==='gradate'?'Voto: ':'Condizione: ')+p[5]);
  parts.push('Quantità: '+getQuantity(p.id));parts.push('Prezzo unitario: '+price(p));return parts.join(' | ')
-}).join('\n')+'\n\nGrazie!'}
+}).join('\n')+'\n\nVisualizza i prodotti selezionati sul sito:\n'+publicListUrl()+'\n\nGrazie!'}
 function renderRequests(){const items=selectedProducts();document.getElementById('requestItems').innerHTML=items.map(p=>{
  const max=Math.max(1,Number(p[8])||1),qty=Math.min(getQuantity(p.id),max);
  return '<div class="request-row"><div><strong>'+esc(label(p))+'</strong><p class="sub">'+esc(categoryNames[p[2]])+' · '+esc(p[10]||'ITA')+' · '+esc(price(p))+'</p></div><div class="request-qty"><label for="qty-'+esc(p.id)+'">Quantità</label><input id="qty-'+esc(p.id)+'" type="number" min="1" max="'+max+'" value="'+qty+'" data-qty="'+esc(p.id)+'"><button type="button" data-remove="'+esc(p.id)+'">Rimuovi</button></div></div>'
  }).join('');
- document.getElementById('requestEmpty').textContent=items.length?'Prodotti selezionati: '+items.length:'Lista vuota: visita il catalogo per aggiungere prodotti.';
+ document.getElementById('requestEmpty').textContent=items.length?'Prodotti selezionati: '+items.length+(sharedEntries?' (lista condivisa)':''):sharedEntries?'Nessun prodotto della lista condivisa è attualmente disponibile.':'Lista vuota: visita il catalogo per aggiungere prodotti.';
  document.getElementById('copyRequest').disabled=!items.length;document.getElementById('sendWhatsApp').disabled=!items.length;
- document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>setRequests(getRequests().filter(id=>id!==b.dataset.remove)));
- document.querySelectorAll('[data-qty]').forEach(e=>e.onchange=()=>saveQuantity(e.dataset.qty,e.value));
+ document.querySelectorAll('[data-remove]').forEach(b=>{if(sharedEntries){b.hidden=true;return;}b.onclick=()=>setRequests(getRequests().filter(id=>id!==b.dataset.remove))});
+ document.querySelectorAll('[data-qty]').forEach(e=>{if(sharedEntries)e.disabled=true;else e.onchange=()=>saveQuantity(e.dataset.qty,e.value)});if(isRequestAdmin)renderRequestAdminActions();
 }
 document.getElementById('sendWhatsApp').onclick=()=>{if(!selectedProducts().length)return;window.open('https://wa.me/'+whatsappNumber+'?text='+encodeURIComponent(requestMessage()),'_blank','noopener,noreferrer')};
 document.getElementById('copyRequest').onclick=async()=>{if(!selectedProducts().length)return;const msg=requestMessage();try{await navigator.clipboard.writeText(msg);document.getElementById('copyFeedback').textContent='Messaggio copiato.'}catch(e){window.prompt('Copia il messaggio:',msg)}};
-loadProducts().then(data=>{products=data;renderRequests()}).catch(e=>{document.getElementById('requestEmpty').textContent='Errore caricamento prodotti: '+e.message});
+
+function renderRequestAdminActions(){
+ if(!isRequestAdmin){requestAdminArea.hidden=true;return;}
+ requestAdminArea.hidden=false;
+ requestAdminArea.replaceChildren();
+ const heading=document.createElement('strong');heading.textContent='Gestione amministratore · Cataloghi';requestAdminArea.append(heading);
+ const intro=document.createElement('p');intro.textContent='Rimuovi uno o più prodotti dai cataloghi senza cancellarne i dati. Potrai ripristinarli da questa stessa lista.';intro.style.cssText='font-size:13px;opacity:.85';requestAdminArea.append(intro);
+ const active=selectedProducts();
+ for(const p of active){
+  const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;justify-content:space-between;margin:9px 0';
+  const name=document.createElement('span');name.textContent=label(p);name.style.cssText='font-size:13px;min-width:0;overflow-wrap:anywhere';
+  const btn=document.createElement('button');btn.type='button';btn.textContent='Rimuovi dal catalogo';btn.style.cssText='flex-shrink:0;border:1px solid #cf9c63;background:#36221b;color:#fff;border-radius:6px;padding:8px;font-size:12px';
+  btn.disabled=requestAdminBusy;btn.onclick=()=>changeCatalogVisibility([p.id],false);
+  row.append(name,btn);requestAdminArea.append(row);
+ }
+ if(active.length){
+  const all=document.createElement('button');all.type='button';all.textContent='Rimuovi tutti i '+active.length+' prodotti dai cataloghi';
+  all.style.cssText='margin-top:12px;padding:11px;width:100%;background:#71301f;color:white;border:1px solid #f2bd82;border-radius:8px;font-weight:bold';
+  all.disabled=requestAdminBusy;all.onclick=()=>changeCatalogVisibility(active.map(p=>p.id),false);
+  requestAdminArea.append(all);
+ }
+ if(archivedRequestProducts.length){
+  const h=document.createElement('h3');h.textContent='Prodotti rimossi · Ripristino';h.style.cssText='margin:18px 0 10px;font-size:15px';requestAdminArea.append(h);
+  for(const p of archivedRequestProducts){
+   const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;justify-content:space-between;margin:9px 0';
+   const labelNode=document.createElement('span');labelNode.textContent=p.name+(p.sigla?' - '+p.sigla:'');labelNode.style.cssText='font-size:13px;overflow-wrap:anywhere';
+   const btn=document.createElement('button');btn.type='button';btn.textContent='Ripristina';btn.style.cssText='padding:8px;color:#f9d48b;border:1px solid #d1a557;background:#242017;border-radius:6px';
+   btn.disabled=requestAdminBusy;btn.onclick=()=>changeCatalogVisibility([p.id],true);
+   row.append(labelNode,btn);requestAdminArea.append(row);
+  }
+ }
+ const result=document.createElement('p');result.id='requestAdminResult';result.setAttribute('role','status');result.style.cssText='margin-top:10px;font-size:13px';requestAdminArea.append(result);
+}
+async function refreshRequestCatalog(){
+ products=await loadProducts();
+ if(isRequestAdmin){
+  const ids=listEntries().map(x=>x.id).slice(0,100);
+  archivedRequestProducts=[];
+  if(ids.length){
+   const {data,error}=await sb.from('products').select('id,name,sigla,archived_at').in('id',ids).not('archived_at','is',null);
+   if(error)throw error;
+   archivedRequestProducts=data||[];
+  }
+ }
+ renderRequests();
+}
+async function changeCatalogVisibility(ids,restore){
+ if(!isRequestAdmin||requestAdminBusy||!ids.length)return;
+ const action=restore?'ripristinare':'rimuovere dai cataloghi';
+ if(!confirm('Confermi di voler '+action+' '+ids.length+' prodotto/i?\n\n'+(restore?'Torneranno visibili nella vetrina.':'I prodotti rimarranno nel database e saranno recuperabili.')))return;
+ requestAdminBusy=true;renderRequestAdminActions();
+ try{
+  let req=sb.from('products').update({archived_at:restore?null:new Date().toISOString()}).in('id',ids);
+  req=restore?req.not('archived_at','is',null):req.is('archived_at',null);
+  const {data,error}=await req.select('id');
+  if(error)throw error;
+  if((data||[]).length!==ids.length)throw Error('Operazione parziale: modificati '+(data||[]).length+' articoli su '+ids.length+'.');
+  await refreshRequestCatalog();
+  alert(restore?'Prodotti ripristinati.':'Prodotti rimossi dai cataloghi. Puoi ripristinarli da questa lista.');
+ }catch(e){
+  alert('Impossibile completare la modifica: '+(e?.message||e));
+  try{await refreshRequestCatalog()}catch(_){}
+ }finally{requestAdminBusy=false;renderRequestAdminActions();}
+}
+async function initializeRequestAdmin(){
+ try{
+  const {data,error}=await sb.auth.getUser();
+  if(error||!data?.user)return;
+  const {data:admin,error:checkError}=await sb.from('admin_users').select('user_id').eq('user_id',data.user.id).maybeSingle();
+  if(checkError||!admin)return;
+  isRequestAdmin=true;
+  await refreshRequestCatalog();
+ }catch(e){console.warn('Controllo amministratore lista non disponibile:',e?.message||e);}
+}
+
+loadProducts().then(data=>{products=data;renderRequests();initializeRequestAdmin()}).catch(e=>{document.getElementById('requestEmpty').textContent='Errore caricamento prodotti: '+e.message});
 </script><nav aria-label="Navigazione smartphone" class="mobile-dock"><a href="index.html"><span>⌂</span>Home</a><a href="catalogo.html"><span>▦</span>Catalogo</a><a class="active" href="richieste.html"><span>♡</span>Lista</a></nav>
 <script>
 if ('serviceWorker' in navigator) {

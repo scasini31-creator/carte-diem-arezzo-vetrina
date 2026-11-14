@@ -43,3 +43,38 @@
   }
   #catalogGrid .cd-product-language-badge .cd-language-flag{font-size:15px}
 }
+
+/* Condizione delle carte raw a destra, senza alterare la bandiera a sinistra. */
+.cd-product-condition-badge{
+  position:absolute;
+  z-index:3;
+  right:6px;
+  bottom:6px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:25px;
+  min-height:22px;
+  padding:2px 5px;
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.37);
+  border-radius:5px;
+  background:rgba(7,10,18,.82);
+  color:#fff;
+  font:700 11px/1 Arial,Helvetica,sans-serif;
+  box-shadow:0 1px 5px #0009;
+  text-shadow:0 1px 2px #000;
+  pointer-events:none;
+  user-select:none;
+}
+@media(max-width:650px){
+  #catalogGrid .cd-product-condition-badge{
+    right:4px;
+    bottom:4px;
+    min-width:22px;
+    min-height:19px;
+    padding:1px 4px;
+    border-radius:4px;
+    font-size:10px;
+  }
+}

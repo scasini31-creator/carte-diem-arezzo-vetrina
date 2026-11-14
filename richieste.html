@@ -102,7 +102,7 @@ const sharedEntries=shareParam===null?null:Array.from(new Map(shareParam.split('
  const bits=part.split(':');const id=bits[0],qty=Number(bits[1]||1);
  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)&&Number.isSafeInteger(qty)&&qty>0&&qty<=999?{id,qty}:null;
 }).filter(Boolean).map(item=>[item.id,item])).values());
-let isRequestAdmin=false,archivedRequestProducts=[],requestAdminBusy=false;
+let isRequestAdmin=false,archivedRequestProducts=[],requestAdminBusy=false,lastSaleLaunchUrl=null;
 const requestAdminArea=document.createElement('div');
 requestAdminArea.id='adminRequestActions';
 requestAdminArea.hidden=true;
@@ -166,6 +166,11 @@ function renderRequestAdminActions(){
    row.append(labelNode,btn);requestAdminArea.append(row);
   }
  }
+ if(lastSaleLaunchUrl){
+  const link=document.createElement('a');link.href=lastSaleLaunchUrl;link.textContent='Apri scheda vendita nel gestionale';
+  link.style.cssText='display:block;margin-top:12px;padding:12px;border:1px solid #be9b54;border-radius:8px;color:#f5d48c;font-weight:bold;text-align:center;background:#292218';
+  requestAdminArea.append(link);
+ }
  const result=document.createElement('p');result.id='requestAdminResult';result.setAttribute('role','status');result.style.cssText='margin-top:10px;font-size:13px';requestAdminArea.append(result);
 }
 async function refreshRequestCatalog(){
@@ -198,10 +203,9 @@ function makeGestionaleSaleLink(ids){
  return 'cartediemgestionale://vendita?d='+encoded;
 }
 function openGestionaleSale(uri){
- const message=document.createElement('p');message.style.cssText='padding:12px;border:1px solid #be9b54;border-radius:8px;background:#292218;color:#fff;margin-top:12px';
- message.textContent='Articoli rimossi. Si sta aprendo la scheda vendita nel gestionale. Se non si apre automaticamente: ';
- const retry=document.createElement('a');retry.href=uri;retry.textContent='Apri scheda vendita';retry.style.cssText='color:#f5d48c;font-weight:bold;text-decoration:underline';
- message.append(retry);requestAdminArea.append(message);
+ lastSaleLaunchUrl=uri;
+ // Fallimento dell'apertura: il pulsante di riprova resta nella lista amministratore.
+ renderRequestAdminActions();
  location.href=uri;
 }
 async function changeCatalogVisibility(ids,restore){

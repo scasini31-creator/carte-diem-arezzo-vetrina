@@ -11,7 +11,7 @@ const platforms=['Game Boy','Game Boy Color','Game Boy Advance','Nintendo DS','N
 const sealed=['Box','ETB','Bundle','Tin','Collezioni','Bustine','UPC','Altro'];
 const accessories=['Binder','Sleeve e bustine protettive','Toploader e protezioni rigide','Espositori','Box portacarte','Altro'];
 const collectibles=['Funko Pop','Figure e Statue','Gadget','Altro'];
-const graders=['PSA','BGS','CGC','GRAAD','TAG','ACE','Altre','Non specificata'];
+const graders=['PSA','BGS','CGC','GRAAD','CCIC','TAG','ACE','Altre','Non specificata'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));}
 function notify(t,error=false){status.textContent=t;status.classList.toggle('admin-toast-error',error);$('adminModalMessage').textContent=t;}
 function ensure(ok,message){if(!ok)throw new Error(message);}

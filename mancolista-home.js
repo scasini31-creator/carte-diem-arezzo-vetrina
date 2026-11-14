@@ -16,6 +16,21 @@
   style.id = 'cd-mancolista-details-style';
   style.textContent = `
     #cd-mancolista-track .cd-featured-card.cd-wish-clickable{cursor:pointer}
+    #cd-mancolista-track .cd-mancolista-image-box{position:relative!important}
+    #cd-mancolista-track .cd-wish-language,#cd-mancolista-track .cd-wish-conditions>span{
+      display:inline-flex;align-items:center;justify-content:center;
+      box-sizing:border-box;min-height:21px;padding:3px 5px;
+      border:1px solid #ffffff60;border-radius:5px;background:#070a12d9;
+      color:#fff;font:700 10px/1.15 Arial,Helvetica,sans-serif;
+      text-shadow:0 1px 2px #000;box-shadow:0 1px 5px #0009;
+      pointer-events:none;overflow-wrap:anywhere
+    }
+    #cd-mancolista-track .cd-wish-language{position:absolute;left:5px;bottom:5px;z-index:3}
+    #cd-mancolista-track .cd-wish-language .cd-wish-flag{font:normal 17px/1 "Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif}
+    #cd-mancolista-track .cd-wish-conditions{position:absolute;right:5px;bottom:5px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:3px;max-width:calc(100% - 48px);pointer-events:none}
+    #cd-mancolista-track .cd-wish-conditions>span{max-width:100%;text-align:right;white-space:normal}
+    #cd-mancolista-detail .cd-wish-condition-lines{display:flex;flex-direction:column;align-items:flex-start;gap:3px;white-space:pre-wrap}
+
     #cd-mancolista-track .cd-featured-card.cd-wish-clickable:focus-visible{outline:3px solid #ffd05e;outline-offset:3px}
     #cd-mancolista-detail{max-width:min(92vw,680px);max-height:88dvh;width:100%;padding:0;border:1px solid #b9935a;border-radius:16px;background:#10131b;color:#f8f5ed;box-shadow:0 18px 70px #000b;overflow:auto}
     #cd-mancolista-detail::backdrop{background:#000b}
@@ -51,6 +66,59 @@
     parent.appendChild(row);
   }
 
+  function splitConditions(value) {
+    return String(value || '').split(';').map(v => v.trim()).filter(Boolean);
+  }
+
+  function appendConditions(parent, values) {
+    const row = document.createElement('div');
+    row.className = 'cd-wish-row';
+    const label = document.createElement('span');
+    label.className = 'cd-wish-label';
+    label.textContent = 'Condizioni';
+    const lines = document.createElement('div');
+    lines.className = 'cd-wish-condition-lines';
+    for (const value of values.length ? values : ['Non specificate']) {
+      const line = document.createElement('span');
+      line.textContent = value;
+      lines.appendChild(line);
+    }
+    row.append(label, lines);
+    parent.appendChild(row);
+  }
+
+  function addPreviewBadges(imageBox, item) {
+    const language = String(item.lingua || '').trim().toUpperCase();
+    if (language) {
+      const languages = {ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']};
+      const badge = document.createElement('span');
+      badge.className = 'cd-wish-language';
+      badge.setAttribute('aria-label', 'Lingua: ' + (languages[language]?.[1] || language));
+      badge.title = 'Lingua: ' + (languages[language]?.[1] || language);
+      if (languages[language]) {
+        const flag = document.createElement('span');
+        flag.className = 'cd-wish-flag';
+        flag.textContent = languages[language][0];
+        badge.appendChild(flag);
+      } else {
+        badge.textContent = language;
+      }
+      imageBox.appendChild(badge);
+    }
+    const conditions = splitConditions(item.condizioni);
+    if (conditions.length) {
+      const list = document.createElement('div');
+      list.className = 'cd-wish-conditions';
+      list.setAttribute('aria-label', 'Condizioni: ' + conditions.join(', '));
+      for (const condition of conditions) {
+        const badge = document.createElement('span');
+        badge.textContent = condition;
+        list.appendChild(badge);
+      }
+      imageBox.appendChild(list);
+    }
+  }
+
   function openDetail(item) {
     const media = dialog.querySelector('.cd-wish-media');
     const content = dialog.querySelector('.cd-wish-text');
@@ -71,7 +139,7 @@
     content.appendChild(title);
     addRow(content, 'Espansione', item.espansione);
     addRow(content, 'Lingua', item.lingua);
-    addRow(content, 'Condizioni', item.condizioni);
+    appendConditions(content, splitConditions(item.condizioni));
     if (item.descrizione?.trim()) addRow(content, 'Descrizione', item.descrizione);
     if (!dialog.open) dialog.showModal();
   }
@@ -104,6 +172,7 @@
         img.src = item.immagine_url;
         imageBox.appendChild(img);
       }
+      addPreviewBadges(imageBox, item);
       card.appendChild(imageBox);
 
       const details = document.createElement('div');

@@ -627,7 +627,7 @@ document.getElementById('clearPriceFilter').onclick=()=>{
 };
 
 const gradingCompanies=[
- 'PSA','BGS','CGC','GRAAD','Altre','Non specificata'
+ 'PSA','BGS','CGC','GRAAD','CCIC','Altre','Non specificata'
 ];
 
 function productGrader(p){
@@ -635,7 +635,7 @@ function productGrader(p){
  const saved=String(p.details?.grader||'');
  if(saved)return gradingCompanies.includes(saved)?saved:'Altre';
  const raw=String(p[5]||'').trim().toUpperCase();
- const match=raw.match(/^(PSA|BGS|CGC|GRAAD)(?=\s|[-:]|[0-9]|$)/);
+ const match=raw.match(/^(PSA|BGS|CGC|GRAAD|CCIC)(?=\s|[-:]|[0-9]|$)/);
  if(match)return match[1];
  if(!raw||/^(?:[0-9]+(?:[.,][0-9]+)?|BLACK LABEL)$/.test(raw))
    return 'Non specificata';
@@ -1189,7 +1189,7 @@ function catalogConditionBadge(p){
  let grade=String(p[5]||'').trim().toUpperCase().replace(',', '.');
  // Compatibilità con vecchi articoli che potrebbero avere casa e voto insieme.
  if(!grader){
-  const old=grade.match(/^(PSA|BGS|CGC|GRAAD|TAG|ACE)\s+(.+)$/);
+  const old=grade.match(/^(PSA|BGS|CGC|GRAAD|CCIC|TAG|ACE)\s+(.+)$/);
   if(old){grader=old[1];grade=old[2];}
  }
  if(grade==='BLACK LABEL')grade='BL';

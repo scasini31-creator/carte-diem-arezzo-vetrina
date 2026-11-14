@@ -39,3 +39,16 @@ async function removeFeaturedProduct(productId) {
 
   if (error) throw error;
 }
+
+/* Indicatore lingua delle anteprime: bandiera per i codici noti, sigla per gli altri. */
+function productLanguageBadgeMarkup(value){
+ const code=String(value||'ITA').trim().toUpperCase();
+ const langs={
+  ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],
+  JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']
+ };
+ const item=langs[code];
+ if(item)return '<span class="cd-product-language-badge" role="img" aria-label="Lingua: '+item[1]+'" title="'+item[1]+'"><span class="cd-language-flag" aria-hidden="true">'+item[0]+'</span></span>';
+ const safe=code.replace(/[^A-Z0-9]/g,'').slice(0,5);
+ return safe?'<span class="cd-product-language-badge" aria-label="Lingua: '+safe+'" title="Lingua: '+safe+'">'+safe+'</span>':'';
+}

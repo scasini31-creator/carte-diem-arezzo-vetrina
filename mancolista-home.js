@@ -202,11 +202,12 @@
     }
     track.replaceChildren();
     for (const item of data) {
-      const card = document.createElement('div');
+      const card = document.createElement('a');
       card.className = 'cd-featured-card cd-wish-clickable';
+      card.href = 'mancolista-scheda.html?id=' + encodeURIComponent(String(item.id));
+      card.style.textDecoration = 'none';
+      card.style.color = 'inherit';
       card.dataset.wishlistId = item.id;
-      card.tabIndex = 0;
-      card.setAttribute('role', 'button');
       card.setAttribute('aria-label', 'Apri scheda: ' + item.nome);
 
       const imageBox = document.createElement('div');
@@ -235,16 +236,6 @@
         details.appendChild(p);
       }
       card.appendChild(details);
-      card.addEventListener('click', event => {
-        if (event.target.closest('.cd-admin-wish-edit')) return;
-        openDetail(item);
-      });
-      card.addEventListener('keydown', event => {
-        if ((event.key === 'Enter' || event.key === ' ') && event.target === card) {
-          event.preventDefault();
-          openDetail(item);
-        }
-      });
       track.appendChild(card);
     }
   } catch (error) {

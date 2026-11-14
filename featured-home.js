@@ -1,19 +1,36 @@
 
 (async function () {
   function featuredConditionBadge(p){
-    if(p?.[2]!=='singole')return '';
-    const names={
-      'NEAR MINT':['NM','Near Mint'],'NM':['NM','Near Mint'],
-      'EXCELLENT':['EX','Excellent'],'EX':['EX','Excellent'],
-      'GOOD':['GD','Good'],'GD':['GD','Good'],
-      'LIGHT PLAYED':['LP','Light Played'],'LP':['LP','Light Played'],
-      'PLAYED':['PL','Played'],'PL':['PL','Played'],
-      'POOR':['PR','Poor'],'PR':['PR','Poor'],
-      'SIGILLATA':['SIG','Sigillata'],'SEALED':['SIG','Sigillata'],'SIG':['SIG','Sigillata']
-    };
-    const item=names[String(p[5]||'').trim().toUpperCase()];
-    return item?'<span class="cd-product-condition-badge" title="Condizione: '+item[1]+'" aria-label="Condizione: '+item[1]+'">'+item[0]+'</span>':'';
-  }
+ if(!p)return '';
+ const category=p[2];
+ const rawConditions={
+  'NEAR MINT':['NM','Near Mint'],'NM':['NM','Near Mint'],
+  'EXCELLENT':['EX','Excellent'],'EX':['EX','Excellent'],
+  'GOOD':['GD','Good'],'GD':['GD','Good'],
+  'LIGHT PLAYED':['LP','Light Played'],'LP':['LP','Light Played'],
+  'PLAYED':['PL','Played'],'PL':['PL','Played'],
+  'POOR':['PR','Poor'],'PR':['PR','Poor'],
+  'SIGILLATA':['SIG','Sigillata'],'SEALED':['SIG','Sigillata'],'SIG':['SIG','Sigillata']
+ };
+ if(category==='singole'){
+  const item=rawConditions[String(p[5]||'').trim().toUpperCase()];
+  return item?'<span class="cd-product-condition-badge" title="Condizione: '+item[1]+'" aria-label="Condizione: '+item[1]+'">'+item[0]+'</span>':'';
+ }
+ if(category!=='gradate')return '';
+ let grader=String(p.details?.grader||'').trim().toUpperCase();
+ let grade=String(p[5]||'').trim().toUpperCase().replace(',', '.');
+ // Compatibilità con vecchi articoli che potrebbero avere casa e voto insieme.
+ if(!grader){
+  const old=grade.match(/^(PSA|BGS|CGC|GRAAD|TAG|ACE)\s+(.+)$/);
+  if(old){grader=old[1];grade=old[2];}
+ }
+ if(grade==='BLACK LABEL')grade='BL';
+ if(grader==='NON SPECIFICATA')grader='';
+ if(!grader&&!grade)return '';
+ const value=[grader,grade].filter(Boolean).join(' ');
+ const safe=value.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'" :'&#39;'}[c]));
+ return '<span class="cd-product-condition-badge cd-product-grade-badge" title="Gradazione: '+safe+'" aria-label="Gradazione: '+safe+'">'+safe+'</span>';
+}
   function featuredLanguageBadge(value){
     const code=String(value||'ITA').trim().toUpperCase();
     const flags={ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']};

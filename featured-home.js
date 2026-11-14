@@ -12,6 +12,11 @@
   'POOR':['PR','Poor'],'PR':['PR','Poor'],
   'SIGILLATA':['SIG','Sigillata'],'SEALED':['SIG','Sigillata'],'SIG':['SIG','Sigillata']
  };
+ if(category==='videogiochi' && p.catalog_group==='videogiochi'){
+  const condition=String(p.details?.gameCondition||'').trim();
+  const value=['CIB','Boxed','Loose'].find(v=>v.toLowerCase()===condition.toLowerCase());
+  return value?'<span class="cd-product-condition-badge" title="Condizione: '+value+'" aria-label="Condizione: '+value+'">'+value+'</span>':'';
+ }
  if(category==='singole'){
   const item=rawConditions[String(p[5]||'').trim().toUpperCase()];
   return item?'<span class="cd-product-condition-badge" title="Condizione: '+item[1]+'" aria-label="Condizione: '+item[1]+'">'+item[0]+'</span>':'';

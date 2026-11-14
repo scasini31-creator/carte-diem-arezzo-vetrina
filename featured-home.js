@@ -90,7 +90,7 @@
       img.alt = p[0] || 'Articolo Carte Diem';
       img.src = (p.preview_urls && p.preview_urls[0]) || (p[7] && p[7][0]) || 'logo-ottimizzato.webp';
       imageBox.appendChild(img);
-      imageBox.insertAdjacentHTML('beforeend', featuredLanguageBadge(p[10])+featuredConditionBadge(p));
+      if(!['accessori','collezione'].includes(p.catalog_group)) imageBox.insertAdjacentHTML('beforeend', featuredLanguageBadge(p[10])+featuredConditionBadge(p));
 
       const nome = document.createElement('strong');
       nome.className = 'cd-mancolista-name';

@@ -1,5 +1,19 @@
 
 (async function () {
+  function featuredConditionBadge(p){
+    if(p?.[2]!=='singole')return '';
+    const names={
+      'NEAR MINT':['NM','Near Mint'],'NM':['NM','Near Mint'],
+      'EXCELLENT':['EX','Excellent'],'EX':['EX','Excellent'],
+      'GOOD':['GD','Good'],'GD':['GD','Good'],
+      'LIGHT PLAYED':['LP','Light Played'],'LP':['LP','Light Played'],
+      'PLAYED':['PL','Played'],'PL':['PL','Played'],
+      'POOR':['PR','Poor'],'PR':['PR','Poor'],
+      'SIGILLATA':['SIG','Sigillata'],'SEALED':['SIG','Sigillata'],'SIG':['SIG','Sigillata']
+    };
+    const item=names[String(p[5]||'').trim().toUpperCase()];
+    return item?'<span class="cd-product-condition-badge" title="Condizione: '+item[1]+'" aria-label="Condizione: '+item[1]+'">'+item[0]+'</span>':'';
+  }
   function featuredLanguageBadge(value){
     const code=String(value||'ITA').trim().toUpperCase();
     const flags={ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']};
@@ -54,7 +68,7 @@
       img.alt = p[0] || 'Articolo Carte Diem';
       img.src = (p.preview_urls && p.preview_urls[0]) || (p[7] && p[7][0]) || 'logo-ottimizzato.webp';
       imageBox.appendChild(img);
-      imageBox.insertAdjacentHTML('beforeend', featuredLanguageBadge(p[10]));
+      imageBox.insertAdjacentHTML('beforeend', featuredLanguageBadge(p[10])+featuredConditionBadge(p));
 
       const nome = document.createElement('strong');
       nome.className = 'cd-mancolista-name';

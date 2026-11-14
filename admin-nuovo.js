@@ -518,10 +518,13 @@ function productFields(p,group,category){
  html+=field('group','Catalogo','select',group,Object.entries(groups));
  html+=field('category','Tipologia','select',category,choices[group]);
  html+=field('sigla','Sigla carta','text',p?.[1]||'');
+ html+=field('language','Lingua','select',p?.[10]||'ITA',['ITA','ENG','JPN','CHN','KOR']);
+ html+=field('condition','Condizione','select',category==='singole'?p?.[5]||'Near Mint':'Near Mint',['Sigillata','Near Mint','Excellent','Good','Light Played','Played','Poor']);
  html+=field('grader','Casa di gradazione','select',d.grader||'PSA',graders);
  html+=field('grade','Voto','select',category==='gradate'?((p?.[5]||'').match(/\b(10|[1-9](?:[.,]5)?|Black Label)\b/i)||[])[0]||'10':'10',Array.from({length:19},(_,i)=>String((i+2)/2)).concat('Black Label'));
  html+=field('sealedType','Tipologia sigillati','select',d.sealedType||'ETB',sealed);
  html+=field('platform','Piattaforma','select',d.platform||'Switch',platforms);
+ html+=field('gameCondition','Condizione console/videogame','select',d.gameCondition||'CIB',['CIB','Boxed','Loose']);
  html+=field('accessoryType','Tipo accessorio','select',d.accessoryType||'Binder',accessories);
  html+=field('collectibleType','Tipo collezionabile','select',d.collectibleType||'Funko Pop',collectibles);
  html+=field('price','Prezzo in euro (vuoto = su richiesta)','number',p?.[3]??'');
@@ -537,9 +540,9 @@ function syncProductFields(){
  f('category').innerHTML=cats.map(([key,title])=>'<option value="'+key+'">'+esc(title)+'</option>').join('');
  if(cats.some(([key])=>key===curr))f('category').value=curr;
  const cat=f('category').value;
- const shown={sigla:['singole','gradate'].includes(cat),
- grader:cat==='gradate',grade:cat==='gradate',sealedType:cat==='sealed',
- platform:['console','videogiochi'].includes(cat),
+ const shown={sigla:['singole','gradate'].includes(cat),language:['singole','gradate','sealed'].includes(cat),
+ condition:cat==='singole',grader:cat==='gradate',grade:cat==='gradate',sealedType:cat==='sealed',
+ platform:['console','videogiochi'].includes(cat),gameCondition:['console','videogiochi'].includes(cat),
  accessoryType:cat==='accessori',collectibleType:cat==='collezione'};
  for(const [name,visible] of Object.entries(shown))document.querySelector('[data-field="'+name+'"]').hidden=!visible;
 }
@@ -741,7 +744,7 @@ async function saveProduct(){
   grader:category==='gradate'?f('grader').value:null,
   sealedType:category==='sealed'?f('sealedType').value:null,
   platform:['console','videogiochi'].includes(category)?f('platform').value:null,
-  gameCondition:originalDetails.gameCondition??null,
+  gameCondition:['console','videogiochi'].includes(category)?f('gameCondition').value:null,
   accessoryType:category==='accessori'?f('accessoryType').value:null,
   collectibleType:category==='collezione'?f('collectibleType').value:null,
   preview_paths:previewPaths
@@ -749,8 +752,8 @@ async function saveProduct(){
  const priceText=f('price').value.trim();
  const raw={
   name,sigla:['singole','gradate'].includes(category)?f('sigla').value.trim()||null:null,
-  catalog_group:group,category,language:editing?.language||'ITA',price:priceText===''?null:Number(priceText),
-  condition_or_grade:category==='singole'?(editing?.condition_or_grade||null):category==='gradate'?f('grade').value:null,
+  catalog_group:group,category,language:f('language').value,price:priceText===''?null:Number(priceText),
+  condition_or_grade:category==='singole'?f('condition').value:category==='gradate'?f('grade').value:null,
   quantity:Math.max(0,Math.floor(Number(f('quantity').value)||0)),description:f('description').value,
   image_paths:paths,details
  };

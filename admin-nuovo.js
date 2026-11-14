@@ -524,7 +524,7 @@ function productFields(p,group,category){
  html+=field('grade','Voto','select',category==='gradate'?((p?.[5]||'').match(/\b(10|[1-9](?:[.,]5)?|Black Label)\b/i)||[])[0]||'10':'10',Array.from({length:19},(_,i)=>String((i+2)/2)).concat('Black Label'));
  html+=field('sealedType','Tipologia sigillati','select',d.sealedType||'ETB',sealed);
  html+=field('platform','Piattaforma','select',d.platform||'Switch',platforms);
- html+=field('gameCondition','Condizione','select',d.gameCondition||'CIB',['CIB','Boxed','Loose']);
+ html+=field('gameCondition','Condizione','select',d.gameCondition||'CIB',['CIB','Boxed','Loose','Sealed']);
  html+=field('accessoryType','Tipo accessorio','select',d.accessoryType||'Binder',accessories);
  html+=field('collectibleType','Tipo collezionabile','select',d.collectibleType||'Funko Pop',collectibles);
  html+=field('price','Prezzo in euro (vuoto = su richiesta)','number',p?.[3]??'');
@@ -542,7 +542,7 @@ function syncProductFields(){
  const cat=f('category').value;
  const shown={sigla:['singole','gradate'].includes(cat),language:['singole','gradate','sealed'].includes(cat),
  condition:cat==='singole',grader:cat==='gradate',grade:cat==='gradate',sealedType:cat==='sealed',
- platform:['console','videogiochi'].includes(cat),gameCondition:cat==='videogiochi',
+ platform:['console','videogiochi'].includes(cat),gameCondition:['console','videogiochi'].includes(cat),
  accessoryType:cat==='accessori',collectibleType:cat==='collezione'};
  for(const [name,visible] of Object.entries(shown))document.querySelector('[data-field="'+name+'"]').hidden=!visible;
 }
@@ -744,7 +744,7 @@ async function saveProduct(){
   grader:category==='gradate'?f('grader').value:null,
   sealedType:category==='sealed'?f('sealedType').value:null,
   platform:['console','videogiochi'].includes(category)?f('platform').value:null,
-  gameCondition:category==='videogiochi'?f('gameCondition').value:(category==='console'?(originalDetails.gameCondition||null):null),
+  gameCondition:['console','videogiochi'].includes(category)?f('gameCondition').value:null,
   accessoryType:category==='accessori'?f('accessoryType').value:null,
   collectibleType:category==='collezione'?f('collectibleType').value:null,
   preview_paths:previewPaths

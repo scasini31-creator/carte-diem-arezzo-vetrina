@@ -107,16 +107,27 @@
   }
 
   function addPreviewBadges(imageBox, item) {
+    // Stesse classi visuali degli articoli in evidenza.
+    // Posizionamento applicato anche direttamente ai nodi per evitare
+    // conflitti con i CSS delle card e con le versioni installate della PWA.
+    imageBox.style.setProperty('position', 'relative', 'important');
     const language = String(item.lingua || '').trim().toUpperCase();
+    const languages = {ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']};
     if (language) {
-      const languages = {ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']};
       const badge = document.createElement('span');
-      badge.className = 'cd-wish-language';
+      badge.className = 'cd-product-language-badge cd-wish-language';
       badge.setAttribute('aria-label', 'Lingua: ' + (languages[language]?.[1] || language));
       badge.title = 'Lingua: ' + (languages[language]?.[1] || language);
+      badge.style.setProperty('position','absolute','important');
+      badge.style.setProperty('left','6px','important');
+      badge.style.setProperty('bottom','6px','important');
+      badge.style.setProperty('right','auto','important');
+      badge.style.setProperty('top','auto','important');
+      badge.style.setProperty('z-index','30','important');
+      badge.style.setProperty('display','inline-flex','important');
       if (languages[language]) {
         const flag = document.createElement('span');
-        flag.className = 'cd-wish-flag';
+        flag.className = 'cd-language-flag cd-wish-flag';
         flag.textContent = languages[language][0];
         badge.appendChild(flag);
       } else {
@@ -129,9 +140,24 @@
       const list = document.createElement('div');
       list.className = 'cd-wish-conditions';
       list.setAttribute('aria-label', 'Condizioni: ' + conditions.join(', '));
+      list.style.setProperty('position','absolute','important');
+      list.style.setProperty('right','6px','important');
+      list.style.setProperty('bottom','6px','important');
+      list.style.setProperty('left','auto','important');
+      list.style.setProperty('top','auto','important');
+      list.style.setProperty('z-index','30','important');
+      list.style.setProperty('display','flex','important');
+      list.style.setProperty('flex-direction','column','important');
+      list.style.setProperty('align-items','flex-end','important');
+      list.style.setProperty('gap','3px','important');
+      list.style.setProperty('pointer-events','none','important');
       for (const condition of conditions) {
         const badge = document.createElement('span');
-        badge.className = 'cd-wish-condition';
+        badge.className = 'cd-product-condition-badge cd-wish-condition';
+        badge.style.setProperty('position','relative','important');
+        badge.style.setProperty('right','auto','important');
+        badge.style.setProperty('bottom','auto','important');
+        badge.style.setProperty('display','inline-flex','important');
         badge.textContent = condition;
         list.appendChild(badge);
       }

@@ -524,7 +524,7 @@ function productFields(p,group,category){
  html+=field('grade','Voto','select',category==='gradate'?((p?.[5]||'').match(/\b(10|[1-9](?:[.,]5)?|Black Label)\b/i)||[])[0]||'10':'10',Array.from({length:19},(_,i)=>String((i+2)/2)).concat('Black Label'));
  html+=field('sealedType','Tipologia sigillati','select',d.sealedType||'ETB',sealed);
  html+=field('platform','Piattaforma','select',d.platform||'Switch',platforms);
- html+=field('gameCondition','Condizione','select',d.gameCondition||'CIB',['CIB','Boxed','Loose','Sealed']);
+ html+=field('gameCondition','Condizione','select',(d.gameCondition||'CIB').toUpperCase(),['SEALED','CIB','BOXED','LOOSE']);
  html+=field('accessoryType','Tipo accessorio','select',d.accessoryType||'Binder',accessories);
  html+=field('collectibleType','Tipo collezionabile','select',d.collectibleType||'Funko Pop',collectibles);
  html+=field('price','Prezzo in euro (vuoto = su richiesta)','number',p?.[3]??'');

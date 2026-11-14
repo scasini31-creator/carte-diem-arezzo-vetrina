@@ -78,3 +78,21 @@
     font-size:10px;
   }
 }
+
+/* Badge unico per casa di gradazione e voto, leggibile sulle card più strette. */
+.cd-product-grade-badge{
+  max-width:calc(100% - 40px);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  padding-inline:6px;
+  font-size:10px;
+  letter-spacing:-.1px;
+}
+@media(max-width:650px){
+ #catalogGrid .cd-product-grade-badge{
+  max-width:calc(100% - 35px);
+  font-size:9px;
+  padding-inline:3px;
+ }
+}

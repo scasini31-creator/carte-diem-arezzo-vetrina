@@ -23,7 +23,7 @@
     #cd-mancolista-detail .cd-wish-photo{width:100%;aspect-ratio:5/7;object-fit:contain;background:#000;border-radius:8px}
     #cd-mancolista-detail .cd-wish-text{text-align:left;min-width:0}
     #cd-mancolista-detail .cd-wish-text h2{font:700 24px/1.25 Georgia,serif;color:#f7d484;margin:6px 0 18px;overflow-wrap:anywhere}
-    #cd-mancolista-detail .cd-wish-row{margin:0 0 14px;overflow-wrap:anywhere;line-height:1.5}
+    #cd-mancolista-detail .cd-wish-row{margin:0 0 14px;overflow-wrap:anywhere;line-height:1.5;white-space:pre-wrap}
     #cd-mancolista-detail .cd-wish-label{display:block;color:#e6c782;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
     #cd-mancolista-detail .cd-wish-top{display:flex;justify-content:flex-end;padding:10px 12px 0}
     #cd-mancolista-detail .cd-wish-close{background:#26232b;color:#fff;border:1px solid #b9935a;border-radius:9px;font-size:23px;line-height:1;min-height:40px;min-width:40px;cursor:pointer}
@@ -72,12 +72,13 @@
     addRow(content, 'Espansione', item.espansione);
     addRow(content, 'Lingua', item.lingua);
     addRow(content, 'Condizioni', item.condizioni);
+    if (item.descrizione?.trim()) addRow(content, 'Descrizione', item.descrizione);
     if (!dialog.open) dialog.showModal();
   }
 
   try {
     const { data, error } = await sb.from('mancolista')
-      .select('id,nome,espansione,immagine_url,posizione,lingua,condizioni')
+      .select('id,nome,espansione,immagine_url,posizione,lingua,condizioni,descrizione')
       .order('posizione', { ascending: true })
       .order('created_at', { ascending: true });
     if (error) throw error;

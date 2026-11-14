@@ -1,0 +1,45 @@
+/* Bandierina della lingua: sovrapposta senza cambiare le dimensioni delle card. */
+#catalogGrid .product > .photo,
+#cd-featured-track .cd-mancolista-image-box{
+  position:relative!important;
+}
+.cd-product-language-badge{
+  position:absolute;
+  z-index:3;
+  left:6px;
+  bottom:6px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:25px;
+  min-height:22px;
+  padding:2px 4px;
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.37);
+  border-radius:5px;
+  background:rgba(7,10,18,.82);
+  color:#fff;
+  font:700 10px/1 Arial,Helvetica,sans-serif;
+  text-shadow:0 1px 2px #000;
+  box-shadow:0 1px 5px #0009;
+  pointer-events:none;
+  user-select:none;
+}
+.cd-product-language-badge .cd-language-flag{
+  display:block;
+  font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif;
+  font-size:17px;
+  font-weight:normal;
+  line-height:1;
+}
+@media(max-width:650px){
+  #catalogGrid .cd-product-language-badge{
+    left:4px;
+    bottom:4px;
+    min-width:22px;
+    min-height:19px;
+    padding:1px 3px;
+    border-radius:4px;
+  }
+  #catalogGrid .cd-product-language-badge .cd-language-flag{font-size:15px}
+}

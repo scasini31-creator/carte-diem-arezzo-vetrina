@@ -21,7 +21,7 @@ function mount(){
  dialog.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:16px"><h2 style="font-size:19px;color:#f0c46f;margin:0">Coda caricamento</h2><button type="button" id="cd-queue-close" style="font-size:23px;background:transparent;border:0;color:#fff">×</button></div><p style="font-size:12px;color:#aaa">I prodotti vengono conservati su questo dispositivo e caricati quando il pannello amministratore è aperto e connesso.</p><div id="cd-queue-list" aria-live="polite"></div>';
  document.body.append(dialog);
  dialog.querySelector('#cd-queue-close').onclick=()=>dialog.close();
- button.onclick=()=>{if(!adminPage){location.href='amministrazione.html?queue=1&return=index.html';return;}dialog.showModal();refresh()};
+ button.onclick=()=>{if(!adminPage){try{if(window.parent!==window&&window.parent.CDQueueUI){window.parent.CDQueueUI.open();return}}catch(e){}location.href='amministrazione.html?queue=1&return=index.html';return;}dialog.showModal();refresh()};
  if(adminPage&&new URLSearchParams(location.search).has('queue')){const obs=new MutationObserver(()=>{if(!document.getElementById('adminRoot').hidden){obs.disconnect();button.click()}});obs.observe(document.getElementById('adminRoot'),{attributes:true,attributeFilter:['hidden']});}
 }
 async function refresh(){
@@ -67,7 +67,7 @@ async function checkPublic(){
   if(!e&&data)show();
  }catch(e){console.warn(e)}
 }
-window.CDQueueUI={show,refresh};
+window.CDQueueUI={show,refresh,open:()=>{if(button&&!button.hidden){dialog.showModal();refresh()}}};
 mount();q.onChange(refresh);
 if(!adminPage){checkPublic();sb.auth.onAuthStateChange(()=>setTimeout(()=>{button.hidden=true;button.style.display='none';checkPublic()},0))}
 else{const obs=new MutationObserver(()=>{if(!document.getElementById('adminRoot').hidden)show();else if(button){button.hidden=true;button.style.display='none'}});obs.observe(document.getElementById('adminRoot'),{attributes:true,attributeFilter:['hidden']})}

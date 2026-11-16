@@ -617,6 +617,7 @@ function openProduct(p,group,category){
   redrawPhotos();e.target.value='';
  };
  redrawPhotos();
+ $('adminSave').textContent=p?'Salva modifiche':'Aggiungi alla coda';
  if(p)$('adminDelete').hidden=false;
 }
 function openWish(p){

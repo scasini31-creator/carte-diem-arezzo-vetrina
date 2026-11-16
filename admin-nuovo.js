@@ -508,7 +508,7 @@ function field(id,label,type,value,options,hidden){
 function f(id){return $('f_'+id)}
 function showDialog(title,html){
  $('adminModalTitle').textContent=title;$('adminFields').innerHTML=html;
- $('adminModalMessage').textContent='';$('adminDelete').hidden=true;
+ $('adminModalMessage').textContent='';$('adminDelete').hidden=true;$('adminSave').textContent='Salva';
  modal.showModal();
 }
 function closeDialog(){modal.close();formMode='';editing=null;photos=[];}
@@ -814,6 +814,7 @@ async function saveWish(){
  if(error)throw error;
  await refreshLists();notify('Mancolista aggiornata.');closeDialog();view.contentWindow.location.reload();
 }
+window.addEventListener('cd-product-uploaded',()=>{if(activeUser){notify('Articolo della coda pubblicato.');try{view.contentWindow.location.reload()}catch(e){}}});
 form.addEventListener('submit',async e=>{
  e.preventDefault();
  const btn=$('adminSave');btn.disabled=true;

@@ -43,6 +43,7 @@ async function checkLogin(){
   const {data,error:e}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
   if(e||!data){showLogin('Questo account non dispone dei permessi amministrativi.');return;}
   activeUser=user;gate.hidden=true;root.hidden=false;
+  window.CDProductQueue.start(sb);window.CDQueueUI?.refresh();
   const target=returnPage();
   if(view.getAttribute('src')!==target)view.setAttribute('src',target);
   await refreshLists();
@@ -79,7 +80,7 @@ sb.auth.onAuthStateChange(event=>{
   $('authMessage').textContent='Imposta la tua nuova password.';
  }
 });
-$('adminLogout').onclick=async()=>{await sb.auth.signOut();activeUser=null;view.src='about:blank';showLogin();location.href='index.html';};
+$('adminLogout').onclick=async()=>{window.CDProductQueue.stop();await sb.auth.signOut();activeUser=null;view.src='about:blank';showLogin();location.href='index.html';};
 async function refreshLists(){
  const [pr,fr,wr,or]=await Promise.all([
    loadProducts(),loadFeaturedProducts(),
@@ -701,6 +702,34 @@ async function uploadPreview(file){
  if(error){console.warn('Miniatura non caricata:',error);return null;}
  return path;
 }
+async function queueNewProduct(){
+ const group=f('group').value,category=f('category').value,name=f('name').value.trim();
+ ensure(name,'Inserisci il nome del prodotto.');
+ ensure((choices[group]||[]).some(([id])=>id===category),'Catalogo e tipologia non compatibili.');
+ ensure(photos.length<=6,'Puoi caricare al massimo 6 fotografie.');
+ const priceText=f('price').value.trim(),price=priceText===''?null:Number(priceText);
+ ensure(price===null||Number.isFinite(price)&&price>=0,'Prezzo non valido.');
+ const row={
+  name,sigla:['singole','gradate'].includes(category)?f('sigla').value.trim()||null:null,
+  catalog_group:group,category,
+  language:['accessori','collezione'].includes(group)?'ITA':f('language').value,
+  price,condition_or_grade:category==='singole'?f('condition').value:category==='gradate'?f('grade').value:null,
+  quantity:Math.max(0,Math.floor(Number(f('quantity').value)||0)),
+  description:f('description').value,
+  details:{
+   grader:category==='gradate'?f('grader').value:null,
+   sealedType:category==='sealed'?f('sealedType').value:null,
+   platform:['console','videogiochi'].includes(category)?f('platform').value:null,
+   gameCondition:['console','videogiochi'].includes(category)?f('gameCondition').value:null,
+   accessoryType:category==='accessori'?f('accessoryType').value:null,
+   collectibleType:category==='collezione'?f('collectibleType').value:null
+  }
+ };
+ const files=photos.map(p=>p.file?{file:p.file}:{path:p.path,thumbPath:p.thumbPath||null});
+ await window.CDProductQueue.enqueue(row,files);
+ closeDialog();notify('Articolo aggiunto alla coda di caricamento.');
+}
+
 async function saveProduct(){
  const group=f('group').value,category=f('category').value,name=f('name').value.trim();
  ensure(name,'Inserisci il nome del prodotto.');
@@ -787,7 +816,7 @@ async function saveWish(){
 form.addEventListener('submit',async e=>{
  e.preventDefault();
  const btn=$('adminSave');btn.disabled=true;
- try{if(formMode==='product')await saveProduct();else if(formMode==='wish')await saveWish();}
+ try{if(formMode==='product')await (editing?saveProduct():queueNewProduct());else if(formMode==='wish')await saveWish();}
  catch(err){notify('Salvataggio non riuscito: '+err.message,true);}finally{btn.disabled=false;}
 });
 $('adminDelete').onclick=async()=>{

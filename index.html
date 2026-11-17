@@ -657,11 +657,7 @@ aria-labelledby="cd-mancolista-title">
   const installed = () =>
     ['standalone','fullscreen','minimal-ui'].some(mode => window.matchMedia('(display-mode: '+mode+')').matches) ||
     window.navigator.standalone === true ||
-    document.referrer.startsWith('android-app://') ||
-    // Android fullscreen PWA fallback when display-mode is not reported correctly.
-    (window.innerHeight >= window.screen.height * 0.94 &&
-     window.innerWidth >= window.screen.width * 0.94 &&
-     !window.navigator.userAgent.includes('wv'));
+    document.referrer.startsWith('android-app://');
 
   const syncInstallButton = () => {
     btn.style.setProperty('display', installed() ? 'none' : 'block', 'important');
@@ -776,7 +772,11 @@ if ('serviceWorker' in navigator) {
  line-clamp:unset!important;
  text-align:center!important;
 }
-</style><script defer src="catalog-order.js?v=1"></script><style id="cd-mancolista-badges-fixed">
+</style><script defer src="catalog-order.js?v=1"></script><style id="cd-single-queue-button">
+/* Coda appartiene esclusivamente alla barra del pannello amministratore. */
+#cd-queue-top-btn, #cd-queue-dialog { display:none!important; }
+</style>
+<style id="cd-mancolista-badges-fixed">
 /* Stessa posizione dei badge negli articoli in evidenza. */
 #cd-mancolista-track .cd-featured-card > .cd-mancolista-image-box{
   position:relative!important;

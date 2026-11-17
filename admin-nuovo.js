@@ -471,12 +471,20 @@ function displayAdminVisitCount(doc){
 function attach(doc){
  if(!activeUser||doc.location.origin!==location.origin)return;
  currentDoc=doc;
+ // Il pulsante Coda deve stare soltanto nella barra amministrativa esterna.
+ // Rimuovi anche eventuali copie residue da una Home incorporata ancora in cache.
+ const removeEmbeddedQueue=()=>{
+  doc.querySelectorAll('#cd-queue-top-btn').forEach(el=>el.remove());
+  doc.querySelectorAll('#cd-queue-dialog').forEach(el=>el.remove());
+ };
+ removeEmbeddedQueue();
  if(!doc.getElementById('cd-admin-overlay'))adminStyle(doc);
  if(listenObserver)listenObserver.disconnect();
  let queued=false;
  const render=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{
    queued=false;
    if(!activeUser||view.contentDocument!==doc)return;
+   removeEmbeddedQueue();
    displayAdminVisitCount(doc);
    if(doc.location.pathname.endsWith('/index.html')||doc.location.pathname.endsWith('/'))homeTools(doc);
    else if(doc.location.pathname.endsWith('/catalogo.html')){catalogTools(doc);decorateProductPhotos(doc);decorateEnlargedPhoto(doc);}

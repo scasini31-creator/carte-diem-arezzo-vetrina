@@ -2,6 +2,8 @@
 (function(){
 'use strict';
 const adminPage=!!document.getElementById('adminRoot');
+// La coda e' disponibile solo nel pannello amministratore, non nelle pagine della vetrina.
+if(!adminPage)return;
 let dialog,button;
 const q=window.CDProductQueue;
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

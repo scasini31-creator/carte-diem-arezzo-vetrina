@@ -711,6 +711,43 @@ async function uploadPreview(file){
  if(error){console.warn('Miniatura non caricata:',error);return null;}
  return path;
 }
+// Avvisa prima dell'accodamento se una sigla e' gia' utilizzata.
+// Confronto completo della sigla (non soltanto il prefisso del set).
+function normalizeProductSigla(value){
+ return String(value||'').trim().replace(/\\s+/g,' ').toLocaleUpperCase('it');
+}
+async function confirmDuplicateSigla(row){
+ const normalized=normalizeProductSigla(row.sigla);
+ if(!normalized)return true;
+ // Leggi i prodotti pubblicati al momento dell'inserimento, non solo la
+ // copia in memoria che potrebbe essere precedente ad altri inserimenti.
+ const {data,error}=await sb.from('products')
+  .select('id,name,sigla,catalog_group,category')
+  .is('archived_at',null).not('sigla','is',null);
+ if(error)throw new Error('Impossibile verificare le sigle presenti: '+error.message);
+ const matches=(data||[]).filter(p=>normalizeProductSigla(p.sigla)===normalized)
+  .map(p=>({name:p.name,sigla:p.sigla,source:'Catalogo'}));
+ // Controlla anche prodotti non ancora pubblicati, gia' nella coda locale.
+ const queued=await window.CDProductQueue.all();
+ for(const item of queued){
+  if(item.status==='done')continue;
+  if(normalizeProductSigla(item.row?.sigla)===normalized){
+   matches.push({name:item.row?.name||'Articolo senza nome',sigla:item.row?.sigla,source:'Coda'});
+  }
+ }
+ if(!matches.length)return true;
+ const shown=matches.slice(0,8).map(p=>
+  '• '+p.name+' ('+p.source+')'
+ ).join('\\n');
+ const extra=matches.length>8?'\\n...e altri '+(matches.length-8)+' articoli.':'';
+ return window.confirm(
+  'ATTENZIONE: SIGLA GIÀ PRESENTE\\n\\n'+
+  'La sigla "'+row.sigla+'" è già utilizzata da '+matches.length+
+  (matches.length===1?' articolo:':' articoli:')+
+  '\\n\\n'+shown+extra+
+  '\\n\\nVuoi aggiungere comunque questo nuovo articolo?'
+ );
+}
 async function queueNewProduct(){
  const group=f('group').value,category=f('category').value,name=f('name').value.trim();
  ensure(name,'Inserisci il nome del prodotto.');
@@ -734,6 +771,7 @@ async function queueNewProduct(){
    collectibleType:category==='collezione'?f('collectibleType').value:null
   }
  };
+ if(!(await confirmDuplicateSigla(row)))return;
  const files=photos.map(p=>p.file?{file:p.file}:{path:p.path,thumbPath:p.thumbPath||null});
  await window.CDProductQueue.enqueue(row,files);
  closeDialog();notify('Articolo aggiunto alla coda di caricamento.');

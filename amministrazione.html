@@ -36,9 +36,27 @@
  <p id="adminModalMessage" role="status"></p>
  <div class="admin-actions"><button type="button" class="admin-danger" id="adminDelete" hidden>Elimina</button><button type="button" class="admin-secondary" id="adminCancel">Annulla</button><button type="submit" class="admin-save" id="adminSave">Salva</button></div>
  </form></dialog>
+<script id="cd-queue-iframe-cleanup">
+/* Elimina controlli Coda obsoleti dalla vetrina incorporata, anche se il browser riusa vecchio HTML. */
+(function(){
+ const frame=document.getElementById('adminView');
+ let observer=null;
+ frame.addEventListener('load',()=>{
+  observer?.disconnect();
+  let doc;
+  try{doc=frame.contentDocument;if(!doc?.body)return}catch(e){return}
+  const clean=()=>{
+   doc.querySelectorAll('#cd-queue-top-btn, #cd-queue-dialog').forEach(el=>el.remove());
+  };
+  clean();
+  observer=new MutationObserver(clean);
+  observer.observe(doc.body,{childList:true,subtree:true});
+ });
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="thumbs/index.js?v=1"></script><script src="supabase-config.js?v=2"></script>
 <script src="cd-product-upload-queue.js?v=2"></script>
-<script src="cd-upload-queue-ui.js?v=1"></script>
+<script src="cd-upload-queue-ui.js?v=2"></script>
 <script src="admin-nuovo.js?v=30"></script>
 </body></html>

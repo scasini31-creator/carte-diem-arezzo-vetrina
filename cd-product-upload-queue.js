@@ -79,6 +79,8 @@ async function work(item){
   await progress(item,Math.floor(5+85*(i+1)/Math.max(1,n)));
  }
  const row={...item.row,image_paths:paths,details:{...(item.row.details||{}),preview_paths:previews}};
+ // Compatibilita con articoli gia salvati in coda usando il valore UI SEALED.
+ if(row.category==='singole'&&String(row.condition_or_grade||'').trim().toUpperCase()==='SEALED')row.condition_or_grade='Sigillata';
  const {error}=await api.from('products').insert(row);
  if(error&&error.code!=='23505')throw error;
  item.files=[];item.status='done';item.progress=100;item.error='';

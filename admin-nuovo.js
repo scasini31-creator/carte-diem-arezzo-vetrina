@@ -714,7 +714,7 @@ async function uploadPreview(file){
 // Avvisa prima dell'accodamento se una sigla e' gia' utilizzata.
 // Confronto completo della sigla (non soltanto il prefisso del set).
 function normalizeProductSigla(value){
- return String(value||'').trim().replace(/\\s+/g,' ').toLocaleUpperCase('it');
+ return String(value||'').trim().replace(/\s+/g,' ').toLocaleUpperCase('it');
 }
 async function confirmDuplicateSigla(row){
  const normalized=normalizeProductSigla(row.sigla);
@@ -738,14 +738,14 @@ async function confirmDuplicateSigla(row){
  if(!matches.length)return true;
  const shown=matches.slice(0,8).map(p=>
   '• '+p.name+' ('+p.source+')'
- ).join('\\n');
- const extra=matches.length>8?'\\n...e altri '+(matches.length-8)+' articoli.':'';
+ ).join('\n');
+ const extra=matches.length>8?'\n...e altri '+(matches.length-8)+' articoli.':'';
  return window.confirm(
-  'ATTENZIONE: SIGLA GIÀ PRESENTE\\n\\n'+
+  'ATTENZIONE: SIGLA GIÀ PRESENTE\n\n'+
   'La sigla "'+row.sigla+'" è già utilizzata da '+matches.length+
   (matches.length===1?' articolo:':' articoli:')+
-  '\\n\\n'+shown+extra+
-  '\\n\\nVuoi aggiungere comunque questo nuovo articolo?'
+  '\n\n'+shown+extra+
+  '\n\nVuoi aggiungere comunque questo nuovo articolo?'
  );
 }
 async function queueNewProduct(){

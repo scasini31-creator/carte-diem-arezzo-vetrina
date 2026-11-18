@@ -38,7 +38,7 @@ async function addGradingCompany(select){
  const input=prompt('Nome della nuova casa di gradazione (2–40 caratteri):');
  if(input===null)return;
  const name=input.trim();
- if(name.length<2||name.length>40||!(/^[\\p{L}\\p{N} .&'()/_+-]+$/u).test(name)){
+ if(name.length<2||name.length>40||!(/^[\p{L}\p{N} .&'()/_+-]+$/u).test(name)){
   notify('Nome non valido. Usa da 2 a 40 caratteri, senza simboli speciali.',true);
   return;
  }

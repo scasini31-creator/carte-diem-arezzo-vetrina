@@ -626,17 +626,17 @@ document.getElementById('clearPriceFilter').onclick=()=>{
  render();
 };
 
-const gradingCompanies=[
- 'PSA','BGS','CGC','GRAAD','CCIC','BCTC','PACG','AiG','TAG','ACE'
-];
+// Elenco delle case attualmente rappresentate nei cataloghi.
+// Le case aggiunte successivamente sono rilevate dai prodotti pubblicati.
+const gradingCompanies=['BCTC','GRAAD','PSA','CCIC'];
 
 function productGrader(p){
  if(p[2]!=='gradate')return '';
- const saved=String(p.details?.grader||'');
- if(saved)return saved==='Altre'||saved==='Non specificata'?'':saved;
+ const saved=String(p.details?.grader||'').trim();
+ if(saved)return ['Altre','Non specificata'].includes(saved)?'':saved;
  const raw=String(p[5]||'').trim().toUpperCase();
- const match=raw.match(/^(PSA|BGS|CGC|GRAAD|CCIC|BCTC|PACG|AIG|TAG|ACE)(?=\s|[-:]|[0-9]|$)/i);
- if(match)return match[1];
+ const match=raw.match(/^([a-z][a-z0-9 .&'()/_+-]{1,39})\s+(?:10|[1-9](?:[.,]5)?|BLACK LABEL)$/i);
+ if(match)return match[1].trim();
  return '';
 }
 

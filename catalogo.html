@@ -627,19 +627,17 @@ document.getElementById('clearPriceFilter').onclick=()=>{
 };
 
 const gradingCompanies=[
- 'PSA','BGS','CGC','GRAAD','CCIC','BCTC','PACG','Altre','Non specificata'
+ 'PSA','BGS','CGC','GRAAD','CCIC','BCTC','PACG','AiG','TAG','ACE'
 ];
 
 function productGrader(p){
  if(p[2]!=='gradate')return '';
  const saved=String(p.details?.grader||'');
- if(saved)return gradingCompanies.includes(saved)?saved:'Altre';
+ if(saved)return saved==='Altre'||saved==='Non specificata'?'':saved;
  const raw=String(p[5]||'').trim().toUpperCase();
- const match=raw.match(/^(PSA|BGS|CGC|GRAAD|CCIC|BCTC|PACG)(?=\s|[-:]|[0-9]|$)/);
+ const match=raw.match(/^(PSA|BGS|CGC|GRAAD|CCIC|BCTC|PACG|AIG|TAG|ACE)(?=\s|[-:]|[0-9]|$)/i);
  if(match)return match[1];
- if(!raw||/^(?:[0-9]+(?:[.,][0-9]+)?|BLACK LABEL)$/.test(raw))
-   return 'Non specificata';
- return 'Altre';
+ return '';
 }
 
 function graderMatches(p){
@@ -1229,7 +1227,7 @@ function catalogConditionBadge(p){
  let grade=String(p[5]||'').trim().toUpperCase().replace(',', '.');
  // Compatibilità con vecchi articoli che potrebbero avere casa e voto insieme.
  if(!grader){
-  const old=grade.match(/^(PSA|BGS|CGC|GRAAD|CCIC|BCTC|PACG|TAG|ACE)\s+(.+)$/);
+  const old=grade.match(/^(PSA|BGS|CGC|GRAAD|CCIC|BCTC|PACG|AIG|TAG|ACE)\s+(.+)$/i);
   if(old){grader=old[1];grade=old[2];}
  }
  if(grade==='BLACK LABEL')grade='BL';
@@ -1448,7 +1446,13 @@ langs.innerHTML=tcgGroup?languageOptions.map(v=>`<button type="button" class="ca
 
   graderSection.hidden=!(tcgGroup&&lockedPokemonType==='gradate');
 
-  graderBox.innerHTML=gradingCompanies.map(v=>
+  const allGraders=[...gradingCompanies];
+  for(const p of products){
+   if(p[2]!=='gradate')continue;
+   const value=productGrader(p);
+   if(value&&!allGraders.some(g=>g.toLocaleLowerCase('it')===value.toLocaleLowerCase('it')))allGraders.push(value);
+  }
+  graderBox.innerHTML=allGraders.map(v=>
     `<button type="button" class="category-toggle"
       data-value="${v}"
       aria-pressed="${selectedGraders.has(v)}">${v}</button>`
@@ -1537,6 +1541,7 @@ window.addEventListener('popstate',event=>{
 
 loadProducts().then(data=>{
   products=data;
+  updateSubcategories();
   const requestedId=new URLSearchParams(location.search).get('prodotto');
   if(requestedId){
     const index=products.findIndex(p=>String(p.id)===requestedId && (p.catalog_group||'pokemon')===currentGroup);

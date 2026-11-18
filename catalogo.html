@@ -1825,7 +1825,6 @@ if ('serviceWorker' in navigator) {
  const root=document.getElementById('filterDrawer');
  if(!root)return;
  const config=[
-  ['cd-panel-sort','Ordina per'],
   ['cd-set-section','Set'],
   ['cd-language-section','Lingua'],
   ['sealedTypeSection','Tipologia'],
@@ -1835,8 +1834,7 @@ if ('serviceWorker' in navigator) {
   ['gameConditionSection','Condizione'],
   ['platformSection','Piattaforma'],
   ['gradingCompanySection','Casa di gradazione'],
-  ['cd-grade-section','Voto'],
-  ['','Fascia di prezzo']
+  ['cd-grade-section','Voto']
  ];
  for(const [id,title] of config){
   const section=id?document.getElementById(id):root.querySelector('.price-filter-section');

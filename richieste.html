@@ -119,7 +119,7 @@ const quantityKey='carte-diem-richieste-quantita-v1';
 const whatsappNumber='393517171630';
 // A shared selection lives in the URL, not in the visitor's local storage.
 const shareParam=new URLSearchParams(location.search).get('lista');
-const sharedEntries=shareParam===null?null:Array.from(new Map(shareParam.split(',').slice(0,100).map(part=>{
+let sharedEntries=shareParam===null?null:Array.from(new Map(shareParam.split(',').slice(0,100).map(part=>{
  const bits=part.split(':');const id=bits[0],qty=Number(bits[1]||1);
  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)&&Number.isSafeInteger(qty)&&qty>0&&qty<=999?{id,qty}:null;
 }).filter(Boolean).map(item=>[item.id,item])).values());
@@ -139,7 +139,22 @@ function publicListUrl(){
 }
 function getQuantities(){try{return JSON.parse(localStorage.getItem(quantityKey)||'{}')||{}}catch(e){return {}}}
 function getQuantity(id){const n=Number(sharedEntries?sharedEntries.find(x=>x.id===id)?.qty:getQuantities()[id]);return Number.isInteger(n)&&n>0?n:1}
-function saveQuantity(id,n){if(sharedEntries)return;const p=products.find(x=>x.id===id);if(!p)return;const max=Math.max(1,Number(p[8])||1);const value=Math.min(max,Math.max(1,Math.floor(Number(n)||1)));const q=getQuantities();q[id]=value;localStorage.setItem(quantityKey,JSON.stringify(q));renderRequests()}
+async function saveQuantity(id,n){
+ const p=products.find(x=>x.id===id);if(!p)return;
+ const max=Math.max(1,Number(p[8])||1);
+ const value=Math.min(max,Math.max(1,Math.floor(Number(n)||1)));
+ if(sharedEntries){
+  if(!isRequestAdmin||!await verifyRequestAdmin()){renderRequests();return;}
+  sharedEntries=sharedEntries.map(item=>item.id===id?{...item,qty:value}:item);
+  const url=new URL(location.href);
+  url.searchParams.set('lista',sharedEntries.map(item=>item.id+':'+item.qty).join(','));
+  history.replaceState(history.state,'',url.href);
+ }else{
+  const q=getQuantities();q[id]=value;
+  localStorage.setItem(quantityKey,JSON.stringify(q));
+ }
+ renderRequests();
+}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function selectedProducts(){return listEntries().map(item=>products.find(p=>p.id===item.id)).filter(Boolean)}
 function requestMessage(){const items=selectedProducts();return 'Ciao CARTE DIEM AREZZO! Vorrei informazioni sui seguenti prodotti:\n\n'+items.map((p,n)=>{
@@ -167,7 +182,7 @@ function renderRequests(){const items=selectedProducts();document.getElementById
  document.getElementById('requestEmpty').textContent=items.length?'Prodotti selezionati: '+items.length+(sharedEntries?' (lista condivisa)':''):sharedEntries?'Nessun prodotto della lista condivisa è attualmente disponibile.':'Lista vuota: visita il catalogo per aggiungere prodotti.';
  document.getElementById('copyRequest').disabled=!items.length;document.getElementById('sendWhatsApp').disabled=!items.length;
  document.querySelectorAll('[data-remove]').forEach(b=>{if(sharedEntries){b.hidden=true;return;}b.onclick=()=>setRequests(getRequests().filter(id=>id!==b.dataset.remove))});
- document.querySelectorAll('[data-qty]').forEach(e=>{if(sharedEntries)e.disabled=true;else e.onchange=()=>saveQuantity(e.dataset.qty,e.value)});if(isRequestAdmin)renderRequestAdminActions();
+ document.querySelectorAll('[data-qty]').forEach(e=>{e.disabled=!!sharedEntries&&!isRequestAdmin;e.onchange=()=>saveQuantity(e.dataset.qty,e.value)});if(isRequestAdmin)renderRequestAdminActions();
 }
 document.getElementById('sendWhatsApp').onclick=()=>{if(!selectedProducts().length)return;window.open('https://wa.me/'+whatsappNumber+'?text='+encodeURIComponent(requestMessage()),'_blank','noopener,noreferrer')};
 document.getElementById('copyRequest').onclick=async()=>{if(!selectedProducts().length)return;const msg=requestMessage();try{await navigator.clipboard.writeText(msg);document.getElementById('copyFeedback').textContent='Messaggio copiato.'}catch(e){window.prompt('Copia il messaggio:',msg)}};
@@ -296,6 +311,7 @@ function invalidateRequestAdmin(){
  archivedRequestProducts=[];
  requestAdminArea.hidden=true;
  requestAdminArea.replaceChildren();
+ if(sharedEntries&&typeof products!=='undefined')renderRequests();
 }
 async function verifyRequestAdmin(){
  const seq=++adminAuthCheckSeq;
@@ -307,6 +323,7 @@ async function verifyRequestAdmin(){
   if(seq!==adminAuthCheckSeq)return false;
   if(checkError||allowed!==true){invalidateRequestAdmin();return false;}
   isRequestAdmin=true;
+  if(sharedEntries)renderRequests();
   return true;
  }catch(e){if(seq===adminAuthCheckSeq)invalidateRequestAdmin();return false;}
 }

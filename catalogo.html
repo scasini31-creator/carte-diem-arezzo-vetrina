@@ -1334,6 +1334,19 @@ function catalogDetailCondition(p){
 }
 let detailReturnScrollY=0;
 let detailHistoryAdded=false;
+// Impostato solo per le aperture tramite link dalla Home / Prodotti in evidenza.
+let detailReturnToPreview=false;
+function positionDetailPreview(){
+ if(!detailReturnToPreview)return;
+ const index=activeDetail;
+ // Se la scheda è stata chiusa, activeDetail è già azzerato:
+ // conserviamo l'ID dell'ultima scheda nel dato di ritorno.
+ const card=document.querySelector('#catalogGrid .product[data-id="'+detailReturnToPreview+'"]');
+ if(!card)return;
+ const top=window.scrollY+card.getBoundingClientRect().top;
+ const target=Math.max(0,top-(window.innerHeight-card.getBoundingClientRect().height)/2);
+ window.scrollTo({top:target,left:0,behavior:'instant'});
+}
 function openDetail(i){
  const alreadyOpen=!document.getElementById('overlay').classList.contains('hidden');
  if(!alreadyOpen){
@@ -1347,9 +1360,14 @@ function dismissDetail(){
  document.getElementById('overlay').classList.add('hidden');
  document.body.style.overflow='';
  activeDetail=-1;
- // Ripristina la posizione precedente senza cambiare pagina o filtri.
- window.scrollTo({top:detailReturnScrollY,left:0,behavior:'instant'});
- requestAnimationFrame(()=>window.scrollTo(0,detailReturnScrollY));
+ // Nel catalogo normale resta alla stessa altezza; dai Prodotti in evidenza
+ // porta invece in vista l'anteprima della carta appena chiusa.
+ if(detailReturnToPreview){
+  requestAnimationFrame(()=>requestAnimationFrame(positionDetailPreview));
+ }else{
+  window.scrollTo({top:detailReturnScrollY,left:0,behavior:'instant'});
+  requestAnimationFrame(()=>window.scrollTo(0,detailReturnScrollY));
+ }
 }
 function closeDetail(){
  if(document.getElementById('overlay').classList.contains('hidden'))return;
@@ -1526,10 +1544,16 @@ loadProducts().then(data=>{
           showCatalog(currentGroup,kind);
         }
       }
-      const allGroupIds=products.map((p,i)=>i).filter(i=>{const p=products[i];return (p.catalog_group||'pokemon')===currentGroup&&p[2]!=='funko'});
-      const position=allGroupIds.filter(i=>selectedCategories.size===0||selectedCategories.has(products[i][2])).indexOf(index);
-      if(position!==-1)currentPage=Math.floor(position/PAGE_SIZE)+1;
+      // Prima ordiniamo realmente i risultati: la pagina dell'anteprima
+      // dipende da ordinamento, filtri e numero di prodotti per pagina.
+      currentPage=1;
       render();
+      const position=visibleProductIds.indexOf(index);
+      if(position!==-1){
+       currentPage=Math.floor(position/PAGE_SIZE)+1;
+       render();
+       detailReturnToPreview=index;
+      }
       openDetail(index);
       return;
     }

@@ -78,6 +78,23 @@ body > header .brand .gold {
 }
 </style>
 <link rel="stylesheet" href="shared-vertical-spacing.css?v=1">
+<style id="cd-shared-admin-product-detail-css">
+#requestItems.is-admin-shared .request-row > div:first-child{cursor:pointer;border-radius:6px;flex:1;min-width:0}
+#requestItems.is-admin-shared .request-row > div:first-child:focus-visible{outline:2px solid #e8c779;outline-offset:4px}
+#requestItems.is-admin-shared .request-row > div:first-child:hover strong{text-decoration:underline;text-decoration-color:#d5b36a;text-underline-offset:3px}
+#cdSharedProductOverlay[hidden]{display:none!important}
+#cdSharedProductOverlay{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}
+#cdSharedProductPanel{position:relative;width:min(720px,100%);max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;background:#171719;border:1px solid #826b44;border-radius:13px;padding:22px 17px 20px;box-sizing:border-box;color:#f4f0e8;box-shadow:0 10px 42px #000b}
+#cdSharedProductClose{position:sticky;top:0;float:right;z-index:1;width:38px;height:38px;background:#28231d;border:1px solid #826b44;border-radius:8px;color:#e8c779;font-size:27px;line-height:1;cursor:pointer}
+#cdSharedProductName{font-family:Georgia,serif;margin:4px 45px 8px 0;font-size:clamp(19px,4vw,25px);line-height:1.3}
+#cdSharedProductMeta{color:#dec795;font-size:14px;line-height:1.6;white-space:pre-line;margin:0 0 12px}
+#cdSharedProductPrice{font-size:21px;font-weight:700;color:#e8c779;margin:14px 0}
+#cdSharedProductDescription{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;margin-top:14px}
+#cdSharedProductMedia{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:4px 2px 10px}
+#cdSharedProductMedia img{display:block;flex:0 0 min(88%,390px);width:min(88%,390px);aspect-ratio:1/1;object-fit:contain;background:#050505;border:1px solid #443825;border-radius:9px;scroll-snap-align:center}
+#cdSharedProductMedia:empty{display:none}
+@media(max-width:700px){#cdSharedProductPanel{padding:16px 13px}#cdSharedProductMedia img{flex-basis:92%;width:92%}}
+</style>
 </head><body><header><a class="brand" href="index.html"><img alt="Logo Carte Diem Arezzo" src="logo-ottimizzato.webp"/><span>CARTE DIEM <span class="gold">AREZZO</span></span></a><nav><a href="index.html">Home</a><a href="catalogo.html">Catalogo</a><a href="index.html#chi-siamo">Chi siamo</a><a href="index.html#contatti">Contatti</a><a class="request-link" href="richieste.html">Lista richieste <b class="request-count">0</b></a></nav></header><main class="container"><div class="eyebrow">CARTE DIEM AREZZO</div><h1 class="section-title">Lista richieste</h1><p class="sub">Seleziona prodotti di categorie diverse. Non è un carrello per acquisti.</p><div class="request-list"><div id="requestItems"></div><div id="sharedListTotal" class="shared-list-total" hidden aria-live="polite"></div><p class="sub" id="requestEmpty"></p><p class="sub">Controlla i prodotti e le quantità, poi invia la richiesta su WhatsApp. L’invio non costituisce un acquisto.</p><div class="request-actions"><button class="button" id="sendWhatsApp" type="button">Invia richiesta su WhatsApp</button><button class="button" id="copyRequest" type="button">Copia messaggio</button></div><p aria-live="polite" class="sub" id="copyFeedback"></p></div></main><footer style="padding:36px 16px 52px;text-align:center;color:#888;background:#080b15;border-top:1px solid #453b35;">© 2026 CARTE DIEM AREZZO<a href="amministrazione.html?return=richieste.html" data-cd-admin-return="1" style="display:block;margin-top:12px;font-size:11px;color:#777;text-decoration:none;text-align:center;">pannello amministratore</a></footer><script id="cd-admin-origin-link">
 (function(){
   var a=document.querySelector('a[data-cd-admin-return="1"]');
@@ -132,7 +149,7 @@ function requestMessage(){const items=selectedProducts();return 'Ciao CARTE DIEM
 }).join('\n')+'\n\nVisualizza i prodotti selezionati sul sito:\n'+publicListUrl()+'\n\nGrazie!'}
 function renderRequests(){const items=selectedProducts();document.getElementById('requestItems').innerHTML=items.map(p=>{
  const max=Math.max(1,Number(p[8])||1),qty=Math.min(getQuantity(p.id),max);
- return '<div class="request-row"><div><strong>'+esc(label(p))+'</strong><p class="sub">'+esc(categoryNames[p[2]])+' · '+esc(p[10]||'ITA')+' · '+esc(price(p))+'</p></div><div class="request-qty"><label for="qty-'+esc(p.id)+'">Quantità</label><input id="qty-'+esc(p.id)+'" type="number" min="1" max="'+max+'" value="'+qty+'" data-qty="'+esc(p.id)+'"><button type="button" data-remove="'+esc(p.id)+'">Rimuovi</button></div></div>'
+ return '<div class="request-row" data-cd-product-id="'+esc(p.id)+'"><div><strong>'+esc(label(p))+'</strong><p class="sub">'+esc(categoryNames[p[2]])+' · '+esc(p[10]||'ITA')+' · '+esc(price(p))+'</p></div><div class="request-qty"><label for="qty-'+esc(p.id)+'">Quantità</label><input id="qty-'+esc(p.id)+'" type="number" min="1" max="'+max+'" value="'+qty+'" data-qty="'+esc(p.id)+'"><button type="button" data-remove="'+esc(p.id)+'">Rimuovi</button></div></div>'
  }).join('');
  const totalBox=document.getElementById('sharedListTotal');
  totalBox.hidden=!sharedEntries||!items.length;
@@ -323,4 +340,111 @@ if ('serviceWorker' in navigator) {
   body nav.mobile-dock>a.active{color:#ffd05e!important}
   body nav.mobile-dock>a span{display:block!important;font:400 24px/1 Arial,sans-serif!important;color:inherit!important}
 }
-</style><script src="shared-mobile-dock.js?v=1"></script></body></html>
+</style>
+<script id="cd-shared-admin-product-detail">
+(function(){
+ const list=document.getElementById('requestItems');
+ const modal=document.createElement('div');
+ modal.id='cdSharedProductOverlay';
+ modal.hidden=true;
+ modal.setAttribute('role','presentation');
+ modal.innerHTML='<div id="cdSharedProductPanel" role="dialog" aria-modal="true" aria-label="Scheda prodotto"><button type="button" id="cdSharedProductClose" aria-label="Chiudi scheda prodotto">×</button><h2 id="cdSharedProductName"></h2><p id="cdSharedProductMeta"></p><div id="cdSharedProductMedia"></div><p id="cdSharedProductPrice"></p><div id="cdSharedProductDescription"></div></div>';
+ document.body.append(modal);
+ const closeButton=modal.querySelector('#cdSharedProductClose');
+ let returnY=0;
+ let modalHistory=false;
+ function visible(){return !modal.hidden}
+ function hide(){
+  if(!visible())return;
+  modal.hidden=true;
+  document.body.style.overflow='';
+  modalHistory=false;
+  requestAnimationFrame(()=>window.scrollTo(0,returnY));
+ }
+ function close(){
+  if(!visible())return;
+  if(modalHistory&&history.state?.cdSharedProductDetail)history.back();
+  else hide();
+ }
+ closeButton.addEventListener('click',close);
+ modal.addEventListener('click',e=>{if(e.target===modal)close()});
+ document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&visible()){e.preventDefault();close();}
+ });
+ window.addEventListener('popstate',()=>{
+  if(visible())hide();
+ });
+ function updateClickable(){
+  const enabled=!!sharedEntries&&isRequestAdmin;
+  list.classList.toggle('is-admin-shared',enabled);
+  list.querySelectorAll('.request-row').forEach(row=>{
+   const target=row.firstElementChild;
+   if(!target)return;
+   if(enabled){
+    target.setAttribute('role','button');
+    target.setAttribute('tabindex','0');
+    target.setAttribute('title','Apri scheda prodotto');
+   }else{
+    target.removeAttribute('role');
+    target.removeAttribute('tabindex');
+    target.removeAttribute('title');
+   }
+  });
+ }
+ function show(p){
+  returnY=window.scrollY;
+  modal.querySelector('#cdSharedProductName').textContent=label(p);
+  const meta=[
+   p.catalog_group==='pokemon'?'TCG Pokémon':p.catalog_group==='tcg'?'Altri TCG':p.catalog_group==='videogiochi'?'Consoles e Videogames':p.catalog_group==='accessori'?'Accessori':p.catalog_group==='collezione'?'Oggetti da collezione':categoryNames[p[2]]||'',
+   categoryNames[p[2]]||p[2]||'',
+   (p[10]?'Lingua: '+p[10]:''),
+   (p[5]?'Condizione / voto: '+p[5]:''),
+   (p[2]==='gradate'&&p.details?.grader?'Casa di gradazione: '+p.details.grader:''),
+   (Number(p[8])>1?'Disponibilità: '+p[8]:'')
+  ].filter(Boolean);
+  modal.querySelector('#cdSharedProductMeta').textContent=meta.join(' · ');
+  modal.querySelector('#cdSharedProductPrice').textContent=price(p);
+  const description=modal.querySelector('#cdSharedProductDescription');
+  description.textContent=String(p[9]||'').trim();
+  description.hidden=!description.textContent;
+  const media=modal.querySelector('#cdSharedProductMedia');
+  media.replaceChildren();
+  (p[7]||[]).forEach((src,i)=>{
+   const img=document.createElement('img');
+   img.src=src;
+   img.alt='Foto '+(i+1)+' di '+(p[7]||[]).length+' del prodotto';
+   img.loading=i===0?'eager':'lazy';
+   media.append(img);
+  });
+  history.pushState({...history.state,cdSharedProductDetail:true},'',location.href);
+  modalHistory=true;
+  modal.hidden=false;
+  document.body.style.overflow='hidden';
+  closeButton.focus({preventScroll:true});
+ }
+ async function openByRow(row){
+  if(!sharedEntries||!isRequestAdmin||visible())return;
+  const id=row.dataset.cdProductId;
+  const p=selectedProducts().find(item=>item.id===id);
+  if(!p)return;
+  if(!await verifyRequestAdmin())return;
+  show(p);
+ }
+ list.addEventListener('click',e=>{
+  if(!isRequestAdmin||!sharedEntries)return;
+  const target=e.target.closest('.request-row > div:first-child');
+  if(target&&list.contains(target))openByRow(target.parentElement);
+ });
+ list.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const target=e.target.closest('.request-row > div:first-child');
+  if(!target||!list.contains(target)||!isRequestAdmin||!sharedEntries)return;
+  e.preventDefault();
+  openByRow(target.parentElement);
+ });
+ const observer=new MutationObserver(updateClickable);
+ observer.observe(list,{childList:true});
+ window.cdSharedAdminProductDetailRefresh=updateClickable;
+ updateClickable();
+})();
+</script><script src="shared-mobile-dock.js?v=1"></script></body></html>

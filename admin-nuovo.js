@@ -11,7 +11,52 @@ const platforms=['Game Boy','Game Boy Color','Game Boy Advance','Nintendo DS','N
 const sealed=['Box','ETB','Bundle','Tin','Collezioni','Bustine','UPC','Altro'];
 const accessories=['Binder','Sleeve e bustine protettive','Toploader e protezioni rigide','Espositori','Box portacarte','Altro'];
 const collectibles=['Funko Pop','Figure e Statue','Gadget','Altro'];
-const graders=['PSA','BGS','CGC','GRAAD','CCIC','BCTC','PACG','TAG','ACE','Altre','Non specificata'];
+const graders=['PSA','BGS','CGC','GRAAD','CCIC','BCTC','PACG','AiG','TAG','ACE'];
+const ADD_GRADER='__add_grader__';
+async function loadGradingCompanies(){
+ const {data,error}=await sb.from('grading_companies').select('name').order('name');
+ if(error)throw error;
+ for(const item of data||[]){
+  const name=String(item.name||'').trim();
+  if(name&&!graders.some(g=>g.toLocaleLowerCase('it')===name.toLocaleLowerCase('it')))graders.push(name);
+ }
+ const select=f('grader');
+ if(select&&formMode==='product')syncGraderOptions(select);
+}
+function syncGraderOptions(select){
+ const current=select.value;
+ const list=[...new Set(graders)].filter(Boolean);
+ if(current&&current!==ADD_GRADER&&!list.includes(current))list.push(current);
+ select.innerHTML=list.map(name=>'<option value="'+esc(name)+'">'+esc(name)+'</option>').join('')+
+  '<option value="'+ADD_GRADER+'">＋ Aggiungi casa di gradazione</option>';
+ if(current&&current!==ADD_GRADER)select.value=current;
+ select.dataset.previous=select.value;
+}
+async function addGradingCompany(select){
+ const previous=select.dataset.previous||'PSA';
+ select.value=previous;
+ const input=prompt('Nome della nuova casa di gradazione (2–40 caratteri):');
+ if(input===null)return;
+ const name=input.trim();
+ if(name.length<2||name.length>40||!(/^[\\p{L}\\p{N} .&'()/_+-]+$/u).test(name)){
+  notify('Nome non valido. Usa da 2 a 40 caratteri, senza simboli speciali.',true);
+  return;
+ }
+ const existing=graders.find(g=>g.toLocaleLowerCase('it')===name.toLocaleLowerCase('it'));
+ if(existing){select.value=existing;select.dataset.previous=existing;return;}
+ select.disabled=true;
+ try{
+  const {error}=await sb.from('grading_companies').insert({name});
+  if(error)throw error;
+  graders.push(name);
+  syncGraderOptions(select);
+  select.value=name;
+  select.dataset.previous=name;
+  notify('Casa di gradazione aggiunta: '+name);
+ }catch(e){notify('Impossibile aggiungere la casa di gradazione: '+(e.message||e),true)}
+ finally{select.disabled=false}
+}
+
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));}
 function notify(t,error=false){status.textContent=t;status.classList.toggle('admin-toast-error',error);$('adminModalMessage').textContent=t;}
 function ensure(ok,message){if(!ok)throw new Error(message);}
@@ -529,7 +574,7 @@ function productFields(p,group,category){
  html+=field('sigla','Sigla carta','text',p?.[1]||'');
  html+=field('language','Lingua','select',p?.[10]||'ITA',['ITA','ENG','JPN','CHN','KOR']);
  html+=field('condition','Condizione','select',category==='singole'?(String(p?.[5]||'Near Mint').trim().toUpperCase()==='SIGILLATA'?'SEALED':p?.[5]||'Near Mint'):'Near Mint',['SEALED','Near Mint','Excellent','Good','Light Played','Played','Poor']);
- html+=field('grader','Casa di gradazione','select',d.grader||'PSA',graders);
+ html+=field('grader','Casa di gradazione','select',d.grader||'PSA',[...graders.filter(g=>g!=='Altre'&&g!=='Non specificata'),...(d.grader&&!graders.includes(d.grader)?[d.grader]:[]),[ADD_GRADER,'＋ Aggiungi casa di gradazione']]);
  html+=field('grade','Voto','select',category==='gradate'?((p?.[5]||'').match(/\b(10|[1-9](?:[.,]5)?|Black Label)\b/i)||[])[0]||'10':'10',Array.from({length:19},(_,i)=>String((i+2)/2)).concat('Black Label'));
  html+=field('sealedType','Tipologia sigillati','select',d.sealedType||'ETB',sealed);
  html+=field('platform','Piattaforma','select',d.platform||'Switch',platforms);
@@ -615,6 +660,13 @@ function openProduct(p,group,category){
  const g=p?.catalog_group||group||'pokemon';
  photos=(p?.paths||[]).map((path,i)=>({path,thumbPath:p?.details?.preview_paths?.[i]||null,url:p?.[7]?.[i]||imageUrl(path)}));
  showDialog(p?'Modifica prodotto':'Nuovo articolo',productFields(p,g,cat));
+ const graderSelect=f('grader');
+ graderSelect.dataset.previous=graderSelect.value;
+ graderSelect.addEventListener('change',()=>{
+  if(graderSelect.value===ADD_GRADER){void addGradingCompany(graderSelect);}
+  else graderSelect.dataset.previous=graderSelect.value;
+ });
+ void loadGradingCompanies().catch(err=>console.warn('Case di gradazione non aggiornate:',err.message));
  f('group').onchange=syncProductFields;f('category').onchange=syncProductFields;
  syncProductFields();f('category').value=cat;syncProductFields();
  f('photos').onchange=e=>{

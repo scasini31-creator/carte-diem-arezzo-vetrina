@@ -19,7 +19,7 @@ function activeGradingCompanies(){
  for(const p of products){
   if(p[2]!=='gradate')continue;
   const saved=String(p.details?.grader||'').trim();
-  const legacy=String(p[5]||'').trim().match(/^([a-z][a-z0-9 .&'()/_+-]{1,39})\\s+(?:10|[1-9](?:[.,]5)?|Black Label)$/i);
+  const legacy=String(p[5]||'').trim().match(/^([a-z][a-z0-9 .&'()/_+-]{1,39})\s+(?:10|[1-9](?:[.,]5)?|Black Label)$/i);
   const name=saved||legacy?.[1]||'';
   if(!name||['Altre','Non specificata'].includes(name))continue;
   if(!list.some(g=>g.toLocaleLowerCase('it')===name.toLocaleLowerCase('it')))list.push(name);
@@ -27,8 +27,6 @@ function activeGradingCompanies(){
  return list;
 }
 async function loadGradingCompanies(){
- const {error}=await sb.from('grading_companies').select('name').limit(1);
- if(error)throw error;
  const inUse=activeGradingCompanies();
  const names=[...inUse];
  // I nomi nuovi sono selezionabili durante l'inserimento del primo prodotto.

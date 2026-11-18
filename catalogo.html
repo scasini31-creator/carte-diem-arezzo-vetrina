@@ -1794,7 +1794,19 @@ if ('serviceWorker' in navigator) {
 </style>
 <style id="cd-filter-submenus-style">
 /* Sottomenù indipendenti per tutti i gruppi di filtri. */
-#filterDrawer .cd-submenu{min-width:0}
+#filterDrawer .cd-submenu{min-width:0;position:relative}
+#filterDrawer .cd-submenu .cd-submenu-toggle{padding-right:66px!important}
+#filterDrawer .cd-submenu .cd-submenu-reset{
+ position:absolute;right:37px;top:6px;z-index:2;
+ display:grid;place-items:center;width:34px;height:34px;padding:0;
+ color:#e8c779;background:#171719;border:1px solid #826b44;
+ border-radius:7px;cursor:pointer;box-sizing:border-box;
+}
+#filterDrawer .cd-submenu .cd-submenu-reset:disabled{opacity:.55;cursor:default}
+#filterDrawer .cd-submenu .cd-submenu-reset:focus-visible{outline:2px solid #e8c779;outline-offset:2px}
+#filterDrawer .cd-submenu .cd-submenu-reset svg{width:18px;height:18px}
+@media(max-width:700px){#filterDrawer .cd-submenu .cd-submenu-reset{top:7px}}
+
 #filterDrawer .cd-submenu .cd-submenu-toggle{
  display:flex!important;align-items:center!important;justify-content:space-between!important;
  width:100%!important;min-height:45px!important;padding:10px 12px!important;
@@ -1857,21 +1869,41 @@ if ('serviceWorker' in navigator) {
  const root=document.getElementById('filterDrawer');
  if(!root)return;
  const config=[
-  ['cd-set-section','Set'],
-  ['cd-language-section','Lingua'],
-  ['sealedTypeSection','Tipologia'],
-  ['accessoryTypeSection','Tipologia'],
-  ['collectibleTypeSection','Tipologia'],
-  ['cd-condition-section','Condizione'],
-  ['gameConditionSection','Condizione'],
-  ['platformSection','Piattaforma'],
-  ['gradingCompanySection','Casa di gradazione'],
-  ['cd-grade-section','Voto']
+  ['cd-set-section','Set',selectedSets],
+  ['cd-language-section','Lingua',selectedLanguages],
+  ['sealedTypeSection','Tipologia',selectedSealedTypes],
+  ['accessoryTypeSection','Tipologia',selectedAccessoryTypes],
+  ['collectibleTypeSection','Tipologia',selectedCollectibleTypes],
+  ['cd-condition-section','Condizione',selectedConditions],
+  ['gameConditionSection','Condizione',selectedGameConditions],
+  ['platformSection','Piattaforma',selectedPlatforms],
+  ['gradingCompanySection','Casa di gradazione',selectedGraders],
+  ['cd-grade-section','Voto',selectedGrades]
  ];
- for(const [id,title] of config){
-  const section=id?document.getElementById(id):root.querySelector('.price-filter-section');
+ const syncResets=()=>{for(const [id,,values] of config){
+  const reset=document.getElementById(id)?.querySelector('.cd-submenu-reset');
+  if(reset)reset.disabled=values.size===0;
+ }};
+ for(const [id,title,values] of config){
+  const section=document.getElementById(id);
   if(!section||section.classList.contains('cd-submenu'))continue;
   section.classList.add('cd-submenu');
+  const reset=document.createElement('button');
+  reset.type='button';
+  reset.className='cd-submenu-reset';
+  reset.title='Cancella filtro '+title;
+  reset.setAttribute('aria-label','Cancella filtro '+title);
+  reset.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 10v7"/><path d="M14 10v7"/></svg>';
+  reset.addEventListener('click',event=>{
+   event.stopPropagation();
+   if(!values.size)return;
+   values.clear();
+   section.querySelectorAll('.category-toggle[aria-pressed]').forEach(button=>button.setAttribute('aria-pressed','false'));
+   currentPage=1;
+   render();
+   syncResets();
+  });
+  section.prepend(reset);
   const button=document.createElement('button');
   button.type='button';
   button.className='cd-submenu-toggle';
@@ -1886,5 +1918,8 @@ if ('serviceWorker' in navigator) {
   });
   section.prepend(button);
  }
+ const observer=new MutationObserver(syncResets);
+ observer.observe(root,{attributes:true,attributeFilter:['aria-pressed'],childList:true,subtree:true});
+ syncResets();
 })();
 </script><script defer src="catalog-order.js?v=1"></script></body></html>

@@ -1541,7 +1541,7 @@ window.addEventListener('popstate',event=>{
 
 loadProducts().then(data=>{
   products=data;
-  updateSubcategories();
+  if(lockedPokemonType)updateSubcategories();
   const requestedId=new URLSearchParams(location.search).get('prodotto');
   if(requestedId){
     const index=products.findIndex(p=>String(p.id)===requestedId && (p.catalog_group||'pokemon')===currentGroup);

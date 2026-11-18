@@ -1358,6 +1358,16 @@ function openDetail(i){
 function dismissDetail(){
  document.getElementById('overlay').classList.add('hidden');
  document.body.style.overflow='';
+ // Se nella scheda in evidenza si è passati a un'altra carta con le frecce,
+ // mostra l'anteprima dell'ultima carta effettivamente visualizzata.
+ if(detailReturnToPreview!==null&&activeDetail>=0){
+  const position=visibleProductIds.indexOf(activeDetail);
+  if(position>=0){
+   const page=Math.floor(position/PAGE_SIZE)+1;
+   if(currentPage!==page){currentPage=page;render();}
+   detailReturnToPreview=activeDetail;
+  }
+ }
  activeDetail=-1;
  // Nel catalogo normale resta alla stessa altezza; dai Prodotti in evidenza
  // porta invece in vista l'anteprima della carta appena chiusa.

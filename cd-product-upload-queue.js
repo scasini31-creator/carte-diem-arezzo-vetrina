@@ -83,8 +83,9 @@ async function work(item){
  if(row.category==='singole'&&String(row.condition_or_grade||'').trim().toUpperCase()==='SEALED')row.condition_or_grade='Sigillata';
  const {error}=await api.from('products').insert(row);
  if(error&&error.code!=='23505')throw error;
- item.files=[];item.status='done';item.progress=100;item.error='';
- await put(item);changed();
+ // Caricamento completato: rimuovi subito la voce locale dalla coda/storico.
+ // Il prodotto rimane salvato normalmente nel catalogo Supabase.
+ await remove(item.id);changed();
  window.dispatchEvent(new CustomEvent('cd-product-uploaded',{detail:{id:item.id}}));
 }
 async function run(){
@@ -96,6 +97,9 @@ async function run(){
   const {data,error:authError}=await api.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
   if(authError||!data)return;
   const rows=await all();
+  // Pulisci anche i completamenti conservati dalle versioni precedenti.
+  for(const item of rows.filter(x=>x.status==='done'))await remove(item.id);
+  if(rows.some(x=>x.status==='done'))changed();
   for(const item of rows){
    if(!enabled)break;
    if(!['pending','uploading'].includes(item.status))continue;

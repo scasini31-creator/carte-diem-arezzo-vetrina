@@ -579,9 +579,13 @@ function sortProductIds(ids){
  );
  const priced=(a,b,descending=false)=>{
    const x=products[a][3],y=products[b][3];
-   if(x===null&&y===null)return 0;
-   if(x===null)return 1;
-   if(y===null)return -1;
+   // In ordine decrescente, "Prezzo su richiesta" precede tutti gli importi.
+   // Negli altri ordinamenti per prezzo resta dopo gli importi numerici.
+   const noX=x===null||x===undefined;
+   const noY=y===null||y===undefined;
+   if(noX&&noY)return 0;
+   if(noX)return descending?-1:1;
+   if(noY)return descending?1:-1;
    return descending?y-x:x-y;
  };
  if(mode==='old')result.reverse();

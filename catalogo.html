@@ -1335,16 +1335,15 @@ function catalogDetailCondition(p){
 let detailReturnScrollY=0;
 let detailHistoryAdded=false;
 // Impostato solo per le aperture tramite link dalla Home / Prodotti in evidenza.
-let detailReturnToPreview=false;
+let detailReturnToPreview=null;
 function positionDetailPreview(){
- if(!detailReturnToPreview)return;
- const index=activeDetail;
- // Se la scheda è stata chiusa, activeDetail è già azzerato:
- // conserviamo l'ID dell'ultima scheda nel dato di ritorno.
- const card=document.querySelector('#catalogGrid .product[data-id="'+detailReturnToPreview+'"]');
+ if(detailReturnToPreview===null)return;
+ const index=detailReturnToPreview;
+ detailReturnToPreview=null;
+ const card=document.querySelector('#catalogGrid .product[data-id="'+index+'"]');
  if(!card)return;
- const top=window.scrollY+card.getBoundingClientRect().top;
- const target=Math.max(0,top-(window.innerHeight-card.getBoundingClientRect().height)/2);
+ const rect=card.getBoundingClientRect();
+ const target=Math.max(0,window.scrollY+rect.top-(window.innerHeight-rect.height)/2);
  window.scrollTo({top:target,left:0,behavior:'instant'});
 }
 function openDetail(i){
@@ -1362,7 +1361,7 @@ function dismissDetail(){
  activeDetail=-1;
  // Nel catalogo normale resta alla stessa altezza; dai Prodotti in evidenza
  // porta invece in vista l'anteprima della carta appena chiusa.
- if(detailReturnToPreview){
+ if(detailReturnToPreview!==null){
   requestAnimationFrame(()=>requestAnimationFrame(positionDetailPreview));
  }else{
   window.scrollTo({top:detailReturnScrollY,left:0,behavior:'instant'});

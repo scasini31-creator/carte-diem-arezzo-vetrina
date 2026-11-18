@@ -11,29 +11,45 @@ const platforms=['Game Boy','Game Boy Color','Game Boy Advance','Nintendo DS','N
 const sealed=['Box','ETB','Bundle','Tin','Collezioni','Bustine','UPC','Altro'];
 const accessories=['Binder','Sleeve e bustine protettive','Toploader e protezioni rigide','Espositori','Box portacarte','Altro'];
 const collectibles=['Funko Pop','Figure e Statue','Gadget','Altro'];
-const graders=['PSA','BGS','CGC','GRAAD','CCIC','BCTC','PACG','AiG','TAG','ACE'];
+// Mostra solo le case con carte gradate attualmente pubblicate.
+const graders=[];
 const ADD_GRADER='__add_grader__';
-async function loadGradingCompanies(){
- const {data,error}=await sb.from('grading_companies').select('name').order('name');
- if(error)throw error;
- for(const item of data||[]){
-  const name=String(item.name||'').trim();
-  if(name&&!graders.some(g=>g.toLocaleLowerCase('it')===name.toLocaleLowerCase('it')))graders.push(name);
+function activeGradingCompanies(){
+ const list=[];
+ for(const p of products){
+  if(p[2]!=='gradate')continue;
+  const saved=String(p.details?.grader||'').trim();
+  const legacy=String(p[5]||'').trim().match(/^([a-z][a-z0-9 .&'()/_+-]{1,39})\\s+(?:10|[1-9](?:[.,]5)?|Black Label)$/i);
+  const name=saved||legacy?.[1]||'';
+  if(!name||['Altre','Non specificata'].includes(name))continue;
+  if(!list.some(g=>g.toLocaleLowerCase('it')===name.toLocaleLowerCase('it')))list.push(name);
  }
+ return list;
+}
+async function loadGradingCompanies(){
+ const {error}=await sb.from('grading_companies').select('name').limit(1);
+ if(error)throw error;
+ const inUse=activeGradingCompanies();
+ const names=[...inUse];
+ // I nomi nuovi sono selezionabili durante l'inserimento del primo prodotto.
  const select=f('grader');
+ const selected=select?.value;
+ if(selected&&selected!==ADD_GRADER&&!names.some(g=>g.toLocaleLowerCase('it')===selected.toLocaleLowerCase('it')))names.push(selected);
+ graders.splice(0,graders.length,...names);
  if(select&&formMode==='product')syncGraderOptions(select);
 }
 function syncGraderOptions(select){
  const current=select.value;
  const list=[...new Set(graders)].filter(Boolean);
  if(current&&current!==ADD_GRADER&&!list.includes(current))list.push(current);
- select.innerHTML=list.map(name=>'<option value="'+esc(name)+'">'+esc(name)+'</option>').join('')+
+ select.innerHTML=(list.length?'':'<option value="">Seleziona una casa di gradazione</option>')+
+  list.map(name=>'<option value="'+esc(name)+'">'+esc(name)+'</option>').join('')+
   '<option value="'+ADD_GRADER+'">＋ Aggiungi casa di gradazione</option>';
  if(current&&current!==ADD_GRADER)select.value=current;
  select.dataset.previous=select.value;
 }
 async function addGradingCompany(select){
- const previous=select.dataset.previous||'PSA';
+ const previous=select.dataset.previous||'';
  select.value=previous;
  const input=prompt('Nome della nuova casa di gradazione (2–40 caratteri):');
  if(input===null)return;
@@ -574,7 +590,7 @@ function productFields(p,group,category){
  html+=field('sigla','Sigla carta','text',p?.[1]||'');
  html+=field('language','Lingua','select',p?.[10]||'ITA',['ITA','ENG','JPN','CHN','KOR']);
  html+=field('condition','Condizione','select',category==='singole'?(String(p?.[5]||'Near Mint').trim().toUpperCase()==='SIGILLATA'?'SEALED':p?.[5]||'Near Mint'):'Near Mint',['SEALED','Near Mint','Excellent','Good','Light Played','Played','Poor']);
- html+=field('grader','Casa di gradazione','select',d.grader||'PSA',[...graders.filter(g=>g!=='Altre'&&g!=='Non specificata'),...(d.grader&&!graders.includes(d.grader)?[d.grader]:[]),[ADD_GRADER,'＋ Aggiungi casa di gradazione']]);
+ html+=field('grader','Casa di gradazione','select',d.grader||graders[0]||'',[...(graders.length?[]:[['','Seleziona una casa di gradazione']]),...graders,...(d.grader&&!graders.includes(d.grader)?[d.grader]:[]),[ADD_GRADER,'＋ Aggiungi casa di gradazione']]);
  html+=field('grade','Voto','select',category==='gradate'?((p?.[5]||'').match(/\b(10|[1-9](?:[.,]5)?|Black Label)\b/i)||[])[0]||'10':'10',Array.from({length:19},(_,i)=>String((i+2)/2)).concat('Black Label'));
  html+=field('sealedType','Tipologia sigillati','select',d.sealedType||'ETB',sealed);
  html+=field('platform','Piattaforma','select',d.platform||'Switch',platforms);
@@ -656,6 +672,8 @@ function redrawPhotos(){
 }
 function openProduct(p,group,category){
  formMode='product';editing=p||null;
+ // Rigenera le opzioni a ogni apertura, evitando nomi non più utilizzati.
+ graders.splice(0,graders.length,...activeGradingCompanies());
  const cat=category||p?.[2]||choices[group][0][0];
  const g=p?.catalog_group||group||'pokemon';
  photos=(p?.paths||[]).map((path,i)=>({path,thumbPath:p?.details?.preview_paths?.[i]||null,url:p?.[7]?.[i]||imageUrl(path)}));
@@ -889,6 +907,7 @@ async function saveProduct(){
   image_paths:paths,details
  };
  ensure(raw.price===null||Number.isFinite(raw.price)&&raw.price>=0,'Prezzo non valido.');
+ if(category==='gradate')ensure(details.grader&&details.grader!==ADD_GRADER,'Seleziona o aggiungi una casa di gradazione.');
  const query=editing?sb.from('products').update(raw).eq('id',editing.id):sb.from('products').insert(raw);
  let error;
  try{({error}=await query)}catch(e){throw new Error('Connessione al database: '+e.message)}

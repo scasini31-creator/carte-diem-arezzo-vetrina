@@ -1317,13 +1317,10 @@ function catalogDetailCondition(p){
  if(p[2]==='gradate'){
   let vote=String(p[5]||'').trim();
   const grader=productGrader(p);
-  // Nei record piu' vecchi il nome della casa puo' essere incluso nel voto.
-  if(grader&&grader!=='Non specificata'){
-   const prefix=new RegExp('^'+grader.replace(/[.*+?^$\{\}()|[\]\\]/g,'\\function openDetail(i){activeDetail=i;updateDetailRequest();updateDetailNavigation();let p=products[i];document.getElementById('detailName').textContent=label(p);document.getElementById('detailCategory').textContent=categoryNames[p[2]];document.getElementById('detailCondition').textContent=['accessori','collezione'].includes(p.catalog_group)?'':(['console','videogiochi'].includes(p[2])&&p.catalog_group==='videogiochi')?(p.details?.gameCondition?'Condizione: '+String(p.details.gameCondition).toUpperCase():''):(([ 'singole','gradate'].includes(p[2])&&p[5]?(String(p[5]).trim().toUpperCase()==='SIGILLATA'?'SEALED':p[5])+' - ':'')+(p[10]||'ITA'));')+'(?:\\s+|[-:]\\s*)','i');
-   vote=vote.replace(prefix,'').trim();
-  }
-  const result=[grader&&grader!=='Non specificata'?grader:'',vote].filter(Boolean).join(' ');
-  return [result,language].filter(Boolean).join(' - ');
+  if(grader&&grader!=='Non specificata'&&vote.toUpperCase().startsWith(grader.toUpperCase()+' '))
+   vote=vote.slice(grader.length).trim();
+  const text=[grader&&grader!=='Non specificata'?grader:'',vote].filter(Boolean).join(' ');
+  return [text,language].filter(Boolean).join(' - ');
  }
  const condition=String(p[5]||'').trim();
  return [(condition.toUpperCase()==='SIGILLATA'?'SEALED':condition),language].filter(Boolean).join(' - ');

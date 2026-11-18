@@ -1289,8 +1289,15 @@ function renderPagination(totalPages,totalCount){
  nav.querySelectorAll('button[data-page]').forEach(b=>b.onclick=()=>{
    const next=Number(b.dataset.page);
    if(next<1||next>totalPages||next===currentPage)return;
-   currentPage=next;render();
-   document.getElementById('catalogGrid').scrollIntoView({behavior:'smooth',block:'start'});
+   // Conserva la pagina e la posizione precedente nella cronologia Android.
+   const previousState=history.state||{};
+   history.replaceState({...previousState,cdCatalogPage:currentPage,cdCatalogScroll:window.scrollY},'',location.href);
+   currentPage=next;
+   render();
+   const grid=document.getElementById('catalogGrid');
+   const targetY=Math.max(0,window.scrollY+grid.getBoundingClientRect().top);
+   history.pushState({...previousState,cdCatalogPage:next,cdCatalogScroll:targetY},'',location.href);
+   grid.scrollIntoView({behavior:'smooth',block:'start'});
  });
 }
 function updateQuickButtons(){document.querySelectorAll('.quick-add').forEach(b=>{const selected=getRequests().includes(products[Number(b.dataset.quickAdd)]?.id);b.textContent=selected?'✓ Nella lista':'Aggiungi alla lista';b.classList.toggle('is-added',selected);b.setAttribute('aria-pressed',String(selected))})}
@@ -1488,6 +1495,14 @@ window.addEventListener('popstate',event=>{
   detailHistoryAdded=false;
   dismissDetail();
   return; // Non richiamare showCatalog: conserva filtri, pagina e scorrimento.
+ }
+ if(Number.isInteger(event.state?.cdCatalogPage)){
+  // Indietro/Avanti nella paginazione: stessa sottocategoria e stessi filtri.
+  currentPage=event.state.cdCatalogPage;
+  render();
+  const position=Math.max(0,Number(event.state.cdCatalogScroll)||0);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:position,left:0,behavior:'instant'})));
+  return;
  }
  const q=new URLSearchParams(location.search);
  showCatalog(q.get('catalogo'),q.get('sottocategoria'));

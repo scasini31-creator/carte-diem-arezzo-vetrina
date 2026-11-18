@@ -1809,7 +1809,23 @@ if ('serviceWorker' in navigator) {
 }
 #filterDrawer .cd-submenu > .filter-heading,
 #filterDrawer #cd-panel-sort.cd-submenu > label{display:none!important}
-#filterDrawer #extraFilters .cd-submenu{margin:0 0 10px!important}
+/* Spaziatura verticale unica: il gap del contenitore gestisce ogni distanza. */
+#filterDrawer #extraFilters{
+ gap:12px!important;
+ margin:12px 0 0!important;
+ padding:0!important;
+}
+#filterDrawer #extraFilters .cd-submenu{
+ margin:0!important;
+}
+#filterDrawer #cd-panel-sort{
+ margin:10px 0 0!important;
+}
+#filterDrawer .price-filter-section:not(.cd-submenu){
+ margin:12px 0 17px!important;
+}
+#filterDrawer .cd-submenu[hidden]{display:none!important}
+
 #filterDrawer #cd-panel-sort.cd-submenu{margin:10px 0!important;gap:0!important}
 #filterDrawer .price-filter-section.cd-submenu{margin:10px 0 17px!important}
 #filterDrawer .cd-submenu.cd-submenu-open > .category-filters{display:flex;flex-wrap:wrap;gap:8px 9px}

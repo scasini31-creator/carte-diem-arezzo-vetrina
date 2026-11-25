@@ -62,7 +62,15 @@
       return;
     }
 
-    const prodotti = await loadProducts();
+    const ids = [...new Set(evidenza.map(r => String(r.product_id)).filter(Boolean))];
+    const prodotti = [];
+    for(let i=0;i<ids.length;i+=50){
+      const {data,error}=await sb.from('products')
+        .select('id,name,sigla,category,price,condition_or_grade,language,quantity,description,image_paths,created_at,updated_at,catalog_group,details')
+        .is('archived_at',null).in('id',ids.slice(i,i+50));
+      if(error)throw error;
+      prodotti.push(...(data||[]).map(rowToProduct));
+    }
     const mappa = new Map(prodotti.map(p => [String(p.id), p]));
     const selezionati = evidenza
       .map(r => mappa.get(String(r.product_id)))

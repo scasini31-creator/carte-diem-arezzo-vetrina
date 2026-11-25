@@ -822,7 +822,7 @@ async function createPreviewBlob(file){
   const context=canvas.getContext('2d',{alpha:false});
   if(!context)return null;
   context.drawImage(image,0,0,canvas.width,canvas.height);
-  return await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',0.76));
+  return await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',0.72));
  }catch(e){console.warn('Miniatura non generata:',e);return null;}
  finally{image?.close?.();}
 }
@@ -928,11 +928,10 @@ async function saveProduct(){
    }catch(e){
     throw new Error('Invio foto '+(i+1)+' non riuscito dopo '+((performance.now()-uploadStart)/1000).toFixed(1)+' s: '+e.message);
    }
-   // Il file è già ottimizzato: una sola richiesta Storage per fotografia.
-   // Senza miniatura separata il catalogo usa la stessa immagine compressa.
-   previewPaths[i]=null;
+   // Miniatura leggera separata per il catalogo; conserva la foto dettagliata.
+   previewPaths[i]=await uploadPreview(prepared.original);
    // Riutilizza il file già caricato se il salvataggio del database va ripetuto.
-   ph.path=paths[i];ph.thumbPath=null;
+   ph.path=paths[i];ph.thumbPath=previewPaths[i];
    ph.uploadSeconds=((performance.now()-uploadStart)/1000).toFixed(1);
    ph.prepareSeconds=prepSeconds;
    uploaded++;

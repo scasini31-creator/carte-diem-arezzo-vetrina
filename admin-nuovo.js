@@ -13,6 +13,40 @@ const accessories=['Binder','Sleeve e bustine protettive','Toploader e protezion
 const collectibles=['Funko Pop','Figure e Statue','Gadget','Altro'];
 // Mostra solo le case con carte gradate attualmente pubblicate.
 const graders=[];
+const ADD_LANGUAGE='__add_language__';
+let productLanguages=['ITA','ENG','JPN','CHN','KOR','DEU'];
+function languageOptionsFor(value,allowEmpty=false){
+ return [...(allowEmpty?[['','Non specificata']]:[]),...new Set([...productLanguages,...(value?[value]:[])]) ,[ADD_LANGUAGE,'＋ Aggiungi nuova lingua']];
+}
+async function loadProductLanguages(){
+ const {data,error}=await sb.from('product_languages').select('code').order('code');
+ if(error)throw error;
+ productLanguages=[...new Set([...productLanguages,...data.map(r=>r.code)])];
+}
+function bindLanguageSelect(select,allowEmpty=false){
+ const sync=value=>{
+  select.replaceChildren(...languageOptionsFor(value,allowEmpty).map(o=>new Option(Array.isArray(o)?o[1]:o,Array.isArray(o)?o[0]:o)));
+  select.value=value;select.dataset.previous=select.value;
+ };
+ select.dataset.previous=select.value;
+ select.addEventListener('change',async()=>{
+  if(select.value!==ADD_LANGUAGE){select.dataset.previous=select.value;return;}
+  const previous=select.dataset.previous||'';select.value=previous;
+  const input=prompt('Sigla della nuova lingua (3 lettere, es. FRA):');
+  if(input===null)return;
+  const code=input.trim().toUpperCase();
+  if(!/^[A-Z]{3}$/.test(code)){notify('Inserisci una sigla di tre lettere.',true);return;}
+  if(productLanguages.includes(code)){sync(code);return;}
+  select.disabled=true;$('adminSave').disabled=true;
+  try{
+   const {error}=await sb.from('product_languages').insert({code});
+   if(error&&error.code!=='23505')throw error;
+   await loadProductLanguages();sync(code);notify('Lingua aggiunta: '+code);
+  }catch(e){notify('Impossibile aggiungere la lingua: '+e.message,true);}
+  finally{select.disabled=false;$('adminSave').disabled=false;}
+ });
+ void loadProductLanguages().then(()=>{if(select.isConnected&&!select.disabled)sync(select.value);}).catch(e=>console.warn('Lingue non aggiornate:',e.message));
+}
 const ADD_GRADER='__add_grader__';
 function activeGradingCompanies(){
  const list=[];
@@ -586,7 +620,7 @@ function productFields(p,group,category){
  html+=field('group','Catalogo','select',group,Object.entries(groups));
  html+=field('category','Tipologia','select',category,choices[group]);
  html+=field('sigla','Sigla carta','text',p?.[1]||'');
- html+=field('language','Lingua','select',p?.[10]||'ITA',['ITA','ENG','JPN','CHN','KOR']);
+ html+=field('language','Lingua','select',p?.[10]||'ITA',languageOptionsFor(p?.[10]));
  html+=field('condition','Condizione','select',category==='singole'?(String(p?.[5]||'Near Mint').trim().toUpperCase()==='SIGILLATA'?'SEALED':p?.[5]||'Near Mint'):'Near Mint',['SEALED','Near Mint','Excellent','Good','Light Played','Played','Poor']);
  html+=field('grader','Casa di gradazione','select',d.grader||graders[0]||'',[...(graders.length?[]:[['','Seleziona una casa di gradazione']]),...graders,...(d.grader&&!graders.includes(d.grader)?[d.grader]:[]),[ADD_GRADER,'＋ Aggiungi casa di gradazione']]);
  html+=field('grade','Voto','select',category==='gradate'?((p?.[5]||'').match(/\b(10|[1-9](?:[.,]5)?|Black Label)\b/i)||[])[0]||'10':'10',Array.from({length:19},(_,i)=>String((i+2)/2)).concat('Black Label'));
@@ -676,6 +710,7 @@ function openProduct(p,group,category){
  const g=p?.catalog_group||group||'pokemon';
  photos=(p?.paths||[]).map((path,i)=>({path,thumbPath:p?.details?.preview_paths?.[i]||null,url:p?.[7]?.[i]||imageUrl(path)}));
  showDialog(p?'Modifica prodotto':'Nuovo articolo',productFields(p,g,cat));
+ bindLanguageSelect(f('language'));
  const graderSelect=f('grader');
  graderSelect.dataset.previous=graderSelect.value;
  graderSelect.addEventListener('change',()=>{
@@ -701,7 +736,7 @@ function openWish(p){
  showDialog(p?'Modifica mancolista':'Nuovo articolo mancolista',
   field('wishName','Nome articolo','text',p?.nome||'')+
   field('wishExpansion','Espansione','text',p?.espansione||'')+
-  field('wishLanguage','Lingua','select',p?.lingua||'', [['','Non specificata'],['ITA','ITA'],['ENG','ENG'],['JPN','JPN'],['CHN','CHN'],['KOR','KOR']])+
+  field('wishLanguage','Lingua','select',p?.lingua||'', [['','Non specificata'],...productLanguages.map(code=>[code,code]),...(p?.lingua&&!productLanguages.includes(p.lingua)?[[p.lingua,p.lingua]]:[])])+
   field('wishCondition','Condizioni (inserimento libero)','text',p?.condizioni||'')+
   field('wishDescription','Descrizione','textarea',p?.descrizione||'')+
   field('wishImage','Indirizzo immagine (facoltativo)','url',p?.immagine_url||'')+

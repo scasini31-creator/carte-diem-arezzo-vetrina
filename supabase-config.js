@@ -45,7 +45,7 @@ function productLanguageBadgeMarkup(value){
  const code=String(value||'ITA').trim().toUpperCase();
  const langs={
   ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],
-  JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']
+  JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano'],DEU:['🇩🇪','Tedesco']
  };
  const item=langs[code];
  if(item)return '<span class="cd-product-language-badge" role="img" aria-label="Lingua: '+item[1]+'" title="'+item[1]+'"><span class="cd-language-flag" aria-hidden="true">'+item[0]+'</span></span>';

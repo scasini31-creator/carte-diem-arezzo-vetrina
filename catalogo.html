@@ -1352,7 +1352,7 @@ function openDetail(i){
   history.pushState({...history.state,cdProductOverlay:true},'',location.href);
   detailHistoryAdded=true;
  }
- activeDetail=i;updateDetailRequest();updateDetailNavigation();let p=products[i];document.getElementById('detailName').textContent=label(p);document.getElementById('detailCategory').textContent=categoryNames[p[2]];document.getElementById('detailCondition').textContent=catalogDetailCondition(p);document.getElementById('detailCondition').style.display=document.getElementById('detailCondition').textContent?'':'none';const description=document.getElementById('detailDescription');description.textContent=String(p[9]||'').trim();description.hidden=!description.textContent;document.getElementById('detailPriceValue').textContent=price(p);const available=Number(p[8]);const detailQuantity=document.getElementById('detailQuantity');detailQuantity.hidden=!(Number.isFinite(available)&&available>1);detailQuantity.textContent=detailQuantity.hidden?'':available+' disponibili';const detailImages=p[7]||[];const previews=p.preview_urls||[];document.getElementById('detailSymbol').innerHTML=detailImages.length?'<div class="detail-gallery" aria-label="Fotografie del prodotto: tocca una foto per ingrandirla">'+detailImages.map((src,n)=>'<img alt="Foto '+(n+1)+' di '+detailImages.length+'" src="'+escapeHtml(safeImageUrl(previews[n]||src))+'" data-full="'+escapeHtml(safeImageUrl(src))+'" loading="eager" decoding="async" draggable="false">').join('')+'</div>'+(detailImages.length>1?'<span class="gallery-hint">Tocca una foto per ingrandirla</span>':''):escapeHtml(p[6]||'');document.getElementById('overlay').classList.remove('hidden');const gallery=document.querySelector('.detail-gallery');if(gallery)gallery.scrollLeft=0;document.body.style.overflow='hidden';document.getElementById('close').focus()}
+ activeDetail=i;updateDetailRequest();updateDetailNavigation();let p=products[i];document.getElementById('detailName').textContent=label(p);document.getElementById('detailCategory').textContent=categoryNames[p[2]];document.getElementById('detailCondition').textContent=catalogDetailCondition(p);document.getElementById('detailCondition').style.display=document.getElementById('detailCondition').textContent?'':'none';const description=document.getElementById('detailDescription');description.textContent=String(p[9]||'').trim();description.hidden=!description.textContent;document.getElementById('detailPriceValue').textContent=price(p);const available=Number(p[8]);const detailQuantity=document.getElementById('detailQuantity');detailQuantity.hidden=!(Number.isFinite(available)&&available>1);detailQuantity.textContent=detailQuantity.hidden?'':available+' disponibili';const detailImages=p[7]||[];const previews=p.preview_urls||[];document.getElementById('detailSymbol').innerHTML=detailImages.length?'<div class="detail-gallery" aria-label="Fotografie del prodotto: tocca una foto per ingrandirla">'+detailImages.map((src,n)=>'<img alt="Foto '+(n+1)+' di '+detailImages.length+'" src="'+escapeHtml(safeImageUrl(previews[n]||src))+'" data-full="'+escapeHtml(safeImageUrl(src))+'" loading="'+(n===0?'eager':'lazy')+'" decoding="async" draggable="false">').join('')+'</div>'+(detailImages.length>1?'<span class="gallery-hint">Tocca una foto per ingrandirla</span>':''):escapeHtml(p[6]||'');document.getElementById('overlay').classList.remove('hidden');const gallery=document.querySelector('.detail-gallery');if(gallery)gallery.scrollLeft=0;document.body.style.overflow='hidden';document.getElementById('close').focus()}
 function dismissDetail(){
  document.getElementById('overlay').classList.add('hidden');
  document.body.style.overflow='';
@@ -1642,11 +1642,7 @@ window.addEventListener('storage',updateRequestCount);document.addEventListener(
      // Evita che un download precedente sovrascriva la foto selezionata.
      if(full&&token===displayToken&&!lb.hidden)photo.src=full;
    });
-   // In background prepara soltanto le due foto adiacenti.
-   if(photos.length>1){
-     warmFull((current+1)%photos.length);
-     warmFull((current+photos.length-1)%photos.length);
-   }
+   // Scarica l'originale soltanto quando la foto viene selezionata.
  }
  function close(){
    displayToken++;lb.hidden=true;resetZoom();photo.removeAttribute('src');

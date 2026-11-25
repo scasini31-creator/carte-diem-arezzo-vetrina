@@ -112,7 +112,7 @@
     // conflitti con i CSS delle card e con le versioni installate della PWA.
     imageBox.style.setProperty('position', 'relative', 'important');
     const language = String(item.lingua || '').trim().toUpperCase();
-    const languages = {ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano']};
+    const languages = {ITA:['🇮🇹','Italiano'],ENG:['🇬🇧','Inglese'],JPN:['🇯🇵','Giapponese'],CHN:['🇨🇳','Cinese'],KOR:['🇰🇷','Coreano'],DEU:['🇩🇪','Tedesco']};
     if (language) {
       const badge = document.createElement('span');
       badge.className = 'cd-product-language-badge cd-wish-language';

@@ -49,14 +49,14 @@ async function discard(id){
 async function progress(item,pct){
  item.progress=pct;await put(item);changed();
 }
-async function compress(file){
+async function compress(file, max=2200, quality=.82){
  const bmp=await createImageBitmap(file,{imageOrientation:'from-image'});
  try{
-  const ratio=Math.min(1,2200/Math.max(bmp.width,bmp.height));
+  const ratio=Math.min(1,max/Math.max(bmp.width,bmp.height));
   const canvas=document.createElement('canvas');
   canvas.width=Math.round(bmp.width*ratio);canvas.height=Math.round(bmp.height*ratio);
   const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(bmp,0,0,canvas.width,canvas.height);
-  const blob=await new Promise((res,rej)=>canvas.toBlob(b=>b?res(b):rej(Error('Compressione non riuscita')),'image/webp',.82));
+  const blob=await new Promise((res,rej)=>canvas.toBlob(b=>b?res(b):rej(Error('Compressione non riuscita')),'image/webp',quality));
   canvas.width=canvas.height=0;return blob;
  }finally{bmp.close?.()}
 }
@@ -68,7 +68,17 @@ async function uploadOne(item,i){
  const path='admin/queued/'+item.id+'/'+i+'.webp';
  const {error}=await api.storage.from('product-images').upload(path,blob,{contentType:'image/webp',cacheControl:'31536000',upsert:true});
  if(error)throw error;
- return {path,preview:null};
+ let preview=null;
+ try{
+  const mini=await compress(blob,480,.72);
+  if(mini.type==='image/webp' && mini.size<blob.size){
+   const candidate='admin/previews/queued-'+item.id+'-'+i+'.webp';
+   const {error:previewError}=await api.storage.from('product-images').upload(candidate,mini,{contentType:'image/webp',cacheControl:'31536000',upsert:true});
+   if(!previewError)preview=candidate;
+   else console.warn('Miniatura:',previewError);
+  }
+ }catch(e){console.warn('Miniatura:',e);}
+ return {path,preview};
 }
 async function work(item){
  item.status='uploading';item.attempts=(item.attempts||0)+1;await progress(item,2);
